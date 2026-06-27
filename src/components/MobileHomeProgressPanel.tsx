@@ -9,6 +9,7 @@ import {
   Zap,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
+import { translations, type AppLanguage, type Translation } from '../lib/i18n'
 
 import {
   hasClaimedDailyRewardToday,
@@ -30,6 +31,7 @@ type CompactQuest = {
 }
 
 type MobileHomeProgressPanelProps = {
+  language?: AppLanguage
   questStats: QuestStats
   walletBalance: number
   raffleTickets: number
@@ -40,10 +42,10 @@ type MobileHomeProgressPanelProps = {
   onOpenAuction: () => void
 }
 
-const compactQuests = (questStats: QuestStats): CompactQuest[] => [
+const compactQuests = (questStats: QuestStats, t: Translation): CompactQuest[] => [
   {
     id: 'open-1-pack',
-    title: 'Open 1 Pack',
+    title: t.questOpen1Title,
     current: questStats.open1,
     target: 1,
     reward: { points: 50, xp: 25 },
@@ -52,7 +54,7 @@ const compactQuests = (questStats: QuestStats): CompactQuest[] => [
   },
   {
     id: 'open-10-total-packs',
-    title: 'Open 10 Packs',
+    title: t.questOpen10Title,
     current: questStats.openPacks,
     target: 10,
     reward: { points: 120, xp: 80 },
@@ -61,7 +63,7 @@ const compactQuests = (questStats: QuestStats): CompactQuest[] => [
   },
   {
     id: 'sell-back-1-card',
-    title: 'Sell Back',
+    title: t.questSellBackTitle,
     current: questStats.sellBack,
     target: 1,
     reward: { points: 75, xp: 60 },
@@ -70,7 +72,7 @@ const compactQuests = (questStats: QuestStats): CompactQuest[] => [
   },
   {
     id: 'top-up-wallet',
-    title: 'Top Up',
+    title: t.questTopUpTitle,
     current: questStats.topUp,
     target: 1,
     reward: { points: 100, xp: 40 },
@@ -79,7 +81,7 @@ const compactQuests = (questStats: QuestStats): CompactQuest[] => [
   },
   {
     id: 'request-shipping-1-card',
-    title: 'Shipping',
+    title: t.questShippingTitle,
     current: questStats.shipping,
     target: 1,
     reward: { points: 0, xp: 150 },
@@ -88,7 +90,7 @@ const compactQuests = (questStats: QuestStats): CompactQuest[] => [
   },
   {
     id: 'open-100-burst',
-    title: 'Open 100',
+    title: t.questOpen100Title,
     current: questStats.open100,
     target: 1,
     reward: { points: 500, xp: 300 },
@@ -111,6 +113,7 @@ const clampProgress = (current: number, target: number) => {
 }
 
 export default function MobileHomeProgressPanel({
+  language = 'en',
   questStats,
   walletBalance,
   raffleTickets,
@@ -120,7 +123,8 @@ export default function MobileHomeProgressPanel({
   onOpenPacks,
   onOpenAuction,
 }: MobileHomeProgressPanelProps) {
-  const quests = compactQuests(questStats)
+  const t = translations[language]
+  const quests = compactQuests(questStats, t)
   const level = Math.floor(questStats.xp / 500)
   const xpIntoLevel = questStats.xp % 500
   const xpTarget = 500
@@ -137,10 +141,10 @@ export default function MobileHomeProgressPanel({
         <div className="mb-3 flex items-center justify-between gap-3">
           <div>
             <p className="text-[10px] font-black uppercase tracking-[0.3em] text-cyan-300">
-              Player Hub
+              {t.playerHub}
             </p>
             <h2 className="mt-1 text-xl font-black text-white">
-              Level & Daily Quest
+              {t.levelDailyQuest}
             </h2>
           </div>
 
@@ -153,7 +157,7 @@ export default function MobileHomeProgressPanel({
                 : 'border-orange-300/25 bg-orange-300/10 text-orange-200'
             }`}
           >
-            {claimedToday ? 'Claimed' : 'Daily Login'}
+            {claimedToday ? t.claimedToday : t.dailyLogin}
           </button>
         </div>
 
@@ -161,14 +165,14 @@ export default function MobileHomeProgressPanel({
           <div className="flex items-start justify-between gap-4">
             <div>
               <p className="text-[10px] font-black uppercase tracking-[0.24em] text-slate-500">
-                Player Level
+                {t.playerLevelLabel}
               </p>
               <div className="mt-1 flex items-end gap-2">
                 <p className="text-4xl font-black leading-none text-white">
                   LV {level}
                 </p>
                 <p className="pb-1 text-xs font-black text-orange-200">
-                  🔥 {xpTarget - xpIntoLevel} XP left
+                  🔥 {xpTarget - xpIntoLevel} {t.xpLeft}
                 </p>
               </div>
             </div>
@@ -185,8 +189,8 @@ export default function MobileHomeProgressPanel({
 
           <div className="mt-3">
             <div className="mb-1 flex items-center justify-between text-[10px] font-black uppercase tracking-[0.18em] text-slate-500">
-              <span>{xpIntoLevel} XP</span>
-              <span>{xpTarget} XP</span>
+              <span>{xpIntoLevel} {t.xpLabel}</span>
+              <span>{xpTarget} {t.xpLabel}</span>
             </div>
             <div className="h-2 overflow-hidden rounded-full bg-black/40">
               <div
@@ -199,7 +203,7 @@ export default function MobileHomeProgressPanel({
           <div className="mt-3 grid grid-cols-3 gap-2">
             <div className="rounded-2xl border border-white/8 bg-black/20 p-2">
               <p className="text-[9px] uppercase tracking-[0.2em] text-slate-500">
-                Wallet
+                {t.wallet}
               </p>
               <p className="mt-1 text-lg font-black text-white">
                 {walletBalance.toLocaleString()}
@@ -207,7 +211,7 @@ export default function MobileHomeProgressPanel({
             </div>
             <div className="rounded-2xl border border-white/8 bg-black/20 p-2">
               <p className="text-[9px] uppercase tracking-[0.2em] text-slate-500">
-                Tickets
+                {t.tickets}
               </p>
               <p className="mt-1 text-lg font-black text-amber-200">
                 {raffleTickets}
@@ -215,7 +219,7 @@ export default function MobileHomeProgressPanel({
             </div>
             <div className="rounded-2xl border border-white/8 bg-black/20 p-2">
               <p className="text-[9px] uppercase tracking-[0.2em] text-slate-500">
-                Quest
+                {t.quest}
               </p>
               <p className="mt-1 text-lg font-black text-cyan-200">
                 {completedCount}/{quests.length}
@@ -231,8 +235,8 @@ export default function MobileHomeProgressPanel({
             className="rounded-2xl border border-cyan-300/16 bg-cyan-300/[0.06] p-3 text-left"
           >
             <PackageOpen className="h-5 w-5 text-cyan-300" />
-            <p className="mt-2 text-sm font-black text-white">Open Packs</p>
-            <p className="mt-0.5 text-[11px] text-slate-500">Complete open quests</p>
+            <p className="mt-2 text-sm font-black text-white">{t.openPacksAction}</p>
+            <p className="mt-0.5 text-[11px] text-slate-500">{t.completeOpenQuests}</p>
           </button>
 
           <button
@@ -241,8 +245,8 @@ export default function MobileHomeProgressPanel({
             className="rounded-2xl border border-amber-300/16 bg-amber-300/[0.06] p-3 text-left"
           >
             <Ticket className="h-5 w-5 text-amber-300" />
-            <p className="mt-2 text-sm font-black text-white">Auction Bid</p>
-            <p className="mt-0.5 text-[11px] text-slate-500">Use points to bid</p>
+            <p className="mt-2 text-sm font-black text-white">{t.auctionBidAction}</p>
+            <p className="mt-0.5 text-[11px] text-slate-500">{t.usePointsToBid}</p>
           </button>
         </div>
 
@@ -250,10 +254,10 @@ export default function MobileHomeProgressPanel({
           <div className="mb-2 flex items-center justify-between">
             <div>
               <p className="text-[10px] font-black uppercase tracking-[0.28em] text-cyan-300">
-                Daily Quest
+                {t.dailyQuest}
               </p>
               <p className="text-xs text-slate-500">
-                Swipe to view all missions
+                {t.swipeViewMissions}
               </p>
             </div>
             <p className="text-xs font-black text-emerald-200">
@@ -292,7 +296,7 @@ export default function MobileHomeProgressPanel({
                   </p>
 
                   <div className="mt-2 flex items-center justify-between text-[11px] font-black text-slate-400">
-                    <span>Progress</span>
+                    <span>{t.progress}</span>
                     <span className="text-slate-200">
                       {progress}/{quest.target}
                     </span>
@@ -307,8 +311,8 @@ export default function MobileHomeProgressPanel({
 
                   <div className="mt-3 flex items-center justify-between gap-2">
                     <p className="text-[11px] font-black text-amber-200">
-                      {quest.reward.points} pts
-                      <span className="text-purple-200"> + {quest.reward.xp} XP</span>
+                      {quest.reward.points} {t.pointsShort}
+                      <span className="text-purple-200"> + {quest.reward.xp} {t.xpLabel}</span>
                     </p>
 
                     <button
@@ -323,7 +327,7 @@ export default function MobileHomeProgressPanel({
                             : 'bg-white/[0.06] text-slate-500'
                       }`}
                     >
-                      {isClaimed ? 'Done' : canClaim ? 'Claim' : 'Locked'}
+                      {isClaimed ? t.done : canClaim ? t.claim : t.locked}
                     </button>
                   </div>
                 </div>

@@ -90,6 +90,21 @@ function getEntriesForPrize(entries: RaffleEntry[], prizeId: string) {
     .reduce((total, entry) => total + entry.tickets, 0)
 }
 
+function getLocalizedRaffleStatus(status: RaffleEntry['status'] | RaffleWinner['status'], t: Translation) {
+  if (status === 'Entered') return t.raffleStatusEntered
+  if (status === 'Winner Pending') return t.raffleStatusWinnerPending
+  if (status === 'Winner Selected') return t.raffleStatusWinnerSelected
+
+  return status
+}
+
+function getLocalizedRaffleEndsIn(value: string, t: Translation) {
+  const dayMatch = value.match(/^(\d+)\s+days?$/i)
+  if (!dayMatch) return value
+
+  return `${dayMatch[1]} ${t.daysLeft}`
+}
+
 function localizeRafflePrize(prize: RafflePrize, t: Translation): RafflePrize {
   if (prize.id === 'secret-rare-mystery-slab') {
     return {
@@ -116,6 +131,7 @@ function localizeRafflePrize(prize: RafflePrize, t: Translation): RafflePrize {
     name: t.rafflePrizePointsName,
     category: t.rafflePrizePointsCategory,
     description: t.rafflePrizePointsDescription,
+    prizeValue: `5,000 ${t.pointsShort}`,
   }
 }
 
@@ -266,7 +282,7 @@ export default function RaffleCenterPanel({
                           </span>
                           <span className="flex items-center gap-1 rounded-full border border-amber-300/20 bg-amber-300/10 px-2 py-0.5 text-[8px] font-black uppercase tracking-[0.12em] text-amber-200">
                             <CalendarDays className="h-2.5 w-2.5" />
-                            {prize.endsIn}
+                            {getLocalizedRaffleEndsIn(prize.endsIn, t)}
                           </span>
                         </div>
 
@@ -363,12 +379,12 @@ export default function RaffleCenterPanel({
                       {entry.prizeName}
                     </p>
                     <p className="mt-1 truncate text-[11px] text-slate-400 sm:text-xs">
-                      {entry.createdAt} · {entry.status}
+                      {entry.createdAt} · {getLocalizedRaffleStatus(entry.status, t)}
                     </p>
                   </div>
 
                   <span className="shrink-0 rounded-full border border-amber-300/20 bg-amber-300/10 px-3 py-1 text-xs font-black text-amber-200">
-                    {entry.tickets}
+                    {entry.tickets} {t.ticketUnit}
                   </span>
                 </div>
               ))}
@@ -401,7 +417,7 @@ export default function RaffleCenterPanel({
                   </div>
 
                   <span className="shrink-0 rounded-full border border-emerald-300/20 bg-emerald-300/10 px-3 py-1 text-xs font-black text-emerald-200">
-                    {winner.tickets}
+                    {winner.tickets} {t.ticketUnit}
                   </span>
                 </div>
               ))}

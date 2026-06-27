@@ -156,6 +156,16 @@ const getAccentClasses = (accent: string) => {
   return accents[accent] ?? accents.cyan;
 };
 
+const getLocalizedDailyRewardTitle = (day: number, t: Translation) => {
+  if (day === 1) return t.dailyRewardStarterPack;
+  if (day === 2) return t.dailyRewardBoost5;
+  if (day === 3) return t.dailyRewardGems15;
+  if (day === 4) return t.dailyRewardBonus3;
+  if (day === 5) return t.dailyRewardRarePack;
+  if (day === 6) return t.dailyRewardTopUp10;
+  return t.dailyRewardFreePull;
+};
+
 const getCountdownToMidnight = () => {
   const now = new Date();
   const next = new Date(now);
@@ -276,11 +286,11 @@ export default function QuestLeaderboardPanel({
             <div className="mt-auto flex items-center justify-between gap-2 pt-3">
               <p className="min-w-0 truncate text-xs text-slate-300">
                 <span className="font-black text-amber-300">
-                  {quest.reward.points} pts
+                  {quest.reward.points} {t.pointsShort}
                 </span>{" "}
                 +{" "}
                 <span className="font-black text-purple-300">
-                  {quest.reward.xp} XP
+                  {quest.reward.xp} {t.xpLabel}
                 </span>
               </p>
 
@@ -336,8 +346,8 @@ export default function QuestLeaderboardPanel({
 
               <div className="mt-6">
                 <div className="mb-2 flex items-center justify-between text-xs font-black uppercase tracking-[0.2em] text-slate-400">
-                  <span>{xpIntoLevel.toLocaleString()} XP</span>
-                  <span>{xpTarget.toLocaleString()} XP</span>
+                  <span>{xpIntoLevel.toLocaleString()} {t.xpLabel}</span>
+                  <span>{xpTarget.toLocaleString()} {t.xpLabel}</span>
                 </div>
                 <div className="h-3 overflow-hidden rounded-full border border-white/20 bg-black/35">
                   <div
@@ -387,7 +397,7 @@ export default function QuestLeaderboardPanel({
                       🔥 {raffleTickets.toLocaleString()}
                     </span>
                     <span className="rounded-full border border-orange-200/20 bg-orange-300/10 px-3 py-1 text-xs font-black text-orange-100">
-                      495 Gems Demo
+                      {t.gemsDemo}
                     </span>
                   </div>
                 </div>
@@ -448,13 +458,13 @@ export default function QuestLeaderboardPanel({
                       </p>
                       <p className="mt-1 text-sm font-black text-white sm:mt-3 sm:text-lg">
                         {reward.kind === 'free-pull'
-                          ? 'Free'
+                          ? t.freePullLabel
                           : reward.kind === 'gem'
                             ? '🔥'
                             : '+'}
                       </p>
                       <p className="mt-1 truncate text-[9px] font-black text-orange-100 sm:text-[11px]">
-                        {reward.title}
+                        {getLocalizedDailyRewardTitle(reward.day, t)}
                       </p>
                     </div>
                   );
@@ -522,6 +532,7 @@ export default function QuestLeaderboardPanel({
         viewport={{ once: true }}
       >
         <MonthlyLeaderboardSection
+          language={language}
           currentPlayerScore={currentPlayerScore}
           transactionCount={transactions.length}
         />

@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { translations, type AppLanguage, type Translation } from "../lib/i18n";
 import {
   Award,
   Clock3,
@@ -21,6 +22,7 @@ type RankedLeaderboardUser = LeaderboardUser & {
 };
 
 type MonthlyLeaderboardSectionProps = {
+  language: AppLanguage;
   currentPlayerScore?: number;
   transactionCount?: number;
 };
@@ -139,14 +141,20 @@ const formatCompactPoints = (value: number) => {
   return `${value}`;
 };
 
-const formatFullPoints = (value: number) => {
-  return `${value.toLocaleString()} pts`;
+const formatFullPoints = (value: number, t: Translation) => {
+  return `${value.toLocaleString()} ${t.pointsShort}`;
 };
 
-const getRankCopy = (position: 1 | 2 | 3) => {
-  if (position === 1) return "Champion";
-  if (position === 2) return "Runner Up";
-  return "Third Place";
+const getRankCopy = (position: 1 | 2 | 3, t: Translation) => {
+  if (position === 1) return t.champion;
+  if (position === 2) return t.runnerUp;
+  return t.thirdPlace;
+};
+
+const getRankPositionCopy = (position: 1 | 2 | 3, t: Translation) => {
+  if (position === 1) return t.firstPlaceShort;
+  if (position === 2) return t.secondPlaceShort;
+  return t.thirdPlaceShort;
 };
 
 function ChampionEmblem({ position }: { position: 1 | 2 | 3 }) {
@@ -180,9 +188,11 @@ function ChampionEmblem({ position }: { position: 1 | 2 | 3 }) {
 function TopPodiumCard({
   user,
   position,
+  t,
 }: {
   user: RankedLeaderboardUser;
   position: 1 | 2 | 3;
+  t: Translation;
 }) {
   const isChampion = position === 1;
 
@@ -266,7 +276,7 @@ function TopPodiumCard({
 
         <div className="relative z-10 mt-4">
           <p className={`text-[10px] font-black uppercase tracking-[0.28em] ${theme.text}`}>
-            {getRankCopy(position)}
+            {getRankCopy(position, t)}
           </p>
 
           <h3 className="mt-3 truncate text-2xl font-black text-white">
@@ -274,7 +284,7 @@ function TopPodiumCard({
           </h3>
 
           <p className={`mt-1 text-sm font-black ${theme.text}`}>
-            {position === 1 ? "1st" : position === 2 ? "2nd" : "3rd"}
+            {getRankPositionCopy(position, t)}
           </p>
 
           <div className="mx-auto mt-5 flex w-fit items-center gap-3 rounded-2xl border border-white/10 bg-black/40 px-5 py-3 backdrop-blur">
@@ -298,9 +308,11 @@ function TopPodiumCard({
 }
 
 export default function MonthlyLeaderboardSection({
+  language,
   currentPlayerScore = 0,
   transactionCount = 0,
 }: MonthlyLeaderboardSectionProps) {
+  const t = translations[language];
   const [mode, setMode] = useState<"current" | "previous">("current");
 
   const data = useMemo<RankedLeaderboardUser[]>(() => {
@@ -334,19 +346,19 @@ export default function MonthlyLeaderboardSection({
         <div className="inline-flex items-center gap-3">
           <span className="h-px w-12 bg-cyan-300/50" />
           <p className="text-sm font-black uppercase tracking-[0.42em] text-cyan-300">
-            Monthly Ranking
+            {t.monthlyRanking}
           </p>
           <span className="h-px w-12 bg-cyan-300/50" />
         </div>
 
         <h3 className="mt-3 text-3xl font-black tracking-tight text-white md:text-5xl">
-          Monthly Leaderboard
+          {t.monthlyLeaderboard}
         </h3>
 
         <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/[0.05] px-3 py-2 text-xs text-slate-300 backdrop-blur sm:px-5 sm:py-2.5 sm:text-sm">
           <Clock3 className="h-4 w-4" />
           <span>
-            Resets <span className="font-black text-white">Wed, Jul 1 at 8AM (GMT+8)</span>
+            {t.resets} <span className="font-black text-white">{t.resetDateMonthly}</span>
           </span>
         </div>
       </div>
@@ -375,7 +387,7 @@ export default function MonthlyLeaderboardSection({
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-black text-white">{entry.name}</p>
               <p className="text-xs text-slate-400">
-                {entry.rank === 1 ? "Champion" : entry.rank === 2 ? "Runner Up" : "Third Place"}
+                {getRankCopy(entry.rank as 1 | 2 | 3, t)}
               </p>
             </div>
             <div className="flex items-center gap-1 text-sm font-black text-amber-200">
@@ -387,9 +399,9 @@ export default function MonthlyLeaderboardSection({
       </div>
 
       <div className="relative z-10 mt-16 hidden items-end gap-5 md:grid md:grid-cols-[1fr_1.16fr_1fr]">
-        {top2 && <TopPodiumCard user={top2} position={2} />}
-        {top1 && <TopPodiumCard user={top1} position={1} />}
-        {top3 && <TopPodiumCard user={top3} position={3} />}
+        {top2 && <TopPodiumCard user={top2} position={2} t={t} />}
+        {top1 && <TopPodiumCard user={top1} position={1} t={t} />}
+        {top3 && <TopPodiumCard user={top3} position={3} t={t} />}
       </div>
 
       <div className="relative z-10 mt-5 overflow-hidden rounded-[1.35rem] border border-cyan-300/18 bg-black/35 p-2.5 shadow-[inset_0_0_28px_rgba(34,211,238,0.08)] sm:mt-7 sm:rounded-[1.8rem] sm:p-3">
@@ -404,7 +416,7 @@ export default function MonthlyLeaderboardSection({
                   : "text-slate-400 hover:text-white"
               }`}
             >
-              Current Month
+              {t.currentMonth}
             </button>
             <button
               type="button"
@@ -415,7 +427,7 @@ export default function MonthlyLeaderboardSection({
                   : "text-slate-400 hover:text-white"
               }`}
             >
-              Previous Month
+              {t.previousMonth}
             </button>
           </div>
         </div>
@@ -449,7 +461,7 @@ export default function MonthlyLeaderboardSection({
                   </p>
                   {entry.isCurrentPlayer && (
                     <span className="rounded-full bg-cyan-300 px-2 py-0.5 text-[10px] font-black uppercase tracking-widest text-black">
-                      You
+                      {t.you}
                     </span>
                   )}
                 </div>
@@ -457,7 +469,7 @@ export default function MonthlyLeaderboardSection({
 
               <div className="flex items-center gap-2 text-right text-sm font-black text-cyan-200 md:text-base">
                 <Trophy className="h-4 w-4" />
-                <span className="hidden sm:inline">{formatFullPoints(entry.points)}</span><span className="sm:hidden">{formatCompactPoints(entry.points)}</span>
+                <span className="hidden sm:inline">{formatFullPoints(entry.points, t)}</span><span className="sm:hidden">{formatCompactPoints(entry.points)}</span>
               </div>
             </div>
           ))}
@@ -465,7 +477,7 @@ export default function MonthlyLeaderboardSection({
       </div>
 
       <p className="relative z-10 mt-4 text-center text-xs text-slate-600">
-        Demo logic · {transactionCount} activity records tracked locally.
+        {t.demoLogic} · {transactionCount} {t.activityRecordsTracked}
       </p>
     </section>
   );

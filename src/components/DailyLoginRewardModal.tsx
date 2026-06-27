@@ -8,7 +8,23 @@ import {
   hasClaimedDailyRewardToday,
   type DailyLoginState,
 } from '../data/dailyLoginRewards'
-import { translations, type AppLanguage } from '../lib/i18n'
+import { translations, type AppLanguage, type Translation } from '../lib/i18n'
+
+const getLocalizedDailyRewardTitle = (day: number, t: Translation) => {
+  if (day === 1) return t.dailyRewardStarterPack
+  if (day === 2) return t.dailyRewardBoost5
+  if (day === 3) return t.dailyRewardGems15
+  if (day === 4) return t.dailyRewardBonus3
+  if (day === 5) return t.dailyRewardRarePack
+  if (day === 6) return t.dailyRewardTopUp10
+  return t.dailyRewardFreePull
+}
+
+const getLocalizedDailyRewardSubtitle = (
+  points: number,
+  raffleTickets: number,
+  t: Translation,
+) => `${points} ${t.pointsShort} + ${raffleTickets} ${t.ticketUnit}`
 
 type DailyLoginRewardModalProps = {
   isOpen: boolean
@@ -101,7 +117,7 @@ export default function DailyLoginRewardModal({
               <button
                 type="button"
                 onClick={onClose}
-                aria-label="Close daily login rewards"
+                aria-label={t.cancel}
                 className="absolute right-3 top-3 z-[60] flex h-9 w-9 items-center justify-center rounded-full border border-white/35 bg-black/55 text-white shadow-[0_0_24px_rgba(0,0,0,0.35)] transition hover:scale-105 hover:bg-white/15 sm:right-4 sm:top-4 sm:h-11 sm:w-11"
               >
                 <X className="h-5 w-5" />
@@ -141,10 +157,10 @@ export default function DailyLoginRewardModal({
                         </p>
                         <Icon className="mx-auto mt-2 h-5 w-5 text-orange-200 sm:mt-3 sm:h-7 sm:w-7" />
                         <p className="mt-1 text-[10px] font-black leading-tight text-white sm:mt-2 sm:text-xs">
-                          {reward.title}
+                          {getLocalizedDailyRewardTitle(reward.day, t)}
                         </p>
                         <p className="mt-0.5 hidden text-[10px] leading-4 text-orange-100/70 sm:block">
-                          {reward.subtitle}
+                          {getLocalizedDailyRewardSubtitle(reward.points, reward.raffleTickets, t)}
                         </p>
                       </div>
                     )
@@ -161,7 +177,7 @@ export default function DailyLoginRewardModal({
                         {t.freePullReward}
                       </p>
                       <p className="text-xs text-orange-100/70">
-                        350 pts + 10 raffle tickets + 150 XP
+                        {t.dailyLoginBonusDetail}
                       </p>
                     </div>
                     <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-orange-200/30 bg-orange-300/10 sm:h-16 sm:w-14">
@@ -176,7 +192,7 @@ export default function DailyLoginRewardModal({
                     <p className="mt-1 text-lg font-black text-white">+{currentReward.points}</p>
                   </div>
                   <div>
-                    <p className="text-[10px] uppercase tracking-[0.2em] text-white/45">XP</p>
+                    <p className="text-[10px] uppercase tracking-[0.2em] text-white/45">{t.xpLabel}</p>
                     <p className="mt-1 text-lg font-black text-purple-100">+{currentReward.xp}</p>
                   </div>
                   <div>
