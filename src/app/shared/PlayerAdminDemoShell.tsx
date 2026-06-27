@@ -35,6 +35,7 @@ import TransactionDrawer, {
 } from '../../components/TransactionDrawer'
 import SellBackConfirmModal from '../../components/SellBackConfirmModal'
 import ShippingConfirmModal from '../../components/ShippingConfirmModal'
+import ShippingCenterDrawer from '../../components/ShippingCenterDrawer'
 import AdminControlCenterDrawer from '../../components/AdminControlCenterDrawer'
 import QuestLeaderboardPanel, {
   initialQuestStats,
@@ -700,6 +701,7 @@ function PlayerAdminDemoShell({
   const [isVaultOpen, setIsVaultOpen] = useState(false)
   const [isTransactionOpen, setIsTransactionOpen] = useState(false)
   const [isPlayerWalletOpen, setIsPlayerWalletOpen] = useState(false)
+  const [isShippingCenterOpen, setIsShippingCenterOpen] = useState(false)
   const [isAdminShippingOpen, setIsAdminShippingOpen] = useState(initialAdminOpen)
   const [selectedCategory, setSelectedCategory] =
     useState<PackCategory>('All')
@@ -1463,6 +1465,7 @@ function PlayerAdminDemoShell({
     setIsTopUpOpen(false)
     setIsVaultOpen(false)
     setIsTransactionOpen(false)
+    setIsShippingCenterOpen(false)
     setIsAdminShippingOpen(false)
     setSelectedCategory('All')
     setVaultCards([])
@@ -1864,7 +1867,7 @@ function PlayerAdminDemoShell({
                         <Gift className="mx-auto h-5 w-5 text-purple-200" />
                         <p className="mt-1.5 text-[10px] font-bold text-slate-300">Paid</p>
                       </button>
-                      <button type="button" onClick={() => setIsAdminShippingOpen(true)} className="rounded-2xl border border-white/10 bg-[#0b1220] px-2 py-3">
+                      <button type="button" onClick={() => setIsShippingCenterOpen(true)} className="rounded-2xl border border-white/10 bg-[#0b1220] px-2 py-3">
                         <PackageOpen className="mx-auto h-5 w-5 text-yellow-200" />
                         <p className="mt-1.5 text-[10px] font-bold text-slate-300">To Ship</p>
                       </button>
@@ -1884,7 +1887,7 @@ function PlayerAdminDemoShell({
                       <span className="flex items-center gap-3 text-sm font-black text-white"><Gift className="h-5 w-5 text-purple-200" />Daily Bonus & Coin</span>
                       <ChevronRight className="h-4 w-4 text-slate-500" />
                     </button>
-                    <button type="button" onClick={() => setIsAdminShippingOpen(true)} className="flex w-full items-center justify-between gap-3 border-b border-white/10 px-4 py-3.5 text-left">
+                    <button type="button" onClick={() => setIsShippingCenterOpen(true)} className="flex w-full items-center justify-between gap-3 border-b border-white/10 px-4 py-3.5 text-left">
                       <span className="flex items-center gap-3 text-sm font-black text-white"><PackageOpen className="h-5 w-5 text-yellow-200" />Shipping Requests</span>
                       <span className="flex items-center gap-1 text-xs font-black text-slate-400">{vaultCards.filter((card) => card.status === 'Shipping Requested').length} <ChevronRight className="h-4 w-4 text-slate-500" /></span>
                     </button>
@@ -2218,6 +2221,12 @@ function PlayerAdminDemoShell({
         dailyLoginState={dailyLoginState}
         onClose={() => setIsDailyLoginOpen(false)}
         onClaim={handleClaimDailyLoginReward}
+      />
+
+      <ShippingCenterDrawer
+        isOpen={isShippingCenterOpen}
+        cards={vaultCards}
+        onClose={() => setIsShippingCenterOpen(false)}
       />
 
       <AdminControlCenterDrawer
