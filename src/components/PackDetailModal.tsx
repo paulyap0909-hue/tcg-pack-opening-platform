@@ -86,6 +86,35 @@ const getQuantityIcon = (quantity: number) => {
   return ChevronsUp
 }
 
+function getLocalizedPackCategory(category: string, t: Translation) {
+  if (category === 'Pokémon Inspired') return t.pokemonInspired
+  if (category === 'One Piece Inspired') return t.onePieceInspired
+  if (category === 'Premium Mystery Pack') return t.premiumMysteryPack
+  if (category === 'Creator Drops') return t.creatorDrops
+
+  return category
+}
+
+function getLocalizedPackBadge(badge: string, t: Translation) {
+  if (badge === 'Charizard Chase') return t.charizardChase
+  if (badge === 'Creator Drop') return t.creatorDrop
+  if (badge === 'Emperor Pack') return t.emperorPack
+  if (badge === 'Flame Kick') return t.flameKick
+  if (badge === 'Gold Chase') return t.goldChase
+  if (badge === 'Gold Map') return t.goldMap
+  if (badge === 'Kanto Drop') return t.kantoDrop
+  if (badge === 'Luffy Chase') return t.luffyChase
+  if (badge === 'Pikachu Chase') return t.pikachuChase
+  if (badge === 'Sword Drop') return t.swordDrop
+  if (badge === 'Treasure Drop') return t.treasureDrop
+  if (badge === 'Vaulted') return t.vaulted
+  if (badge === 'Vintage Holo') return t.vintageHolo
+  if (badge === 'Weekly Drop') return t.weeklyDrop
+
+  return badge
+}
+
+
 export default function PackDetailModal({
   language,
   pack,
@@ -179,11 +208,11 @@ export default function PackDetailModal({
                           : 'border-cyan-300/30 bg-cyan-300/10 text-cyan-200'
                       }`}
                     >
-                      {isNearlySoldOut ? t.nearlySoldOut : pack.badge}
+                      {isNearlySoldOut ? t.nearlySoldOut : getLocalizedPackBadge(pack.badge, t)}
                     </span>
 
                     <span className="truncate text-[10px] font-bold uppercase tracking-[0.18em] text-slate-500 sm:text-xs sm:tracking-[0.22em]">
-                      {pack.category}
+                      {getLocalizedPackCategory(pack.category, t)}
                     </span>
                   </div>
 

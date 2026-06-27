@@ -898,6 +898,21 @@ function PlayerAdminDemoShell({
   } = useAudio()
   const t = translations[language]
 
+  const getPackUniverseEyebrow = (universeId: PackUniverse) =>
+    universeId === 'pokemon' ? t.pokemonWorldEyebrow : t.onePieceWorldEyebrow
+
+  const getPackUniverseDescription = (universeId: PackUniverse) =>
+    universeId === 'pokemon' ? t.pokemonWorldDesc : t.onePieceWorldDesc
+
+  const getPackCategoryLabel = (category: string) => {
+    if (category === 'Pokémon Inspired') return t.pokemonInspired
+    if (category === 'One Piece Inspired') return t.onePieceInspired
+    if (category === 'Premium Mystery Pack') return t.premiumMysteryPack
+    if (category === 'Creator Drops') return t.creatorDrops
+
+    return category
+  }
+
   useEffect(() => {
     saveStoredLanguage(language)
   }, [language])
@@ -1819,12 +1834,12 @@ function PlayerAdminDemoShell({
                   {t.chooseYourPackWorld}
                 </p>
                 <p className="mt-1 text-sm font-bold text-slate-300">
-                  {activePackUniverseMeta.description}
+                  {getPackUniverseDescription(activePackUniverseMeta.id)}
                 </p>
               </div>
 
               <div className="hidden rounded-full border border-white/10 bg-black/25 px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-slate-400 sm:block">
-                BGM Switch
+                {t.bgmSwitch}
               </div>
             </div>
 
@@ -1865,7 +1880,7 @@ function PlayerAdminDemoShell({
                     <div className="relative z-10 flex h-full min-h-[200px] flex-col justify-between p-4">
                       <div>
                         <div className="flex h-[4.65rem] flex-col justify-start gap-1 text-[10px] font-black uppercase leading-none tracking-[0.22em] text-current/65">
-                          {option.eyebrow.split(' ').map((word) => (
+                          {getPackUniverseEyebrow(option.id).split(' ').map((word) => (
                             <span key={`${option.id}-${word}`}>{word}</span>
                           ))}
                         </div>
@@ -1922,7 +1937,7 @@ function PlayerAdminDemoShell({
                         <h3 className="line-clamp-2 min-h-[2.3rem] text-xs font-black leading-tight text-white sm:min-h-[3.4rem] sm:text-[1.05rem]">
                           {pack.name}
                         </h3>
-                        <p className="mt-1 text-xs text-slate-500 sm:text-sm">{pack.category}</p>
+                        <p className="mt-1 text-xs text-slate-500 sm:text-sm">{getPackCategoryLabel(pack.category)}</p>
                       </div>
 
                       <div className="flex flex-1 items-center justify-center px-2 py-4 sm:px-4 sm:py-6">
@@ -1953,7 +1968,7 @@ function PlayerAdminDemoShell({
                             isSoldOut ? 'text-slate-500' : 'text-slate-300 hover:text-white'
                           }`}
                         >
-                          {isSoldOut ? 'Sold Out' : t.pull}
+                          {isSoldOut ? t.soldOut : t.pull}
                           {!isSoldOut && <ChevronRight className="h-4 w-4" />}
                         </button>
                       </div>
@@ -2197,12 +2212,12 @@ function PlayerAdminDemoShell({
                   {t.chooseYourPackWorld}
                 </p>
                 <p className="mt-1 text-sm font-bold text-slate-300">
-                  {activePackUniverseMeta.description}
+                  {getPackUniverseDescription(activePackUniverseMeta.id)}
                 </p>
               </div>
 
               <div className="hidden rounded-full border border-white/10 bg-black/25 px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-slate-400 sm:block">
-                BGM Switch
+                {t.bgmSwitch}
               </div>
             </div>
 
@@ -2228,7 +2243,7 @@ function PlayerAdminDemoShell({
                     <div className="relative flex items-start justify-between gap-2">
                       <div className="min-w-0">
                         <p className="text-[10px] font-black uppercase tracking-[0.18em] text-current/60">
-                          {option.eyebrow}
+                          {getPackUniverseEyebrow(option.id)}
                         </p>
                         <h3 className="mt-1 text-lg font-black tracking-tight text-white">
                           {option.label}
@@ -2280,7 +2295,7 @@ function PlayerAdminDemoShell({
                         <h3 className="line-clamp-2 min-h-[2.3rem] text-xs font-black leading-tight text-white sm:min-h-[3.4rem] sm:text-[1.05rem]">
                           {pack.name}
                         </h3>
-                        <p className="mt-1 text-xs text-slate-500 sm:text-sm">{pack.category}</p>
+                        <p className="mt-1 text-xs text-slate-500 sm:text-sm">{getPackCategoryLabel(pack.category)}</p>
                       </div>
 
                       <div className="flex flex-1 items-center justify-center px-2 py-4 sm:px-4 sm:py-6">
@@ -2311,7 +2326,7 @@ function PlayerAdminDemoShell({
                             isSoldOut ? 'text-slate-500' : 'text-slate-300 hover:text-white'
                           }`}
                         >
-                          {isSoldOut ? 'Sold Out' : t.pull}
+                          {isSoldOut ? t.soldOut : t.pull}
                           {!isSoldOut && <ChevronRight className="h-4 w-4" />}
                         </button>
                       </div>
