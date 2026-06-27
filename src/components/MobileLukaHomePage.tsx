@@ -15,6 +15,7 @@ import {
 } from 'lucide-react'
 
 import type { Pack } from '../data/cardPool'
+import onePieceMasterPackCover from '../assets/decks/onepiece-pack-01.png'
 
 type MobileLukaHomePageProps = {
   packs: Pack[]
@@ -477,8 +478,8 @@ export default function MobileLukaHomePage({
 
                 <div className={`flex flex-1 items-center justify-center ${isMaster ? 'py-2' : 'py-1'}`}>
                   <img
-                    src={pack.cover}
-                    alt={pack.name}
+                    src={isMaster ? onePieceMasterPackCover : pack.cover}
+                    alt={isMaster ? 'One Piece Master Pack' : pack.name}
                     loading="lazy"
                     className={`${isMaster ? 'max-h-[128px]' : 'max-h-[84px]'} w-auto object-contain drop-shadow-[0_18px_28px_rgba(0,0,0,0.42)]`}
                   />
