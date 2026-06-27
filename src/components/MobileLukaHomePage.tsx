@@ -281,7 +281,7 @@ export default function MobileLukaHomePage({
             JOMLUFFYZ
           </p>
           <p className="text-[10px] font-black uppercase tracking-[0.28em] text-orange-200">
-            Treasure Pack Lobby
+            {t.treasurePackLobby}
           </p>
         </div>
 
@@ -290,7 +290,7 @@ export default function MobileLukaHomePage({
           onClick={onSignIn}
           className="rounded-2xl border border-white/10 bg-white/[0.08] px-4 py-2.5 text-sm font-black text-white shadow-[0_10px_30px_rgba(0,0,0,0.25)]"
         >
-          Profile
+          {t.profile}
         </button>
       </div>
 
@@ -301,23 +301,23 @@ export default function MobileLukaHomePage({
           <div className="grid grid-cols-[1fr_118px] gap-3">
             <div>
               <p className="text-[10px] font-black uppercase tracking-[0.24em] text-orange-200">
-                Weekly Event
+                {t.weeklyEvent}
               </p>
               <h2 className="mt-1 text-2xl font-black leading-[1.05] text-white">
-                1 Week Pack Opening Leaderboard
+                {t.oneWeekPackOpeningLeaderboard}
               </h2>
               <p className="mt-2 text-xs leading-5 text-orange-100/80">
-                Pull more, rank higher, unlock the legend.
+                {t.pullMoreRankHigher}
               </p>
 
               <div className="mt-4 inline-flex items-center gap-2 rounded-2xl border border-orange-200/30 bg-orange-300/10 px-3 py-2">
                 <Sparkles className="h-4 w-4 text-orange-200" />
                 <div>
                   <p className="text-[9px] font-black uppercase tracking-[0.22em] text-orange-100/60">
-                    Prize Pool
+                    {t.prizePool}
                   </p>
                   <p className="text-lg font-black text-white">
-                    41,000 pts
+                    41,000 {t.pointsShort}
                   </p>
                 </div>
               </div>
@@ -330,10 +330,10 @@ export default function MobileLukaHomePage({
                   className="flex items-center justify-between gap-2 border-b border-white/8 py-1.5 last:border-b-0"
                 >
                   <span className="text-[10px] font-black uppercase tracking-[0.12em] text-orange-100/75">
-                    {row.rank}
+                    {t.topRank} {row.rank.replace('Top ', '')}
                   </span>
                   <span className="text-[10px] font-black text-white">
-                    {row.reward}
+                    {row.reward.replace(' pts', ` ${t.pointsShort}`)}
                   </span>
                 </div>
               ))}
@@ -343,7 +343,7 @@ export default function MobileLukaHomePage({
           <div className="mt-4 grid grid-cols-3 gap-2">
             <div className="rounded-2xl border border-white/10 bg-black/25 p-2">
               <p className="text-[9px] uppercase tracking-[0.18em] text-orange-100/55">
-                Wallet
+                {t.wallet}
               </p>
               <p className="mt-1 text-lg font-black text-white">
                 {walletBalance}
@@ -351,7 +351,7 @@ export default function MobileLukaHomePage({
             </div>
             <div className="rounded-2xl border border-white/10 bg-black/25 p-2">
               <p className="text-[9px] uppercase tracking-[0.18em] text-orange-100/55">
-                Tickets
+                {t.tickets}
               </p>
               <p className="mt-1 text-lg font-black text-yellow-200">
                 {raffleTickets}
@@ -359,7 +359,7 @@ export default function MobileLukaHomePage({
             </div>
             <div className="rounded-2xl border border-white/10 bg-black/25 p-2">
               <p className="text-[9px] uppercase tracking-[0.18em] text-orange-100/55">
-                Vault
+                {t.myVault}
               </p>
               <p className="mt-1 text-lg font-black text-cyan-200">
                 {vaultCount}
@@ -386,10 +386,10 @@ export default function MobileLukaHomePage({
                 {item.user}
               </p>
               <p className="truncate text-[11px] text-slate-400">
-                {item.action} · {item.prize}
+                {item.action === 'just pulled' ? t.justPulled : item.action === 'won auction' ? t.wonAuction : t.openedTenPacks} · {item.prize === 'Rare hit' ? t.rareHit : item.prize}
               </p>
             </div>
-            <p className="text-[10px] font-bold text-slate-500">{item.time}</p>
+            <p className="text-[10px] font-bold text-slate-500">{item.time.replace('m ago', ` ${t.minutesAgoShort}`)}</p>
           </div>
         ))}
       </div>
@@ -401,8 +401,8 @@ export default function MobileLukaHomePage({
           className="relative overflow-hidden rounded-2xl border border-orange-300/25 bg-orange-300/[0.09] p-3 text-left"
         >
           <UserPlus className="h-5 w-5 text-orange-200" />
-          <p className="mt-2 text-sm font-black text-white">Invite</p>
-          <p className="text-[10px] text-orange-100/65">Friends</p>
+          <p className="mt-2 text-sm font-black text-white">{t.invite}</p>
+          <p className="text-[10px] text-orange-100/65">{t.friends}</p>
           <Share2 className="absolute -right-1 -top-1 h-12 w-12 text-orange-200/10" />
         </button>
 
@@ -412,8 +412,8 @@ export default function MobileLukaHomePage({
           className="relative overflow-hidden rounded-2xl border border-cyan-300/25 bg-cyan-300/[0.08] p-3 text-left"
         >
           <Gift className="h-5 w-5 text-cyan-200" />
-          <p className="mt-2 text-sm font-black text-white">Raffles</p>
-          <p className="text-[10px] text-cyan-100/65">{raffleTickets} tickets</p>
+          <p className="mt-2 text-sm font-black text-white">{t.raffles}</p>
+          <p className="text-[10px] text-cyan-100/65">{raffleTickets} {t.tickets.toLowerCase()}</p>
           <Sparkles className="absolute -right-1 -top-1 h-12 w-12 text-cyan-200/10" />
         </button>
 
@@ -423,8 +423,8 @@ export default function MobileLukaHomePage({
           className="relative overflow-hidden rounded-2xl border border-purple-300/25 bg-purple-300/[0.09] p-3 text-left"
         >
           <Trophy className="h-5 w-5 text-purple-200" />
-          <p className="mt-2 text-sm font-black text-white">Leaderboard</p>
-          <p className="text-[10px] text-purple-100/65">Top rewards</p>
+          <p className="mt-2 text-sm font-black text-white">{t.leaderboard}</p>
+          <p className="text-[10px] text-purple-100/65">{t.topRewards}</p>
           <Medal className="absolute -right-1 -top-1 h-12 w-12 text-purple-200/10" />
         </button>
       </div>
@@ -521,10 +521,10 @@ export default function MobileLukaHomePage({
               </button>
               <div className="text-center">
                 <p className="text-[10px] font-black uppercase tracking-[0.3em] text-cyan-200">
-                  Jomluffyz Event
+                  {t.jomluffyzEvent}
                 </p>
                 <h3 className="mt-1 text-xl font-black tracking-tight text-white">
-                  Spending Leaderboard
+                  {t.spendingLeaderboard}
                 </h3>
               </div>
               <button
@@ -543,10 +543,10 @@ export default function MobileLukaHomePage({
                 <div className="absolute -right-5 -top-6 h-16 w-16 rounded-full bg-orange-300/20 blur-xl" />
                 <Flame className="relative z-10 h-4 w-4 fill-orange-300 text-orange-300" />
                 <p className="relative z-10 mt-1.5 text-[10px] font-black leading-3 text-white">
-                  Weekly Spending
+                  {t.weeklySpending}
                 </p>
                 <p className="relative z-10 mt-1 text-[8px] font-black uppercase tracking-[0.12em] text-orange-100/70">
-                  Worth 13K
+                  {t.worth} 13K
                 </p>
               </button>
 
@@ -557,10 +557,10 @@ export default function MobileLukaHomePage({
                 <div className="absolute -right-5 -top-6 h-16 w-16 rounded-full bg-cyan-300/10 blur-xl" />
                 <Flame className="relative z-10 h-4 w-4 text-slate-400" />
                 <p className="relative z-10 mt-1.5 text-[10px] font-black leading-3 text-white/78">
-                  Weekly Burn
+                  {t.weeklyBurn}
                 </p>
                 <p className="relative z-10 mt-1 text-[8px] font-black uppercase tracking-[0.12em] text-slate-500">
-                  Worth 10K
+                  {t.worth} 10K
                 </p>
               </button>
 
@@ -571,10 +571,10 @@ export default function MobileLukaHomePage({
                 <div className="absolute -right-5 -top-6 h-16 w-16 rounded-full bg-purple-300/10 blur-xl" />
                 <Trophy className="relative z-10 h-4 w-4 text-slate-400" />
                 <p className="relative z-10 mt-1.5 text-[10px] font-black leading-3 text-white/78">
-                  Master Pack
+                  {t.masterPack}
                 </p>
                 <p className="relative z-10 mt-1 text-[8px] font-black uppercase tracking-[0.12em] text-slate-500">
-                  Worth 55K
+                  {t.worth} 55K
                 </p>
               </button>
             </div>
@@ -589,16 +589,16 @@ export default function MobileLukaHomePage({
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <p className="text-[10px] font-black uppercase tracking-[0.28em] text-orange-100">
-                      Top Spenders
+                      {t.topSpenders}
                     </p>
                     <p className="mt-1 max-w-[180px] text-[11px] font-semibold leading-4 text-orange-100/55">
-                      Weekly spending battle for premium reward points.
+                      {t.topSpendersDesc}
                     </p>
                   </div>
 
                   <div className="rounded-2xl border border-white/10 bg-black/35 px-3 py-2 text-right backdrop-blur">
                     <p className="text-[9px] font-black uppercase tracking-[0.18em] text-orange-100/60">
-                      Total Worth
+                      {t.totalWorth}
                     </p>
                     <p className="mt-1 text-lg font-black text-white">
                       41,000
@@ -609,7 +609,7 @@ export default function MobileLukaHomePage({
                 <div className="mt-5 grid grid-cols-[1fr_132px] gap-3">
                   <div className="flex flex-col justify-end rounded-2xl border border-orange-200/15 bg-black/20 p-3">
                     <p className="text-[10px] font-bold text-orange-100/60">
-                      Ends in
+                      {t.endsIn}
                     </p>
                     <p className="mt-1 font-mono text-[1.35rem] font-black tracking-[0.08em] text-white">
                       22H:29M:00S
@@ -623,10 +623,10 @@ export default function MobileLukaHomePage({
                         className="flex items-center justify-between gap-2 border-b border-white/8 py-1.5 last:border-b-0"
                       >
                         <span className="text-[9px] font-black uppercase tracking-[0.12em] text-white/72">
-                          {row.rank.replace('Top ', 'Top ')}
+                          {t.topRank} {row.rank.replace('Top ', '')}
                         </span>
                         <span className="text-[10px] font-black text-orange-100">
-                          {row.reward.replace(' pts', '')}
+                          {row.reward.replace(' pts', ` ${t.pointsShort}`)}
                         </span>
                       </div>
                     ))}
@@ -641,14 +641,14 @@ export default function MobileLukaHomePage({
                   type="button"
                   className="relative px-1 pb-2 text-xs font-black text-orange-300"
                 >
-                  Current Event
+                  {t.currentEvent}
                   <span className="absolute inset-x-0 bottom-0 h-[2px] rounded-full bg-orange-400 shadow-[0_0_16px_rgba(251,146,60,0.75)]" />
                 </button>
                 <button
                   type="button"
                   className="px-1 pb-2 text-xs font-black text-slate-500"
                 >
-                  Past Event
+                  {t.pastEvent}
                 </button>
               </div>
 
@@ -675,7 +675,7 @@ export default function MobileLukaHomePage({
             <div className="mt-5 rounded-2xl border border-cyan-300/16 bg-cyan-300/[0.055] p-4 text-center">
               <Clock3 className="mx-auto h-5 w-5 text-cyan-200" />
               <p className="mt-2 text-xs font-semibold leading-5 text-slate-300">
-                Rankings are demo data for mobile preview. Real production will connect to wallet spend, pack openings and auction bid history.
+                {t.leaderboardDemoNotice}
               </p>
             </div>
           </div>

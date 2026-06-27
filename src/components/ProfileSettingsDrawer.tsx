@@ -331,7 +331,7 @@ export default function ProfileSettingsDrawer({
                   type="button"
                   onClick={onClose}
                   className="flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/[0.07] text-white"
-                  aria-label="Close account settings"
+                  aria-label={t.cancel}
                 >
                   <X className="h-5 w-5" />
                 </button>
@@ -620,7 +620,7 @@ export default function ProfileSettingsDrawer({
                         type="button"
                         onClick={() => setIsEditOpen(false)}
                         className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/[0.07]"
-                        aria-label="Close edit profile"
+                        aria-label={t.cancel}
                       >
                         <X className="h-5 w-5" />
                       </button>
@@ -730,7 +730,7 @@ export default function ProfileSettingsDrawer({
                       type="button"
                       onClick={() => setIsLanguageOpen(false)}
                       className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/[0.07]"
-                      aria-label="Close language picker"
+                      aria-label={t.cancel}
                     >
                       <X className="h-5 w-5" />
                     </button>
