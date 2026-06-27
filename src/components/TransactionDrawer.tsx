@@ -12,7 +12,7 @@ import {
   X,
 } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
-import { translations, type AppLanguage } from '../lib/i18n'
+import { translations, type AppLanguage, type Translation } from '../lib/i18n'
 
 export type TransactionType =
   | 'top-up'
@@ -118,6 +118,128 @@ function getFilterMatch(filter: TransactionFilter, transaction: TransactionRecor
   if (filter === 'raffle') return transaction.type === 'raffle'
 
   return true
+}
+
+function getTextAfterSeparator(value: string) {
+  return value.includes('·') ? value.split('·').slice(1).join('·').trim() : ''
+}
+
+function getOpenQuantity(transaction: TransactionRecord) {
+  if (transaction.type === 'open-1') return 1
+
+  const match = transaction.title.match(/Open\s+(\d+)/i)
+  return match ? Number(match[1]) : 10
+}
+
+function getLocalizedTransactionStatus(
+  status: TransactionRecord['status'],
+  t: Translation,
+) {
+  if (status === 'Completed') return t.transactionStatusCompleted
+  if (status === 'Pending') return t.transactionStatusPending
+  if (status === 'Failed') return t.transactionStatusFailed
+
+  return status
+}
+
+function getLocalizedTransactionTitle(transaction: TransactionRecord, t: Translation) {
+  const itemName = getTextAfterSeparator(transaction.title)
+
+  if (transaction.type === 'top-up') {
+    if (transaction.title.includes('Daily Login')) {
+      const dayMatch = transaction.title.match(/Day\s+(\d+)/i)
+      return dayMatch
+        ? `${t.txDailyLoginTitle} · ${t.day} ${dayMatch[1]}`
+        : t.txDailyLoginTitle
+    }
+
+    if (transaction.title.includes('Quest XP')) return t.txQuestXpRewardTitle
+    if (transaction.title.includes('Quest')) return t.txQuestRewardTitle
+
+    return t.txWalletTopUpTitle
+  }
+
+  if (transaction.type === 'open-1') {
+    return itemName ? `${t.txOpenPackTitle} · ${itemName}` : t.txOpenPackTitle
+  }
+
+  if (transaction.type === 'open-10') {
+    const quantity = getOpenQuantity(transaction)
+    return itemName
+      ? `${t.txOpenMultiTitle} ${quantity} · ${itemName}`
+      : `${t.txOpenMultiTitle} ${quantity}`
+  }
+
+  if (transaction.type === 'sell-back') {
+    return itemName ? `${t.txSellBackTitle} · ${itemName}` : t.txSellBackTitle
+  }
+
+  if (transaction.type === 'shipping') {
+    if (transaction.title.includes('Request')) {
+      return itemName
+        ? `${t.txShippingRequestTitle} · ${itemName}`
+        : t.txShippingRequestTitle
+    }
+
+    return itemName
+      ? `${t.txShippingStatusTitle} · ${itemName}`
+      : t.txShippingStatusTitle
+  }
+
+  if (transaction.type === 'raffle') {
+    return itemName ? `${t.txRaffleEntryTitle} · ${itemName}` : t.txRaffleEntryTitle
+  }
+
+  if (transaction.type === 'marketplace') {
+    if (transaction.title.includes('Cancelled')) {
+      return itemName
+        ? `${t.txCancelledListingTitle} · ${itemName}`
+        : t.txCancelledListingTitle
+    }
+
+    return itemName
+      ? `${t.txListedMarketplaceTitle} · ${itemName}`
+      : t.txListedMarketplaceTitle
+  }
+
+  if (transaction.type === 'auction') {
+    return itemName ? `${t.txAuctionBidTitle} · ${itemName}` : t.txAuctionBidTitle
+  }
+
+  return transaction.title
+}
+
+function getLocalizedTransactionDescription(
+  transaction: TransactionRecord,
+  t: Translation,
+) {
+  if (transaction.type === 'top-up') {
+    if (transaction.title.includes('Daily Login')) return t.txDailyLoginDesc
+    if (transaction.title.includes('Quest')) return t.txQuestRewardDesc
+    return t.txWalletTopUpDesc
+  }
+
+  if (transaction.type === 'open-1') return t.txOpenPackDesc
+  if (transaction.type === 'open-10') return t.txOpenMultiDesc
+  if (transaction.type === 'sell-back') return t.txSellBackDesc
+
+  if (transaction.type === 'shipping') {
+    return transaction.title.includes('Request')
+      ? t.txShippingRequestDesc
+      : t.txShippingStatusDesc
+  }
+
+  if (transaction.type === 'raffle') return t.txRaffleEntryDesc
+
+  if (transaction.type === 'marketplace') {
+    return transaction.title.includes('Cancelled')
+      ? t.txCancelledListingDesc
+      : t.txListedMarketplaceDesc
+  }
+
+  if (transaction.type === 'auction') return t.txAuctionBidDesc
+
+  return transaction.description || t.txGenericTransactionDesc
 }
 
 const transactionFilters: Array<{ id: TransactionFilter; label: string }> = [
@@ -322,10 +444,10 @@ export default function TransactionDrawer({
                             <div className="flex items-start justify-between gap-3">
                               <div className="min-w-0">
                                 <h3 className="line-clamp-1 text-sm font-black text-white">
-                                  {transaction.title}
+                                  {getLocalizedTransactionTitle(transaction, t)}
                                 </h3>
                                 <p className="mt-1 line-clamp-1 text-xs text-slate-400">
-                                  {transaction.createdAt} · {transaction.status}
+                                  {transaction.createdAt} · {getLocalizedTransactionStatus(transaction.status, t)}
                                 </p>
                               </div>
 
@@ -340,7 +462,7 @@ export default function TransactionDrawer({
                             </div>
 
                             <p className="mt-2 line-clamp-2 text-xs leading-5 text-slate-500">
-                              {transaction.description}
+                              {getLocalizedTransactionDescription(transaction, t)}
                             </p>
                           </div>
                         </div>
