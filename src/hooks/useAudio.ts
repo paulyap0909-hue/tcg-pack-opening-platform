@@ -17,6 +17,7 @@ export default function useAudio() {
       audioManager.setEnabled(true, false)
 
       const unlockAudio = () => {
+        void audioManager.warmUpSfx()
         void audioManager.playBgm('lobby')
       }
 
@@ -35,7 +36,9 @@ export default function useAudio() {
   }, [])
 
   useEffect(() => {
-    const handleGlobalButtonClick = (event: MouseEvent) => {
+    const handleGlobalButtonPress = (event: PointerEvent) => {
+      if (event.button !== 0) return
+
       const target = event.target
       if (!(target instanceof HTMLElement)) return
 
@@ -46,10 +49,10 @@ export default function useAudio() {
       audioManager.playSfx('buttonClick')
     }
 
-    document.addEventListener('click', handleGlobalButtonClick, true)
+    document.addEventListener('pointerdown', handleGlobalButtonPress, true)
 
     return () => {
-      document.removeEventListener('click', handleGlobalButtonClick, true)
+      document.removeEventListener('pointerdown', handleGlobalButtonPress, true)
     }
   }, [])
 

@@ -36,7 +36,10 @@ const sfxSources: Record<SfxName, string> = {
   error: errorSrc,
 }
 
-const isBrowser = () => typeof window !== 'undefined' && typeof Audio !== 'undefined'
+const sfxNames = Object.keys(sfxSources) as SfxName[]
+
+const isBrowser = () =>
+  typeof window !== 'undefined' && typeof Audio !== 'undefined'
 
 const getStoredNumber = (key: string, fallback: number) => {
   if (typeof window === 'undefined') return fallback
@@ -45,10 +48,25 @@ const getStoredNumber = (key: string, fallback: number) => {
   return Number.isFinite(storedValue) ? storedValue : fallback
 }
 
+const getAudioContextConstructor = () => {
+  if (typeof window === 'undefined') return null
+
+  return (
+    window.AudioContext ??
+    (window as Window & typeof globalThis & { webkitAudioContext?: typeof AudioContext })
+      .webkitAudioContext ??
+    null
+  )
+}
+
 class TcgAudioManager {
   private enabled = false
   private activeBgm: HTMLAudioElement | null = null
   private activeBgmName: BgmName | null = null
+  private audioContext: AudioContext | null = null
+  private sfxBuffers = new Map<SfxName, AudioBuffer>()
+  private sfxBufferPromises = new Map<SfxName, Promise<AudioBuffer | null>>()
+  private htmlAudioPools = new Map<SfxName, HTMLAudioElement[]>()
   private lastSfxPlayedAt = new Map<SfxName, number>()
 
   get hasSavedPreference() {
@@ -76,9 +94,13 @@ class TcgAudioManager {
       window.localStorage.setItem(AUDIO_ENABLED_KEY, String(enabled))
     }
 
-    if (!enabled) {
-      this.stopBgm()
+    if (enabled) {
+      this.primeHtmlAudioPools()
+      void this.warmUpSfx()
+      return
     }
+
+    this.stopBgm()
   }
 
   getBgmVolume() {
@@ -108,12 +130,102 @@ class TcgAudioManager {
 
   async enableWithSound() {
     this.setEnabled(true)
+    await this.unlockAudioContext()
+    void this.warmUpSfx()
     await this.playBgm('lobby')
     this.playSfx('success', { throttleMs: 0 })
   }
 
   continueMuted() {
     this.setEnabled(false)
+  }
+
+  private getAudioContext() {
+    if (!isBrowser()) return null
+
+    if (this.audioContext) return this.audioContext
+
+    const AudioContextConstructor = getAudioContextConstructor()
+    if (!AudioContextConstructor) return null
+
+    this.audioContext = new AudioContextConstructor()
+    return this.audioContext
+  }
+
+  private async unlockAudioContext() {
+    const context = this.getAudioContext()
+
+    if (!context) return false
+
+    try {
+      if (context.state === 'suspended') {
+        await context.resume()
+      }
+
+      const buffer = context.createBuffer(1, 1, 22050)
+      const source = context.createBufferSource()
+      source.buffer = buffer
+      source.connect(context.destination)
+      source.start(0)
+
+      return true
+    } catch {
+      return false
+    }
+  }
+
+  private primeHtmlAudioPools() {
+    if (!isBrowser()) return
+
+    sfxNames.forEach((name) => {
+      if (this.htmlAudioPools.has(name)) return
+
+      const pool = Array.from({ length: name === 'buttonClick' ? 6 : 3 }, () => {
+        const audio = new Audio(sfxSources[name])
+        audio.preload = 'auto'
+        audio.volume = this.getSfxVolume()
+        audio.load()
+        return audio
+      })
+
+      this.htmlAudioPools.set(name, pool)
+    })
+  }
+
+  private async loadSfxBuffer(name: SfxName) {
+    if (this.sfxBuffers.has(name)) return this.sfxBuffers.get(name) ?? null
+
+    const existingPromise = this.sfxBufferPromises.get(name)
+    if (existingPromise) return existingPromise
+
+    const context = this.getAudioContext()
+
+    if (!context || typeof fetch === 'undefined') return null
+
+    const promise = fetch(sfxSources[name])
+      .then((response) => response.arrayBuffer())
+      .then((arrayBuffer) => context.decodeAudioData(arrayBuffer))
+      .then((buffer) => {
+        this.sfxBuffers.set(name, buffer)
+        return buffer
+      })
+      .catch(() => null)
+
+    this.sfxBufferPromises.set(name, promise)
+
+    const buffer = await promise
+    this.sfxBufferPromises.delete(name)
+
+    return buffer
+  }
+
+  async warmUpSfx() {
+    if (!isBrowser()) return
+
+    this.primeHtmlAudioPools()
+    await this.unlockAudioContext()
+
+    void Promise.all(sfxNames.map((name) => this.loadSfxBuffer(name)))
   }
 
   stopBgm() {
@@ -159,10 +271,61 @@ class TcgAudioManager {
     }
   }
 
+  private playSfxBuffer(name: SfxName, volume: number) {
+    const context = this.getAudioContext()
+    const buffer = this.sfxBuffers.get(name)
+
+    if (!context || !buffer) return false
+
+    try {
+      if (context.state === 'suspended') {
+        void context.resume()
+      }
+
+      const source = context.createBufferSource()
+      const gainNode = context.createGain()
+
+      source.buffer = buffer
+      gainNode.gain.value = volume
+
+      source.connect(gainNode)
+      gainNode.connect(context.destination)
+      source.start(0)
+
+      return true
+    } catch {
+      return false
+    }
+  }
+
+  private playHtmlSfx(name: SfxName, volume: number) {
+    if (!isBrowser()) return
+
+    this.primeHtmlAudioPools()
+
+    const pool = this.htmlAudioPools.get(name)
+    if (!pool) return
+
+    const audio =
+      pool.find((item) => item.paused || item.ended) ??
+      pool.reduce((oldestAudio, currentAudio) =>
+        currentAudio.currentTime > oldestAudio.currentTime ? currentAudio : oldestAudio,
+      )
+
+    try {
+      audio.pause()
+      audio.currentTime = 0
+      audio.volume = volume
+      void audio.play().catch(() => undefined)
+    } catch {
+      // Browser rejected this play attempt; ignore so UI never breaks.
+    }
+  }
+
   playSfx(name: SfxName, options?: { throttleMs?: number; volume?: number }) {
     if (!isBrowser() || !this.enabled) return
 
-    const throttleMs = options?.throttleMs ?? 80
+    const throttleMs = options?.throttleMs ?? 55
     const now = Date.now()
     const lastPlayedAt = this.lastSfxPlayedAt.get(name) ?? 0
 
@@ -170,11 +333,12 @@ class TcgAudioManager {
 
     this.lastSfxPlayedAt.set(name, now)
 
-    const sfx = new Audio(sfxSources[name])
-    sfx.volume = options?.volume ?? this.getSfxVolume()
-    sfx.preload = 'auto'
+    const volume = options?.volume ?? this.getSfxVolume()
 
-    void sfx.play().catch(() => undefined)
+    if (this.playSfxBuffer(name, volume)) return
+
+    void this.loadSfxBuffer(name)
+    this.playHtmlSfx(name, volume)
   }
 }
 

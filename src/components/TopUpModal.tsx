@@ -251,6 +251,7 @@ export default function TopUpModal({
             <div className="relative z-10 shrink-0 border-t border-white/8 bg-[#120906]/95 px-4 pb-[calc(14px+env(safe-area-inset-bottom))] pt-3 backdrop-blur-xl">
               <button
                 type="button"
+                data-audio-silent="true"
                 onClick={handleConfirm}
                 className="flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-orange-500 via-orange-400 to-yellow-300 px-5 py-4 text-sm font-black uppercase tracking-[0.12em] text-black shadow-[0_16px_38px_rgba(249,115,22,0.32)]"
               >
