@@ -2469,6 +2469,7 @@ function PlayerAdminDemoShell({
 
       <ShippingCenterDrawer
         isOpen={isShippingCenterOpen}
+        language={language}
         cards={vaultCards}
         onClose={() => setIsShippingCenterOpen(false)}
       />

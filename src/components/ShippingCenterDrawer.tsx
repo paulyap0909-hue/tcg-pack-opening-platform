@@ -13,11 +13,13 @@ import {
 } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import type { FormEvent } from 'react'
+import { translations, type AppLanguage } from '../lib/i18n'
 
 import type { ShippingInfo, ShippingStatus, VaultCard } from './VaultDrawer'
 
 type ShippingCenterDrawerProps = {
   isOpen: boolean
+  language: AppLanguage
   cards: VaultCard[]
   onClose: () => void
 }
@@ -113,6 +115,23 @@ function getStatusProgress(status: ShippingStatus) {
   return Math.max(index, 0)
 }
 
+
+function getLocalizedShippingStatus(
+  status: ShippingStatus,
+  t: ReturnType<typeof getTranslations>,
+) {
+  if (status === 'Shipping Requested') return t.shippingRequested
+  if (status === 'Preparing') return t.preparing
+  if (status === 'Shipped') return t.shipped
+  if (status === 'Delivered') return t.delivered
+
+  return status
+}
+
+function getTranslations(language: AppLanguage) {
+  return translations[language]
+}
+
 function createAddressFromForm(form: AddressFormState, existingId?: string): SavedShippingAddress {
   const addressLine1 = form.addressLine1.trim()
   const addressLine2 = form.addressLine2.trim()
@@ -151,9 +170,11 @@ function createFormFromAddress(address: SavedShippingAddress): AddressFormState 
 
 export default function ShippingCenterDrawer({
   isOpen,
+  language,
   cards,
   onClose,
 }: ShippingCenterDrawerProps) {
+  const t = getTranslations(language)
   const [activeTab, setActiveTab] = useState<ShippingTab>('requests')
   const [addresses, setAddresses] = useState<SavedShippingAddress[]>(() =>
     safeParseAddresses(),
@@ -326,7 +347,7 @@ export default function ShippingCenterDrawer({
               <button
                 type="button"
                 onClick={onClose}
-                aria-label="Close shipping center"
+                aria-label={t.shippingCenter}
                 className="grid h-11 w-11 place-items-center rounded-full border border-white/10 bg-white/[0.06] text-slate-200"
               >
                 <ChevronLeft className="h-5 w-5" />
@@ -334,15 +355,15 @@ export default function ShippingCenterDrawer({
 
               <div className="min-w-0 flex-1 text-center">
                 <p className="text-[10px] font-black uppercase tracking-[0.3em] text-cyan-300">
-                  Player Shipping
+                  {t.playerShipping}
                 </p>
-                <h2 className="truncate text-xl font-black">Shipping Center</h2>
+                <h2 className="truncate text-xl font-black">{t.shippingCenter}</h2>
               </div>
 
               <button
                 type="button"
                 onClick={onClose}
-                aria-label="Close"
+                aria-label={t.cancel}
                 className="grid h-11 w-11 place-items-center rounded-full border border-cyan-300/20 bg-cyan-300/[0.06] text-cyan-100"
               >
                 <X className="h-5 w-5" />
@@ -352,21 +373,21 @@ export default function ShippingCenterDrawer({
             <div className="mt-4 grid grid-cols-3 gap-2">
               <div className="rounded-2xl border border-purple-300/15 bg-purple-300/[0.07] p-3">
                 <p className="text-[9px] font-black uppercase tracking-[0.22em] text-purple-200">
-                  Active
+                  {t.active}
                 </p>
                 <p className="mt-1 text-xl font-black">{activeRequests}</p>
               </div>
 
               <div className="rounded-2xl border border-cyan-300/15 bg-cyan-300/[0.07] p-3">
                 <p className="text-[9px] font-black uppercase tracking-[0.22em] text-cyan-200">
-                  Addresses
+                  {t.addresses}
                 </p>
                 <p className="mt-1 text-xl font-black">{addresses.length}</p>
               </div>
 
               <div className="rounded-2xl border border-emerald-300/15 bg-emerald-300/[0.07] p-3">
                 <p className="text-[9px] font-black uppercase tracking-[0.22em] text-emerald-200">
-                  Delivered
+                  {t.delivered}
                 </p>
                 <p className="mt-1 text-xl font-black">{deliveredRequests}</p>
               </div>
@@ -374,8 +395,8 @@ export default function ShippingCenterDrawer({
 
             <div className="mt-3 grid grid-cols-2 gap-2 rounded-2xl border border-white/10 bg-white/[0.04] p-1">
               {([
-                ['requests', 'Requests'],
-                ['addresses', 'Addresses'],
+                ['requests', t.requests],
+                ['addresses', t.addresses],
               ] as const).map(([tabId, label]) => (
                 <button
                   key={tabId}
@@ -403,11 +424,10 @@ export default function ShippingCenterDrawer({
                         <PackageOpen className="h-9 w-9" />
                       </div>
                       <h3 className="mt-5 text-2xl font-black">
-                        No shipping requests yet
+                        {t.noShippingRequestsYet}
                       </h3>
                       <p className="mt-2 text-sm leading-6 text-slate-400">
-                        Request shipping from cards in My Vault. Your request,
-                        tracking and delivery status will show here.
+                        {t.noShippingRequestsDesc}
                       </p>
                     </div>
                   </div>
@@ -447,7 +467,7 @@ export default function ShippingCenterDrawer({
                                     card.status,
                                   )}`}
                                 >
-                                  {card.status}
+                                  {getLocalizedShippingStatus(card.status, t)}
                                 </span>
                               </div>
 
@@ -468,19 +488,19 @@ export default function ShippingCenterDrawer({
                                 <p className="flex items-center gap-1.5">
                                   <MapPin className="h-3.5 w-3.5 text-cyan-200" />
                                   {shippingInfo
-                                    ? `${shippingInfo.city || 'City'}, ${
-                                        shippingInfo.state || 'State'
+                                    ? `${shippingInfo.city || t.city}, ${
+                                        shippingInfo.state || t.state
                                       }`
-                                    : 'Address pending'}
+                                    : t.addressPending}
                                 </p>
                                 <p className="mt-1 text-slate-500">
                                   {card.shippingRequestedAt
-                                    ? `Requested ${card.shippingRequestedAt}`
-                                    : 'Request created'}
+                                    ? `${t.requested} ${card.shippingRequestedAt}`
+                                    : t.requestCreated}
                                 </p>
                                 {shippingInfo?.trackingNumber && (
                                   <p className="mt-1 font-black text-amber-200">
-                                    Tracking: {shippingInfo.trackingNumber}
+                                    {t.tracking}: {shippingInfo.trackingNumber}
                                   </p>
                                 )}
                               </div>
@@ -503,11 +523,10 @@ export default function ShippingCenterDrawer({
                         <MapPin className="h-9 w-9" />
                       </div>
                       <h3 className="mt-5 text-2xl font-black">
-                        No address saved yet
+                        {t.noAddressSavedYet}
                       </h3>
                       <p className="mt-2 text-sm leading-6 text-slate-400">
-                        Add your first shipping address to request physical card
-                        delivery from My Vault.
+                        {t.noAddressSavedDesc}
                       </p>
                     </div>
                   </div>
@@ -516,7 +535,7 @@ export default function ShippingCenterDrawer({
                     {primaryAddress && (
                       <div className="rounded-[1.35rem] border border-amber-300/20 bg-amber-300/[0.08] p-4">
                         <p className="text-[10px] font-black uppercase tracking-[0.22em] text-amber-200">
-                          Primary address
+                          {t.primaryAddress}
                         </p>
                         <p className="mt-2 text-sm font-black text-white">
                           {primaryAddress.fullName} · {primaryAddress.phone}
@@ -546,7 +565,7 @@ export default function ShippingCenterDrawer({
                               </h3>
                               {address.isPrimary && (
                                 <span className="rounded-full bg-amber-300 px-2.5 py-1 text-[10px] font-black text-black">
-                                  Primary
+                                  {t.primary}
                                 </span>
                               )}
                             </div>
@@ -571,7 +590,7 @@ export default function ShippingCenterDrawer({
                                 }`}
                               >
                                 <CheckCircle2 className="h-4 w-4" />
-                                Make Primary
+                                {t.makePrimary}
                               </button>
 
                               <div className="flex items-center gap-2">
@@ -608,7 +627,7 @@ export default function ShippingCenterDrawer({
               className="pointer-events-auto flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-yellow-300 to-orange-400 px-5 py-4 text-sm font-black text-black shadow-[0_0_34px_rgba(251,191,36,0.25)]"
             >
               <Plus className="h-5 w-5" />
-              Add Address
+              {t.addAddress}
             </button>
           </div>
         </motion.div>
@@ -634,7 +653,7 @@ export default function ShippingCenterDrawer({
                   </button>
 
                   <h3 className="text-lg font-black">
-                    {editingAddressId ? 'Edit Address' : 'Shipping Address'}
+                    {editingAddressId ? t.editAddress : t.shippingAddressTitle}
                   </h3>
 
                   <div className="h-11 w-11" />
@@ -644,14 +663,14 @@ export default function ShippingCenterDrawer({
               <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-[calc(6rem+env(safe-area-inset-bottom))] pt-5">
                 <div className="space-y-4">
                   {[
-                    ['fullName', 'Full name'],
-                    ['state', 'State'],
-                    ['city', 'City'],
-                    ['addressLine1', 'Address Line 01'],
-                    ['addressLine2', 'Address Line 02'],
-                    ['postcode', 'Postcode'],
-                    ['phone', 'Phone Number'],
-                    ['email', 'Email (optional)'],
+                    ['fullName', t.fullName],
+                    ['state', t.state],
+                    ['city', t.city],
+                    ['addressLine1', t.addressLine1],
+                    ['addressLine2', t.addressLine2],
+                    ['postcode', t.postcode],
+                    ['phone', t.phoneNumberPlaceholder],
+                    ['email', t.emailOptional],
                   ].map(([field, placeholder]) => (
                     <label key={field} className="block">
                       <input
@@ -676,7 +695,7 @@ export default function ShippingCenterDrawer({
 
                   <label className="flex items-center justify-between rounded-2xl border border-white/10 bg-white/[0.055] px-4 py-4">
                     <span className="text-sm font-black text-white">
-                      Make Primary
+                      {t.makePrimary}
                     </span>
                     <button
                       type="button"
@@ -703,7 +722,7 @@ export default function ShippingCenterDrawer({
                   className="flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-yellow-300 to-orange-400 px-5 py-4 text-sm font-black text-black shadow-[0_0_34px_rgba(251,191,36,0.25)]"
                 >
                   <ShieldCheck className="h-5 w-5" />
-                  {editingAddressId ? 'Save Address' : 'Add Address'}
+                  {editingAddressId ? t.saveAddress : t.addAddress}
                 </button>
               </div>
             </motion.form>
