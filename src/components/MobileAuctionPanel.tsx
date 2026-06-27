@@ -189,30 +189,31 @@ export default function MobileAuctionPanel({
       id="auction"
       className="mx-auto w-full max-w-7xl px-4 py-7 lg:hidden"
     >
-      <div className="overflow-hidden rounded-[1.5rem] border border-white/10 bg-slate-100 text-slate-950 shadow-[0_24px_70px_rgba(0,0,0,0.35)]">
-        <div className="bg-white px-4 pb-3 pt-4">
+      <div className="overflow-hidden rounded-[1.5rem] border border-cyan-400/10 bg-[#030712] text-white shadow-[0_24px_80px_rgba(0,0,0,0.55)] ring-1 ring-white/5">
+        <div className="relative border-b border-white/10 bg-[radial-gradient(circle_at_top_left,rgba(34,211,238,0.16),transparent_34%),linear-gradient(180deg,rgba(15,23,42,0.96),rgba(2,6,23,0.92))] px-4 pb-3 pt-4">
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-cyan-300/50 to-transparent" />
           <div className="flex items-center gap-2">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
+              <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-cyan-200/60" />
               <input
                 type="text"
                 placeholder="Search cards, seller"
-                className="h-11 w-full rounded-full border border-slate-200 bg-slate-50 pl-10 pr-4 text-sm font-semibold outline-none placeholder:text-slate-400"
+                className="h-11 w-full rounded-full border border-white/10 bg-white/[0.06] pl-10 pr-4 text-sm font-semibold text-white outline-none placeholder:text-slate-500 shadow-inner shadow-black/20 focus:border-cyan-300/50 focus:bg-white/[0.09]"
               />
             </div>
 
             <button
               type="button"
-              className="relative flex h-11 w-11 items-center justify-center rounded-full bg-slate-50 text-slate-700"
+              className="relative flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/[0.06] text-slate-200 shadow-inner shadow-black/20"
             >
               <Bell className="h-5 w-5" />
-              <span className="absolute right-1 top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-pink-500 px-1 text-[10px] font-black text-white">
+              <span className="absolute right-1 top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-pink-500 px-1 text-[10px] font-black text-white shadow-[0_0_14px_rgba(236,72,153,0.55)]">
                 2
               </span>
             </button>
           </div>
 
-          <div className="mt-4 grid grid-cols-2 rounded-2xl bg-slate-50 p-1">
+          <div className="mt-4 grid grid-cols-2 rounded-2xl border border-white/10 bg-black/20 p-1 shadow-inner shadow-black/40">
             {(['General', 'Premier'] as const).map((tab) => {
               const isActive = selectedTab === tab
 
@@ -223,14 +224,14 @@ export default function MobileAuctionPanel({
                   onClick={() => setSelectedTab(tab)}
                   className={`flex items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-sm font-black transition ${
                     isActive
-                      ? 'bg-white text-slate-950 shadow-sm'
-                      : 'text-slate-500'
+                      ? 'bg-yellow-400 text-black shadow-[0_12px_28px_rgba(250,204,21,0.22)]'
+                      : 'text-slate-400 hover:bg-white/[0.06] hover:text-slate-100'
                   }`}
                 >
                   {tab === 'General' ? (
-                    <Gavel className="h-4 w-4 text-yellow-500" />
+                    <Gavel className={`h-4 w-4 ${isActive ? 'text-black' : 'text-yellow-300'}`} />
                   ) : (
-                    <Trophy className="h-4 w-4 text-slate-800" />
+                    <Trophy className={`h-4 w-4 ${isActive ? 'text-black' : 'text-cyan-200'}`} />
                   )}
                   {tab} Auction
                 </button>
@@ -239,9 +240,10 @@ export default function MobileAuctionPanel({
           </div>
         </div>
 
-        <div className="px-4 pb-4">
-          <div className="relative mt-3 overflow-hidden rounded-2xl bg-black">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_35%,rgba(250,204,21,0.38),transparent_34%),linear-gradient(135deg,#111827,#020617)]" />
+        <div className="relative px-4 pb-5">
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_80%_10%,rgba(250,204,21,0.08),transparent_28%),radial-gradient(circle_at_10%_70%,rgba(34,211,238,0.08),transparent_30%)]" />
+          <div className="relative mt-3 overflow-hidden rounded-2xl border border-yellow-300/20 bg-black shadow-[0_18px_55px_rgba(0,0,0,0.32)]">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_35%,rgba(250,204,21,0.42),transparent_34%),radial-gradient(circle_at_88%_62%,rgba(34,211,238,0.12),transparent_30%),linear-gradient(135deg,#111827,#020617)]" />
             <div className="relative z-10 p-4">
               <p className="text-xs font-black uppercase tracking-[0.28em] text-yellow-300">
                 Live Event
@@ -253,7 +255,7 @@ export default function MobileAuctionPanel({
                 Bid before the timer ends. Higher tier auctions unlock premium chase cards.
               </p>
 
-              <div className="mt-4 inline-flex rounded-full bg-yellow-400 px-4 py-2 text-xs font-black text-black">
+              <div className="mt-4 inline-flex rounded-full bg-yellow-400 px-4 py-2 text-xs font-black text-black shadow-[0_0_24px_rgba(250,204,21,0.32)]">
                 {visibleCards.length} auctions live
               </div>
             </div>
@@ -261,71 +263,72 @@ export default function MobileAuctionPanel({
             <div className="absolute bottom-2 right-3 text-7xl opacity-20">🏆</div>
           </div>
 
-          <div className="mt-4 flex items-center justify-between gap-3">
+          <div className="relative mt-4 flex items-center justify-between gap-3">
             <div className="flex gap-2">
               <button
                 type="button"
-                className="flex items-center gap-2 rounded-xl bg-white px-3 py-2.5 text-sm font-black text-slate-700 shadow-sm"
+                className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.06] px-3 py-2.5 text-sm font-black text-slate-200 shadow-sm shadow-black/20"
               >
-                <Filter className="h-4 w-4" />
+                <Filter className="h-4 w-4 text-cyan-200" />
                 Filter
               </button>
               <button
                 type="button"
-                className="flex items-center gap-2 rounded-xl bg-white px-3 py-2.5 text-sm font-black text-slate-700 shadow-sm"
+                className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.06] px-3 py-2.5 text-sm font-black text-slate-200 shadow-sm shadow-black/20"
               >
-                <SlidersHorizontal className="h-4 w-4" />
+                <SlidersHorizontal className="h-4 w-4 text-cyan-200" />
                 Sort
               </button>
             </div>
 
             <button
               type="button"
-              className="flex items-center gap-2 rounded-xl bg-yellow-400 px-4 py-2.5 text-sm font-black text-black shadow-sm"
+              className="flex items-center gap-2 rounded-xl bg-yellow-400 px-4 py-2.5 text-sm font-black text-black shadow-[0_12px_28px_rgba(250,204,21,0.22)]"
             >
               All
               <ChevronDown className="h-4 w-4" />
             </button>
           </div>
 
-          <div className="mt-4 grid grid-cols-2 gap-3">
+          <div className="relative mt-4 grid grid-cols-2 gap-3">
             {visibleCards.map((item) => (
               <button
                 key={item.id}
                 type="button"
                 onClick={() => setSelectedItem(item)}
-                className="overflow-hidden rounded-2xl bg-white text-left shadow-sm"
+                className="overflow-hidden rounded-2xl border border-white/10 bg-[#07111f] text-left shadow-[0_16px_38px_rgba(0,0,0,0.32)] transition active:scale-[0.98]"
               >
-                <div className="relative aspect-[3/4] overflow-hidden bg-slate-200">
+                <div className="relative aspect-[3/4] overflow-hidden bg-slate-950">
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(34,211,238,0.16),transparent_48%)]" />
                   <img
                     src={item.image}
                     alt={item.title}
                     loading="lazy"
-                    className={`h-full w-full object-cover ${
+                    className={`relative z-10 h-full w-full object-cover ${
                       item.status === 'Ended' ? 'opacity-35 grayscale' : ''
                     }`}
                   />
 
-                  <div className="absolute left-2 top-2 rounded-full bg-black/70 px-2 py-1 text-[10px] font-black text-white">
+                  <div className="absolute left-2 top-2 z-20 rounded-full bg-black/75 px-2 py-1 text-[10px] font-black text-white ring-1 ring-white/10">
                     {item.status === 'Ended' ? 'Ended' : item.endsIn}
                   </div>
 
                   {item.status === 'Ending' && (
-                    <div className="absolute bottom-0 left-0 right-0 bg-yellow-400 px-2 py-1 text-xs font-black text-white">
-                      speed
+                    <div className="absolute bottom-0 left-0 right-0 z-20 bg-yellow-400 px-2 py-1 text-xs font-black text-black">
+                      {item.seller}
                     </div>
                   )}
                 </div>
 
-                <div className="p-2.5">
-                  <p className="line-clamp-2 min-h-[2.5rem] text-sm font-semibold leading-5 text-slate-900">
+                <div className="border-t border-white/10 p-2.5">
+                  <p className="line-clamp-2 min-h-[2.5rem] text-sm font-semibold leading-5 text-white">
                     {item.title}
                   </p>
-                  <div className="mt-2 flex items-center gap-1 text-xs text-slate-500">
-                    <Clock3 className="h-3.5 w-3.5" />
+                  <div className="mt-2 flex items-center gap-1 text-xs text-slate-400">
+                    <Clock3 className="h-3.5 w-3.5 text-cyan-200/70" />
                     <span>{item.status === 'Ended' ? 'Sale closed' : item.endsIn}</span>
                   </div>
-                  <p className="mt-1 text-sm font-black text-yellow-600">
+                  <p className="mt-1 text-sm font-black text-yellow-300">
                     {formatMoney(item.currentBid)}
                   </p>
                 </div>
@@ -336,18 +339,18 @@ export default function MobileAuctionPanel({
       </div>
 
       {selectedItem && (
-        <div className="fixed inset-0 z-[1000000] bg-white text-slate-950 lg:hidden">
-          <div className="flex h-full flex-col">
-            <div className="flex h-16 shrink-0 items-center justify-between border-b border-slate-100 px-4">
+        <div className="fixed inset-0 z-[1000000] bg-[#030712] text-white lg:hidden">
+          <div className="flex h-full flex-col bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.13),transparent_32%),radial-gradient(circle_at_80%_20%,rgba(250,204,21,0.10),transparent_28%),linear-gradient(180deg,#020617,#030712)]">
+            <div className="flex h-16 shrink-0 items-center justify-between border-b border-white/10 bg-slate-950/85 px-4 backdrop-blur-xl">
               <button
                 type="button"
                 onClick={() => setSelectedItem(null)}
-                className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-50"
+                className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/[0.06] text-slate-100"
               >
                 <ArrowLeft className="h-5 w-5" />
               </button>
 
-              <div className="flex items-center gap-2 text-sm font-black text-yellow-600">
+              <div className="flex items-center gap-2 text-sm font-black text-yellow-300">
                 <Clock3 className="h-4 w-4" />
                 {selectedItem.status === 'Ended' ? 'Ended' : selectedItem.endsIn}
               </div>
@@ -355,13 +358,13 @@ export default function MobileAuctionPanel({
               <div className="flex gap-2">
                 <button
                   type="button"
-                  className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-50"
+                  className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/[0.06] text-slate-100"
                 >
                   <Heart className="h-5 w-5" />
                 </button>
                 <button
                   type="button"
-                  className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-50"
+                  className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/[0.06] text-slate-100"
                 >
                   <Share2 className="h-5 w-5" />
                 </button>
@@ -369,22 +372,22 @@ export default function MobileAuctionPanel({
             </div>
 
             <div className="flex-1 overflow-y-auto pb-[190px]">
-              <div className="flex justify-center bg-slate-50 p-4">
+              <div className="flex justify-center border-b border-white/10 bg-[radial-gradient(circle_at_center,rgba(34,211,238,0.16),transparent_48%),linear-gradient(180deg,rgba(15,23,42,0.8),rgba(2,6,23,0.95))] p-4">
                 <img
                   src={selectedItem.image}
                   alt={selectedItem.title}
-                  className="max-h-[420px] w-auto rounded-2xl object-contain shadow-[0_18px_55px_rgba(0,0,0,0.20)]"
+                  className="max-h-[420px] w-auto rounded-2xl object-contain shadow-[0_24px_75px_rgba(0,0,0,0.45)] ring-1 ring-white/10"
                 />
               </div>
 
               <div className="px-5 py-5">
-                <h3 className="text-2xl font-semibold leading-tight">
+                <h3 className="text-2xl font-semibold leading-tight text-white">
                   {selectedItem.title}
                 </h3>
 
                 <div className="mt-4 flex items-end justify-between gap-4">
                   <div>
-                    <p className="text-2xl font-black text-yellow-600">
+                    <p className="text-2xl font-black text-yellow-300">
                       {formatMoney(selectedItem.currentBid)}
                     </p>
                     <p className="mt-1 text-sm text-slate-400">
@@ -392,29 +395,29 @@ export default function MobileAuctionPanel({
                     </p>
                   </div>
 
-                  <span className="rounded-full bg-slate-900 px-3 py-1 text-xs font-black text-white">
+                  <span className="rounded-full border border-white/10 bg-white/[0.08] px-3 py-1 text-xs font-black text-white">
                     {selectedItem.bidCount} bid
                   </span>
                 </div>
 
-                <div className="mt-5 rounded-2xl bg-slate-50 p-4 text-center">
-                  <p className="text-sm text-slate-500">
+                <div className="mt-5 rounded-2xl border border-white/10 bg-white/[0.06] p-4 text-center shadow-inner shadow-black/20">
+                  <p className="text-sm text-slate-400">
                     Ends in{' '}
-                    <span className="font-black text-slate-950">
+                    <span className="font-black text-yellow-300">
                       {selectedItem.endsIn}
                     </span>
                   </p>
                 </div>
 
-                <div className="mt-5 flex items-center gap-3 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-100">
+                <div className="mt-5 flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.06] p-4 shadow-[0_16px_45px_rgba(0,0,0,0.24)]">
                   <img
                     src={`https://api.dicebear.com/9.x/adventurer/svg?seed=${selectedItem.seller}&radius=50&backgroundColor=facc15`}
                     alt={selectedItem.seller}
-                    className="h-12 w-12 rounded-full"
+                    className="h-12 w-12 rounded-full ring-2 ring-yellow-300/35"
                   />
                   <div className="min-w-0 flex-1">
-                    <p className="font-black">{selectedItem.seller}</p>
-                    <p className="text-sm text-slate-500">
+                    <p className="font-black text-white">{selectedItem.seller}</p>
+                    <p className="text-sm text-slate-400">
                       {selectedItem.country} | {selectedItem.followers} followers
                     </p>
                     <p className="mt-1 text-xs text-slate-500">
@@ -423,14 +426,14 @@ export default function MobileAuctionPanel({
                   </div>
                   <button
                     type="button"
-                    className="rounded-full bg-yellow-400 px-4 py-2 text-sm font-black"
+                    className="rounded-full bg-yellow-400 px-4 py-2 text-sm font-black text-black shadow-[0_10px_24px_rgba(250,204,21,0.20)]"
                   >
                     Follow
                   </button>
                 </div>
 
-                <div className="mt-5 rounded-2xl bg-slate-50 p-4">
-                  <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-400">
+                <div className="mt-5 rounded-2xl border border-white/10 bg-white/[0.06] p-4 shadow-inner shadow-black/20">
+                  <p className="text-xs font-black uppercase tracking-[0.2em] text-cyan-200/70">
                     Quick Bid
                   </p>
                   <div className="mt-3 grid grid-cols-3 gap-2">
@@ -441,8 +444,8 @@ export default function MobileAuctionPanel({
                         onClick={() => setBidStep(step)}
                         className={`rounded-xl px-4 py-3 text-sm font-black ${
                           bidStep === step
-                            ? 'bg-yellow-400 text-black'
-                            : 'bg-white text-slate-700'
+                            ? 'bg-yellow-400 text-black shadow-[0_12px_24px_rgba(250,204,21,0.18)]'
+                            : 'border border-white/10 bg-black/20 text-slate-300'
                         }`}
                       >
                         +{step}
@@ -453,18 +456,18 @@ export default function MobileAuctionPanel({
               </div>
             </div>
 
-            <div className="fixed bottom-[calc(82px+env(safe-area-inset-bottom))] left-4 right-4 z-[1000020] rounded-[1.6rem] border border-slate-200 bg-white/95 p-3 shadow-[0_-18px_60px_rgba(15,23,42,0.18)] backdrop-blur-xl">
+            <div className="fixed bottom-[calc(82px+env(safe-area-inset-bottom))] left-4 right-4 z-[1000020] rounded-[1.6rem] border border-white/10 bg-slate-950/90 p-3 shadow-[0_-18px_70px_rgba(0,0,0,0.42)] backdrop-blur-xl">
               <div className="mb-2 flex items-center justify-between px-1">
                 <div>
-                  <p className="text-[10px] font-black uppercase tracking-[0.22em] text-slate-400">
+                  <p className="text-[10px] font-black uppercase tracking-[0.22em] text-cyan-200/70">
                     Current Bid
                   </p>
-                  <p className="text-lg font-black text-yellow-600">
+                  <p className="text-lg font-black text-yellow-300">
                     {formatMoney(selectedItem.currentBid)}
                   </p>
                 </div>
 
-                <div className="rounded-full bg-slate-900 px-3 py-1 text-xs font-black text-white">
+                <div className="rounded-full border border-white/10 bg-white/[0.08] px-3 py-1 text-xs font-black text-white">
                   {selectedItem.bidCount} bid
                 </div>
               </div>
@@ -475,7 +478,7 @@ export default function MobileAuctionPanel({
                 disabled={selectedItem.status === 'Ended'}
                 className={`flex w-full items-center justify-center gap-2 rounded-full px-5 py-4 text-base font-black shadow-[0_12px_28px_rgba(234,179,8,0.25)] ${
                   selectedItem.status === 'Ended'
-                    ? 'bg-slate-200 text-slate-400 shadow-none'
+                    ? 'bg-slate-800 text-slate-500 shadow-none'
                     : 'bg-yellow-400 text-black'
                 }`}
               >
