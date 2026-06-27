@@ -3,11 +3,13 @@ import { AnimatePresence, motion } from 'framer-motion'
 import {
   Check,
   ChevronRight,
+  FileText,
   Gavel,
   Gem,
   Gift,
   Globe2,
   Home,
+  Info,
   PackageOpen,
   Trophy,
   UserCircle,
@@ -851,6 +853,8 @@ function PlayerAdminDemoShell({
   const [isShippingCenterOpen, setIsShippingCenterOpen] = useState(false)
   const [isProfileSettingsOpen, setIsProfileSettingsOpen] = useState(false)
   const [isAccountLanguageOpen, setIsAccountLanguageOpen] = useState(false)
+  const [isTermPolicyOpen, setIsTermPolicyOpen] = useState(false)
+  const [isAboutUsOpen, setIsAboutUsOpen] = useState(false)
   const [isAdminShippingOpen, setIsAdminShippingOpen] = useState(initialAdminOpen)
   const [selectedCategory, setSelectedCategory] =
     useState<PackCategory>('All')
@@ -2145,6 +2149,14 @@ function PlayerAdminDemoShell({
                       <span className="flex items-center gap-3 text-sm font-black text-white"><UserCircle className="h-5 w-5 text-emerald-200" />{t.accountSettings}</span>
                       <ChevronRight className="h-4 w-4 text-slate-500" />
                     </button>
+                    <button type="button" onClick={() => setIsTermPolicyOpen(true)} className="flex w-full items-center justify-between gap-3 border-b border-white/10 px-4 py-3.5 text-left">
+                      <span className="flex items-center gap-3 text-sm font-black text-white"><FileText className="h-5 w-5 text-amber-200" />{t.termPolicy}</span>
+                      <ChevronRight className="h-4 w-4 text-slate-500" />
+                    </button>
+                    <button type="button" onClick={() => setIsAboutUsOpen(true)} className="flex w-full items-center justify-between gap-3 border-b border-white/10 px-4 py-3.5 text-left">
+                      <span className="flex items-center gap-3 text-sm font-black text-white"><Info className="h-5 w-5 text-purple-200" />{t.aboutUs}</span>
+                      <ChevronRight className="h-4 w-4 text-slate-500" />
+                    </button>
                     <button type="button" onClick={() => setIsAccountLanguageOpen(true)} className="flex w-full items-center justify-between gap-3 px-4 py-3.5 text-left">
                       <span className="flex items-center gap-3 text-sm font-black text-white"><Globe2 className="h-5 w-5 text-cyan-200" />{t.language}</span>
                       <span className="flex items-center gap-2 text-xs font-black text-slate-400">
@@ -2565,6 +2577,169 @@ function PlayerAdminDemoShell({
                       </button>
                     )
                   })}
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+
+      <AnimatePresence>
+        {isTermPolicyOpen && (
+          <motion.div
+            className="fixed inset-0 z-[1000000] flex items-end justify-center bg-black/65 px-4 pb-4 backdrop-blur-sm sm:items-center"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div
+              className="flex max-h-[88vh] w-full max-w-md flex-col overflow-hidden rounded-[1.6rem] border border-amber-300/18 bg-[#07111f] text-white shadow-[0_-20px_80px_rgba(251,191,36,0.16)]"
+              initial={{ y: 80, scale: 0.98 }}
+              animate={{ y: 0, scale: 1 }}
+              exit={{ y: 80, scale: 0.98 }}
+              transition={{ type: 'spring', damping: 26, stiffness: 260 }}
+            >
+              <div className="flex shrink-0 items-center justify-between border-b border-white/10 px-4 py-4">
+                <div className="min-w-0 pr-4">
+                  <p className="text-[10px] font-black uppercase tracking-[0.26em] text-amber-200">
+                    {t.termPolicy}
+                  </p>
+                  <h3 className="mt-1 text-xl font-black text-white">
+                    {t.jomluffyzAuctionPolicyLegalStrengthenin}
+                  </h3>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsTermPolicyOpen(false)}
+                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/[0.07]"
+                  aria-label={t.cancel}
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+
+              <div className="min-h-0 flex-1 overflow-y-auto p-4">
+                <div className="rounded-2xl border border-amber-300/16 bg-amber-300/[0.055] p-4">
+                  <div className="flex items-start gap-3">
+                    <FileText className="mt-0.5 h-5 w-5 shrink-0 text-amber-200" />
+                    <div>
+                      <p className="text-sm font-black text-white">
+                        {t.jomluffyzAuctionPolicyLegalStrengthenin}
+                      </p>
+                      <p className="mt-1 text-xs font-semibold text-amber-100/70">
+                        {t.auctionPolicyEffectiveDate}
+                      </p>
+                      <p className="mt-3 text-xs leading-5 text-slate-300">
+                        {t.termPolicySubtitle}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-4 space-y-3">
+                  {[
+                    [t.auctionPolicyPurposeTitle, t.auctionPolicyPurposeDesc],
+                    [t.auctionPolicySellerTitle, t.auctionPolicySellerDesc],
+                    [t.auctionPolicyBiddingTitle, t.auctionPolicyBiddingDesc],
+                    [t.auctionPolicyMaxBidTitle, t.auctionPolicyMaxBidDesc],
+                    [t.auctionPolicyPaymentTitle, t.auctionPolicyPaymentDesc],
+                    [t.auctionPolicyProhibitedTitle, t.auctionPolicyProhibitedDesc],
+                    [t.auctionPolicyDisputeTitle, t.auctionPolicyDisputeDesc],
+                    [t.auctionPolicyCreditTitle, t.auctionPolicyCreditDesc],
+                  ].map(([title, description]) => (
+                    <div key={title} className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+                      <p className="text-sm font-black text-white">{title}</p>
+                      <p className="mt-2 text-xs leading-5 text-slate-400">{description}</p>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="mt-4 grid gap-3">
+                  {[
+                    [t.termsOfUseTitle, t.termsOfUseDesc],
+                    [t.buyerProtectionTitle, t.buyerProtectionDesc],
+                    [t.privacyPolicyTitle, t.privacyPolicyDesc],
+                  ].map(([title, description]) => (
+                    <div key={title} className="rounded-2xl border border-cyan-300/12 bg-cyan-300/[0.035] p-4">
+                      <p className="text-sm font-black text-cyan-100">{title}</p>
+                      <p className="mt-2 text-xs leading-5 text-slate-400">{description}</p>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="mt-4 rounded-2xl border border-rose-300/16 bg-rose-300/[0.055] p-4">
+                  <p className="text-xs font-bold leading-5 text-rose-100/85">
+                    {t.auctionPolicyLegalReviewNotice}
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {isAboutUsOpen && (
+          <motion.div
+            className="fixed inset-0 z-[1000000] flex items-end justify-center bg-black/65 px-4 pb-4 backdrop-blur-sm sm:items-center"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div
+              className="flex max-h-[86vh] w-full max-w-md flex-col overflow-hidden rounded-[1.6rem] border border-purple-300/18 bg-[#07111f] text-white shadow-[0_-20px_80px_rgba(168,85,247,0.16)]"
+              initial={{ y: 80, scale: 0.98 }}
+              animate={{ y: 0, scale: 1 }}
+              exit={{ y: 80, scale: 0.98 }}
+              transition={{ type: 'spring', damping: 26, stiffness: 260 }}
+            >
+              <div className="flex shrink-0 items-center justify-between border-b border-white/10 px-4 py-4">
+                <div>
+                  <p className="text-[10px] font-black uppercase tracking-[0.26em] text-purple-200">
+                    {t.aboutUs}
+                  </p>
+                  <h3 className="mt-1 text-xl font-black text-white">
+                    Jomluffyz
+                  </h3>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsAboutUsOpen(false)}
+                  className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/[0.07]"
+                  aria-label={t.cancel}
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+
+              <div className="min-h-0 flex-1 overflow-y-auto p-4">
+                <div className="rounded-[1.35rem] border border-purple-300/16 bg-[radial-gradient(circle_at_top_right,rgba(168,85,247,0.22),transparent_34%),linear-gradient(135deg,rgba(15,23,42,0.96),rgba(3,7,18,0.96))] p-5">
+                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-purple-300/25 bg-purple-300/10">
+                    <Info className="h-7 w-7 text-purple-200" />
+                  </div>
+                  <p className="mt-4 text-sm leading-6 text-slate-300">
+                    {t.aboutUsHero}
+                  </p>
+                </div>
+
+                <div className="mt-4 space-y-3">
+                  {[
+                    [t.aboutMissionTitle, t.aboutMissionDesc],
+                    [t.aboutMarketplaceTitle, t.aboutMarketplaceDesc],
+                    [t.aboutTrustTitle, t.aboutTrustDesc],
+                  ].map(([title, description]) => (
+                    <div key={title} className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+                      <p className="text-sm font-black text-white">{title}</p>
+                      <p className="mt-2 text-xs leading-5 text-slate-400">{description}</p>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="mt-4 rounded-2xl border border-amber-300/16 bg-amber-300/[0.055] p-4">
+                  <p className="text-xs font-bold leading-5 text-amber-100/85">
+                    {t.aboutDemoNotice}
+                  </p>
                 </div>
               </div>
             </motion.div>
