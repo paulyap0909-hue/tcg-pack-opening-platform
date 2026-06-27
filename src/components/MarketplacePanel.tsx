@@ -9,6 +9,7 @@ import {
 
 import type { VaultCard } from './VaultDrawer'
 import { getSellBackPoints } from './VaultDrawer'
+import { translations, type AppLanguage } from '../lib/i18n'
 
 export type MarketplaceListing = {
   id: string
@@ -20,6 +21,7 @@ export type MarketplaceListing = {
 }
 
 type MarketplacePanelProps = {
+  language: AppLanguage
   listings: MarketplaceListing[]
   walletBalance: number
   onBuyListing: (listing: MarketplaceListing) => void
@@ -27,25 +29,25 @@ type MarketplacePanelProps = {
 }
 
 export default function MarketplacePanel({
+  language,
   listings,
   walletBalance,
   onBuyListing,
   onCancelListing,
 }: MarketplacePanelProps) {
+  const t = translations[language]
   const playerListings = listings.filter((listing) => listing.source === 'player')
 
   return (
     <section className="mx-auto w-full max-w-7xl px-5 py-8 lg:px-8">
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="hud-label text-sm">Marketplace</p>
-          <h2 className="mt-2 text-4xl font-black">Player Card Market</h2>
+          <p className="hud-label text-sm">{t.marketplace}</p>
+          <h2 className="mt-2 text-4xl font-black">{t.playerCardMarket}</h2>
         </div>
 
         <p className="max-w-md text-sm leading-6 text-slate-400">
-          Buy listed cards with points or list your Vault cards for other
-          collectors. Demo sellers simulate marketplace liquidity before user
-          login is added.
+          {t.marketplaceSubtitle}
         </p>
       </div>
 
@@ -55,7 +57,7 @@ export default function MarketplacePanel({
             <Store className="h-5 w-5 text-cyan-300" />
           </div>
           <p className="text-[10px] uppercase tracking-[0.28em] text-slate-500">
-            Listings
+            {t.listings}
           </p>
           <p className="mt-2 text-2xl font-black text-white">
             {listings.length}
@@ -67,7 +69,7 @@ export default function MarketplacePanel({
             <ShoppingBag className="h-5 w-5 text-emerald-300" />
           </div>
           <p className="text-[10px] uppercase tracking-[0.28em] text-slate-500">
-            Your Listings
+            {t.yourListings}
           </p>
           <p className="mt-2 text-2xl font-black text-emerald-300">
             {playerListings.length}
@@ -79,7 +81,7 @@ export default function MarketplacePanel({
             <Coins className="h-5 w-5 text-amber-300" />
           </div>
           <p className="text-[10px] uppercase tracking-[0.28em] text-slate-500">
-            Wallet
+            {t.wallet}
           </p>
           <p className="mt-2 text-2xl font-black text-amber-300">
             {walletBalance.toLocaleString()}
@@ -93,10 +95,10 @@ export default function MarketplacePanel({
             <Store className="h-8 w-8 text-cyan-300" />
           </div>
           <h3 className="text-2xl font-black text-white">
-            Marketplace is Empty
+            {t.marketplaceEmpty}
           </h3>
           <p className="mx-auto mt-3 max-w-sm text-sm leading-6 text-slate-400">
-            List a Stored Vault card for sale to activate the marketplace.
+            {t.marketplaceEmptyDesc}
           </p>
         </div>
       ) : (
@@ -119,7 +121,7 @@ export default function MarketplacePanel({
                 <div className="relative z-10">
                   <div className="mb-4 flex items-center justify-between gap-3">
                     <span className="rounded-full border border-cyan-300/30 bg-cyan-300/10 px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.25em] text-cyan-200">
-                      {isOwnListing ? 'Your Listing' : 'Buy Now'}
+                      {isOwnListing ? t.yourListing : t.buyNow}
                     </span>
                     <span className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500">
                       {listing.seller}
@@ -151,7 +153,7 @@ export default function MarketplacePanel({
                     <div className="mt-4 grid grid-cols-2 gap-3">
                       <div className="rounded-2xl border border-cyan-300/10 bg-cyan-300/[0.04] p-3">
                         <p className="text-[10px] uppercase tracking-[0.25em] text-slate-500">
-                          Price
+                          {t.price}
                         </p>
                         <p className="mt-1 text-lg font-black text-cyan-200">
                           {listing.price.toLocaleString()} pts
@@ -160,7 +162,7 @@ export default function MarketplacePanel({
 
                       <div className="rounded-2xl border border-emerald-300/10 bg-emerald-300/[0.04] p-3">
                         <p className="text-[10px] uppercase tracking-[0.25em] text-slate-500">
-                          Sell Back
+                          {t.sellBack}
                         </p>
                         <p className="mt-1 text-lg font-black text-emerald-300">
                           {getSellBackPoints(listing.card)} pts
@@ -180,7 +182,7 @@ export default function MarketplacePanel({
                         className="mt-5 flex w-full items-center justify-center gap-2 rounded-2xl border border-rose-300/30 bg-rose-300/10 px-6 py-4 font-black uppercase tracking-wider text-rose-200 transition hover:scale-[1.02] hover:bg-rose-300/20"
                       >
                         <XCircle className="h-5 w-5" />
-                        Cancel Listing
+                        {t.cancelListing}
                       </button>
                     ) : (
                       <button
@@ -195,8 +197,8 @@ export default function MarketplacePanel({
                       >
                         <ShoppingBag className="h-5 w-5" />
                         {walletBalance < listing.price
-                          ? 'Need More Points'
-                          : 'Buy with Points'}
+                          ? t.needMorePoints
+                          : t.buyWithPoints}
                       </button>
                     )}
                   </div>

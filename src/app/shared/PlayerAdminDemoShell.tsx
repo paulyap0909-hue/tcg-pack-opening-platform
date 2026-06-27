@@ -2454,6 +2454,7 @@ function PlayerAdminDemoShell({
       />
 
       <ListForSaleModal
+        language={language}
         card={listForSaleTarget}
         onClose={() => setListForSaleTarget(null)}
         onConfirm={confirmListForSale}

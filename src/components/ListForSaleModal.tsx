@@ -1,21 +1,25 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { Coins, Store, X } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
+import { translations, type AppLanguage } from '../lib/i18n'
 
 import type { VaultCard } from './VaultDrawer'
 import { getSellBackPoints } from './VaultDrawer'
 
 type ListForSaleModalProps = {
+  language: AppLanguage
   card: VaultCard | null
   onClose: () => void
   onConfirm: (price: number) => void
 }
 
 export default function ListForSaleModal({
+  language,
   card,
   onClose,
   onConfirm,
 }: ListForSaleModalProps) {
+  const t = translations[language]
   const suggestedPrice = useMemo(() => {
     if (!card) return 100
 
@@ -74,7 +78,7 @@ export default function ListForSaleModal({
           <button
             type="button"
             onClick={onClose}
-            aria-label="Close list for sale modal"
+            aria-label={t.cancel}
             className="absolute right-5 top-5 z-10 flex h-11 w-11 items-center justify-center rounded-full border border-cyan-300/40 bg-slate-950/95 text-cyan-100 shadow-[0_0_35px_rgba(34,211,238,0.35)] transition hover:scale-105 hover:bg-cyan-300/10"
           >
             <X className="h-5 w-5" />
@@ -84,17 +88,16 @@ export default function ListForSaleModal({
             <div className="mb-3 flex items-center gap-2">
               <Store className="h-5 w-5 text-cyan-300" />
               <p className="text-xs font-black uppercase tracking-[0.3em] text-cyan-300">
-                List on Marketplace
+                {t.listOnMarketplace}
               </p>
             </div>
 
             <h2 className="text-3xl font-black text-white">
-              Set selling price
+              {t.setSellingPrice}
             </h2>
 
             <p className="mt-3 text-sm leading-6 text-slate-400">
-              Listing this card will lock Sell Back and Shipping until you cancel
-              the listing.
+              {t.listForSaleLockNotice}
             </p>
           </div>
 
@@ -124,18 +127,18 @@ export default function ListForSaleModal({
                 <div className="mb-2 flex items-center gap-2">
                   <Coins className="h-5 w-5 text-emerald-300" />
                   <p className="text-xs uppercase tracking-[0.25em] text-emerald-300">
-                    Sell Back Value
+                    {t.sellBackValue}
                   </p>
                 </div>
 
                 <p className="text-2xl font-black text-emerald-200">
-                  {getSellBackPoints(card).toLocaleString()} Points
+                  {getSellBackPoints(card).toLocaleString()} {t.points}
                 </p>
               </div>
 
               <label className="mt-5 block">
                 <span className="text-xs font-black uppercase tracking-[0.25em] text-cyan-300">
-                  Marketplace Price / Points
+                  {t.marketplacePricePoints}
                 </span>
 
                 <input
@@ -144,13 +147,13 @@ export default function ListForSaleModal({
                   type="number"
                   min="1"
                   className="mt-3 w-full rounded-2xl border border-cyan-300/20 bg-black/40 px-4 py-4 text-lg font-black text-white outline-none transition placeholder:text-slate-600 focus:border-cyan-300"
-                  placeholder="Enter points price"
+                  placeholder={t.enterPointsPrice}
                 />
               </label>
 
               {isInvalidPrice && (
                 <p className="mt-3 text-sm font-bold text-rose-300">
-                  Please enter a valid selling price.
+                  {t.invalidSellingPrice}
                 </p>
               )}
             </div>
@@ -162,7 +165,7 @@ export default function ListForSaleModal({
               onClick={onClose}
               className="rounded-2xl border border-cyan-300/30 bg-cyan-300/10 px-6 py-4 font-black text-cyan-200 transition hover:scale-[1.02] hover:bg-cyan-300/20"
             >
-              Cancel
+              {t.cancel}
             </button>
 
             <button
@@ -176,7 +179,7 @@ export default function ListForSaleModal({
               }`}
             >
               <Store className="h-5 w-5" />
-              Confirm Listing
+              {t.confirmListing}
             </button>
           </div>
         </motion.div>
