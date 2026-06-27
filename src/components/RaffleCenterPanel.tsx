@@ -8,6 +8,8 @@ import {
   Trophy,
 } from 'lucide-react'
 
+import { translations, type AppLanguage, type Translation } from '../lib/i18n'
+
 export type RaffleEntry = {
   id: string
   prizeId: string
@@ -39,6 +41,7 @@ export type RafflePrize = {
 }
 
 type RaffleCenterPanelProps = {
+  language: AppLanguage
   ticketBalance: number
   entries: RaffleEntry[]
   winners?: RaffleWinner[]
@@ -87,12 +90,44 @@ function getEntriesForPrize(entries: RaffleEntry[], prizeId: string) {
     .reduce((total, entry) => total + entry.tickets, 0)
 }
 
+function localizeRafflePrize(prize: RafflePrize, t: Translation): RafflePrize {
+  if (prize.id === 'secret-rare-mystery-slab') {
+    return {
+      ...prize,
+      name: t.rafflePrizeSecretName,
+      category: t.rafflePrizeSecretCategory,
+      description: t.rafflePrizeSecretDescription,
+      prizeValue: t.rafflePrizeSecretValue,
+    }
+  }
+
+  if (prize.id === 'creator-drop-box') {
+    return {
+      ...prize,
+      name: t.rafflePrizeCreatorName,
+      category: t.rafflePrizeCreatorCategory,
+      description: t.rafflePrizeCreatorDescription,
+      prizeValue: t.rafflePrizeCreatorValue,
+    }
+  }
+
+  return {
+    ...prize,
+    name: t.rafflePrizePointsName,
+    category: t.rafflePrizePointsCategory,
+    description: t.rafflePrizePointsDescription,
+  }
+}
+
 export default function RaffleCenterPanel({
+  language,
   ticketBalance,
   entries,
   winners = [],
   onEnterRaffle,
 }: RaffleCenterPanelProps) {
+  const t = translations[language]
+  const localizedPrizes = rafflePrizes.map((prize) => localizeRafflePrize(prize, t))
   const totalTicketsEntered = entries.reduce(
     (total, entry) => total + entry.tickets,
     0,
@@ -114,27 +149,27 @@ export default function RaffleCenterPanel({
             <div className="mb-2 flex items-center gap-2">
               <Ticket className="h-4 w-4 text-amber-300 sm:h-5 sm:w-5" />
               <p className="text-[10px] font-black uppercase tracking-[0.28em] text-amber-300 sm:text-xs">
-                Raffle Center
+                {t.raffleCenter}
               </p>
             </div>
 
             <h2 className="text-2xl font-black leading-tight text-white sm:text-4xl">
-              Weekly Prize Pool
+              {t.weeklyPrizePool}
             </h2>
             <p className="mt-2 max-w-2xl text-xs leading-5 text-slate-400 sm:text-sm sm:leading-6">
-              Use tickets to enter weekly prize draws.
+              {t.weeklyPrizeSubtitle}
             </p>
           </div>
 
           <span className="shrink-0 rounded-full border border-amber-300/20 bg-amber-300/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-amber-200">
-            Weekly
+            {t.weekly}
           </span>
         </div>
 
         <div className="grid grid-cols-3 gap-2">
           <div className="rounded-2xl border border-amber-300/20 bg-amber-300/10 p-3 sm:p-4">
             <p className="text-[9px] uppercase tracking-[0.2em] text-amber-200/80 sm:text-[10px]">
-              Tickets
+              {t.tickets}
             </p>
             <p className="mt-1 text-xl font-black text-amber-300 sm:text-3xl">
               {ticketBalance}
@@ -143,7 +178,7 @@ export default function RaffleCenterPanel({
 
           <div className="rounded-2xl border border-purple-300/20 bg-purple-300/10 p-3 sm:p-4">
             <p className="text-[9px] uppercase tracking-[0.2em] text-purple-200/80 sm:text-[10px]">
-              Entries
+              {t.entries}
             </p>
             <p className="mt-1 text-xl font-black text-purple-300 sm:text-3xl">
               {totalTicketsEntered}
@@ -152,7 +187,7 @@ export default function RaffleCenterPanel({
 
           <div className="rounded-2xl border border-emerald-300/20 bg-emerald-300/10 p-3 sm:p-4">
             <p className="text-[9px] uppercase tracking-[0.2em] text-emerald-200/80 sm:text-[10px]">
-              Winners
+              {t.winners}
             </p>
             <p className="mt-1 text-xl font-black text-emerald-300 sm:text-3xl">
               {winners.length}
@@ -167,14 +202,14 @@ export default function RaffleCenterPanel({
                 <div className="mb-1 flex items-center gap-2">
                   <Trophy className="h-4 w-4 text-emerald-300" />
                   <p className="text-[10px] font-black uppercase tracking-[0.22em] text-emerald-300">
-                    Latest Winner
+                    {t.latestWinner}
                   </p>
                 </div>
                 <h3 className="truncate text-base font-black text-white sm:text-2xl">
                   {latestWinner.winnerName}
                 </h3>
                 <p className="mt-1 line-clamp-1 text-xs text-slate-300 sm:text-sm">
-                  Won <span className="font-black text-emerald-300">{latestWinner.prizeName}</span>
+                  {t.won} <span className="font-black text-emerald-300">{latestWinner.prizeName}</span>
                 </p>
               </div>
 
@@ -188,20 +223,20 @@ export default function RaffleCenterPanel({
         <div className="mt-4 flex items-center justify-between gap-3">
           <div>
             <p className="text-[10px] font-black uppercase tracking-[0.25em] text-cyan-300">
-              Available Prizes
+              {t.availablePrizes}
             </p>
             <p className="mt-1 text-xs text-slate-500">
-              Pick a reward and enter fast.
+              {t.pickRewardFast}
             </p>
           </div>
 
           <span className="rounded-full border border-cyan-300/20 bg-cyan-300/10 px-3 py-1 text-[10px] font-black text-cyan-200">
-            {rafflePrizes.length} live
+            {localizedPrizes.length} {t.live}
           </span>
         </div>
 
         <div className="mt-3 grid gap-3 sm:grid-cols-3">
-          {rafflePrizes.map((prize) => {
+          {localizedPrizes.map((prize) => {
             const enteredTickets = getEntriesForPrize(entries, prize.id)
 
             return (
@@ -248,7 +283,7 @@ export default function RaffleCenterPanel({
                   <div className="mb-3 grid grid-cols-2 gap-2">
                     <div className="rounded-2xl border border-cyan-300/10 bg-cyan-300/[0.04] px-3 py-2">
                       <p className="text-[8px] uppercase tracking-[0.18em] text-slate-500">
-                        Prize
+                        {t.prize}
                       </p>
                       <p className="mt-0.5 truncate text-xs font-black text-cyan-200">
                         {prize.prizeValue}
@@ -257,10 +292,10 @@ export default function RaffleCenterPanel({
 
                     <div className="rounded-2xl border border-purple-300/10 bg-purple-300/[0.04] px-3 py-2">
                       <p className="text-[8px] uppercase tracking-[0.18em] text-slate-500">
-                        Entries
+                        {t.entries}
                       </p>
                       <p className="mt-0.5 text-xs font-black text-purple-200">
-                        {enteredTickets} tickets
+                        {enteredTickets} {t.ticketUnit}
                       </p>
                     </div>
                   </div>
@@ -297,14 +332,14 @@ export default function RaffleCenterPanel({
           <div className="mb-2 flex items-center gap-2 sm:mb-3">
             <Sparkles className="h-4 w-4 text-cyan-300" />
             <p className="text-[10px] font-black uppercase tracking-[0.25em] text-cyan-300 sm:text-xs">
-              Ticket Rules
+              {t.ticketRules}
             </p>
           </div>
 
           <div className="space-y-1 text-[11px] leading-5 text-slate-300 sm:grid sm:grid-cols-3 sm:gap-3 sm:space-y-0 sm:text-sm">
-            <p>Open 1 = +1 ticket · Open 10 = +10</p>
-            <p>Open 100 = +120 · Sell Back = +1</p>
-            <p>Shipping = +3 · Quest Claim = +2</p>
+            <p>{t.ticketRule1}</p>
+            <p>{t.ticketRule2}</p>
+            <p>{t.ticketRule3}</p>
           </div>
         </div>
 
@@ -313,7 +348,7 @@ export default function RaffleCenterPanel({
             <div className="mb-3 flex items-center gap-2 sm:mb-4">
               <Trophy className="h-4 w-4 text-purple-300" />
               <p className="text-[10px] font-black uppercase tracking-[0.25em] text-purple-300 sm:text-xs">
-                Recent Entries
+                {t.recentEntries}
               </p>
             </div>
 
@@ -346,7 +381,7 @@ export default function RaffleCenterPanel({
             <div className="mb-3 flex items-center gap-2 sm:mb-4">
               <Trophy className="h-4 w-4 text-emerald-300" />
               <p className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-300 sm:text-xs">
-                Winner History
+                {t.winnerHistory}
               </p>
             </div>
 
@@ -358,10 +393,10 @@ export default function RaffleCenterPanel({
                 >
                   <div className="min-w-0">
                     <p className="truncate text-sm font-black text-white sm:text-base">
-                      {winner.winnerName} won {winner.prizeName}
+                      {winner.winnerName} {t.won} {winner.prizeName}
                     </p>
                     <p className="mt-1 truncate text-[11px] text-slate-400 sm:text-xs">
-                      {winner.drawnAt} · Entry {getShortId(winner.winningEntryId)}
+                      {winner.drawnAt} · {t.entry} {getShortId(winner.winningEntryId)}
                     </p>
                   </div>
 

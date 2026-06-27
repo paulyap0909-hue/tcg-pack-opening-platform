@@ -8,9 +8,11 @@ import {
   hasClaimedDailyRewardToday,
   type DailyLoginState,
 } from '../data/dailyLoginRewards'
+import { translations, type AppLanguage } from '../lib/i18n'
 
 type DailyLoginRewardModalProps = {
   isOpen: boolean
+  language: AppLanguage
   dailyLoginState: DailyLoginState
   onClose: () => void
   onClaim: () => void
@@ -26,10 +28,13 @@ function getRewardIcon(kind: string) {
 
 export default function DailyLoginRewardModal({
   isOpen,
+  language,
   dailyLoginState,
   onClose,
   onClaim,
 }: DailyLoginRewardModalProps) {
+  const t = translations[language]
+
   useEffect(() => {
     if (!isOpen) return
 
@@ -104,13 +109,13 @@ export default function DailyLoginRewardModal({
 
               <div className="relative z-10 pt-6 text-center sm:pt-8">
                 <p className="text-[10px] font-black uppercase tracking-[0.26em] text-orange-200 sm:text-xs sm:tracking-[0.35em]">
-                  Daily Login Rewards
+                  {t.dailyLoginRewards}
                 </p>
                 <h2 className="mt-1 text-2xl font-black text-white sm:mt-2 sm:text-3xl">
-                  Day {currentReward.day} Reward
+                  {t.day} {currentReward.day} {t.dayReward}
                 </h2>
                 <p className="mt-1 text-xs text-orange-100/80 sm:mt-2 sm:text-sm">
-                  Claim once per day. Streak loops after Day 7.
+                  {t.claimOnceDaily}
                 </p>
 
                 <div className="mt-4 grid grid-cols-3 gap-2 sm:mt-6">
@@ -132,7 +137,7 @@ export default function DailyLoginRewardModal({
                           <CheckCircle2 className="absolute right-2 top-2 h-4 w-4 text-emerald-300" />
                         )}
                         <p className="text-[10px] font-black uppercase tracking-[0.18em] text-white/55">
-                          Day {reward.day}
+                          {t.day} {reward.day}
                         </p>
                         <Icon className="mx-auto mt-2 h-5 w-5 text-orange-200 sm:mt-3 sm:h-7 sm:w-7" />
                         <p className="mt-1 text-[10px] font-black leading-tight text-white sm:mt-2 sm:text-xs">
@@ -150,10 +155,10 @@ export default function DailyLoginRewardModal({
                   <div className="grid grid-cols-[1fr_auto] items-center gap-3">
                     <div className="text-left">
                       <p className="text-[10px] font-black uppercase tracking-[0.22em] text-orange-200/80">
-                        Day 7 Bonus
+                        {t.day7Bonus}
                       </p>
                       <p className="mt-1 text-lg font-black text-white sm:text-xl">
-                        Free Pull Reward
+                        {t.freePullReward}
                       </p>
                       <p className="text-xs text-orange-100/70">
                         350 pts + 10 raffle tickets + 150 XP
@@ -167,7 +172,7 @@ export default function DailyLoginRewardModal({
 
                 <div className="mt-3 grid grid-cols-3 gap-2 rounded-2xl border border-white/10 bg-black/25 p-3 sm:mt-5 sm:gap-3 sm:p-4">
                   <div>
-                    <p className="text-[10px] uppercase tracking-[0.2em] text-white/45">Points</p>
+                    <p className="text-[10px] uppercase tracking-[0.2em] text-white/45">{t.points}</p>
                     <p className="mt-1 text-lg font-black text-white">+{currentReward.points}</p>
                   </div>
                   <div>
@@ -175,7 +180,7 @@ export default function DailyLoginRewardModal({
                     <p className="mt-1 text-lg font-black text-purple-100">+{currentReward.xp}</p>
                   </div>
                   <div>
-                    <p className="text-[10px] uppercase tracking-[0.2em] text-white/45">Tickets</p>
+                    <p className="text-[10px] uppercase tracking-[0.2em] text-white/45">{t.tickets}</p>
                     <p className="mt-1 flex items-center justify-center gap-1 text-lg font-black text-amber-100 sm:justify-start">
                       <Ticket className="h-4 w-4" /> +{currentReward.raffleTickets}
                     </p>
@@ -192,7 +197,7 @@ export default function DailyLoginRewardModal({
                       : 'border border-orange-200/50 bg-gradient-to-r from-orange-500 to-orange-300 text-white hover:scale-[1.02]'
                   }`}
                 >
-                  {claimedToday ? 'Claimed Today' : `Claim Day ${currentReward.day} Reward`}
+                  {claimedToday ? t.claimedToday : `${t.claimDayReward} ${currentReward.day} ${t.dayReward}`}
                 </button>
 
                 <button
@@ -200,7 +205,7 @@ export default function DailyLoginRewardModal({
                   onClick={onClose}
                   className="mt-2 w-full rounded-full border border-white/15 bg-black/25 px-6 py-3 text-xs font-black uppercase tracking-wider text-orange-100 transition hover:scale-[1.01] hover:bg-white/10 sm:mt-3 sm:text-sm"
                 >
-                  Close Rewards
+                  {t.closeRewards}
                 </button>
               </div>
             </div>

@@ -1980,10 +1980,10 @@ function PlayerAdminDemoShell({
                 <div className="flex items-center justify-between gap-3">
                   <div>
                     <p className="text-[10px] font-black uppercase tracking-[0.26em] text-purple-300">
-                      Rewards
+                      {t.navRewards}
                     </p>
                     <h2 className="mt-1 text-xl font-black text-white">
-                      Raffle & Daily Bonus
+                      {t.raffleDailyBonus}
                     </h2>
                   </div>
 
@@ -1994,12 +1994,13 @@ function PlayerAdminDemoShell({
                     }}
                     className="shrink-0 rounded-2xl bg-gradient-to-r from-orange-300 to-yellow-300 px-3 py-2 text-xs font-black text-black"
                   >
-                    Daily Login
+                    {t.dailyLogin}
                   </button>
                 </div>
               </div>
 
               <RaffleCenterPanel
+                language={language}
                 ticketBalance={raffleTickets}
                 entries={raffleEntries}
                 winners={raffleWinners}
@@ -2317,6 +2318,7 @@ function PlayerAdminDemoShell({
 
         <section id="how-it-works">
         <QuestLeaderboardPanel
+          language={language}
           questStats={questStats}
           vaultCards={vaultCards}
           transactions={transactions}
@@ -2339,6 +2341,7 @@ function PlayerAdminDemoShell({
         </div>
 
         <RaffleCenterPanel
+          language={language}
           ticketBalance={raffleTickets}
           entries={raffleEntries}
           winners={raffleWinners}
@@ -2450,6 +2453,7 @@ function PlayerAdminDemoShell({
 
       <DailyLoginRewardModal
         isOpen={isDailyLoginOpen}
+        language={language}
         dailyLoginState={dailyLoginState}
         onClose={() => setIsDailyLoginOpen(false)}
         onClaim={handleClaimDailyLoginReward}

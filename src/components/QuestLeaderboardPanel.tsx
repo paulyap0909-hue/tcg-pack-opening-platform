@@ -19,6 +19,7 @@ import {
 import type { TransactionRecord } from "./TransactionDrawer";
 import { getSellBackPoints, type VaultCard } from "./VaultDrawer";
 import MonthlyLeaderboardSection from "./MonthlyLeaderboardSection";
+import { translations, type AppLanguage, type Translation } from "../lib/i18n";
 
 export type QuestStats = {
   openPacks: number;
@@ -49,6 +50,7 @@ type QuestDefinition = {
 };
 
 type QuestLeaderboardPanelProps = {
+  language: AppLanguage;
   questStats: QuestStats;
   vaultCards: VaultCard[];
   transactions: TransactionRecord[];
@@ -75,11 +77,11 @@ const clampProgress = (current: number, target: number) => {
   return Math.min(Math.max(current, 0), target);
 };
 
-const createQuestDefinitions = (questStats: QuestStats): QuestDefinition[] => [
+const createQuestDefinitions = (questStats: QuestStats, t: Translation): QuestDefinition[] => [
   {
     id: "open-1-pack",
-    title: "Open 1 Pack",
-    description: "Open any single pack.",
+    title: t.questOpen1Title,
+    description: t.questOpen1Desc,
     current: questStats.open1,
     target: 1,
     reward: { points: 50, xp: 25 },
@@ -88,8 +90,8 @@ const createQuestDefinitions = (questStats: QuestStats): QuestDefinition[] => [
   },
   {
     id: "open-10-total-packs",
-    title: "Open 10 Packs",
-    description: "Reach 10 total packs.",
+    title: t.questOpen10Title,
+    description: t.questOpen10Desc,
     current: questStats.openPacks,
     target: 10,
     reward: { points: 120, xp: 80 },
@@ -98,8 +100,8 @@ const createQuestDefinitions = (questStats: QuestStats): QuestDefinition[] => [
   },
   {
     id: "open-100-burst",
-    title: "Open 100 Burst",
-    description: "Use the Open 100 flow.",
+    title: t.questOpen100Title,
+    description: t.questOpen100Desc,
     current: questStats.open100,
     target: 1,
     reward: { points: 500, xp: 300 },
@@ -108,8 +110,8 @@ const createQuestDefinitions = (questStats: QuestStats): QuestDefinition[] => [
   },
   {
     id: "sell-back-1-card",
-    title: "Sell Back 1 Card",
-    description: "Sell one vault card.",
+    title: t.questSellBackTitle,
+    description: t.questSellBackDesc,
     current: questStats.sellBack,
     target: 1,
     reward: { points: 75, xp: 60 },
@@ -118,8 +120,8 @@ const createQuestDefinitions = (questStats: QuestStats): QuestDefinition[] => [
   },
   {
     id: "request-shipping-1-card",
-    title: "Request Shipping",
-    description: "Submit one shipping request.",
+    title: t.questShippingTitle,
+    description: t.questShippingDesc,
     current: questStats.shipping,
     target: 1,
     reward: { points: 0, xp: 150 },
@@ -128,8 +130,8 @@ const createQuestDefinitions = (questStats: QuestStats): QuestDefinition[] => [
   },
   {
     id: "top-up-wallet",
-    title: "Top Up Wallet",
-    description: "Top up wallet once.",
+    title: t.questTopUpTitle,
+    description: t.questTopUpDesc,
     current: questStats.topUp,
     target: 1,
     reward: { points: 100, xp: 40 },
@@ -168,6 +170,7 @@ const getCountdownToMidnight = () => {
 };
 
 export default function QuestLeaderboardPanel({
+  language,
   questStats,
   vaultCards,
   transactions,
@@ -177,6 +180,7 @@ export default function QuestLeaderboardPanel({
   onClaimQuest,
   onOpenDailyLogin,
 }: QuestLeaderboardPanelProps) {
+  const t = translations[language]
   const [raffleCountdown, setRaffleCountdown] = useState(() =>
     getCountdownToMidnight(),
   );
@@ -189,7 +193,7 @@ export default function QuestLeaderboardPanel({
     return () => window.clearInterval(interval);
   }, []);
 
-  const questDefinitions = createQuestDefinitions(questStats);
+  const questDefinitions = createQuestDefinitions(questStats, t);
   const claimedCount = questStats.claimedQuestIds.length;
   const vaultValue = vaultCards.reduce(
     (total, card) => total + getSellBackPoints(card),
@@ -255,7 +259,7 @@ export default function QuestLeaderboardPanel({
 
             <div className="mt-3">
               <div className="mb-1.5 flex items-center justify-between text-[10px] font-black uppercase tracking-[0.18em] text-slate-500">
-                <span>Progress</span>
+                <span>{t.progress}</span>
                 <span className="text-slate-300">
                   {progress} / {quest.target}
                 </span>
@@ -292,7 +296,7 @@ export default function QuestLeaderboardPanel({
                       : "cursor-not-allowed border border-slate-500/20 bg-slate-500/10 text-slate-500"
                 }`}
               >
-                {isClaimed ? "Done" : isCompleted ? "Claim" : "Locked"}
+                {isClaimed ? t.done : isCompleted ? t.claim : t.locked}
               </button>
             </div>
           </motion.article>
@@ -304,10 +308,10 @@ export default function QuestLeaderboardPanel({
   return (
     <section className="mx-auto w-full max-w-7xl px-4 py-7 sm:px-5 lg:px-8">
       <div className="mb-5 flex flex-col gap-2 text-center">
-        <p className="hud-label justify-center text-sm">Quest</p>
-        <h2 className="text-3xl font-black sm:text-4xl">Daily Progress Center</h2>
+        <p className="hud-label justify-center text-sm">{t.dailyQuest}</p>
+        <h2 className="text-3xl font-black sm:text-4xl">{t.dailyProgressCenter}</h2>
         <p className="mx-auto max-w-3xl text-sm leading-6 text-slate-400">
-          Compact player progress, missions, rewards and leaderboard for mobile demo.
+          {t.dailyProgressSubtitle}
         </p>
       </div>
 
@@ -321,12 +325,12 @@ export default function QuestLeaderboardPanel({
           <div className="relative flex h-full flex-col overflow-hidden rounded-[1.5rem] border border-white/20 bg-gradient-to-br from-white/20 via-white/10 to-white/[0.03] p-4 shadow-[0_28px_80px_rgba(0,0,0,0.28)] sm:rounded-[2rem] sm:p-6">
             <div className="relative z-10">
               <p className="text-xs font-black uppercase tracking-[0.28em] text-slate-300">
-                Player Level
+                {t.playerLevel}
               </p>
               <div className="mt-3 flex flex-wrap items-end gap-3 sm:mt-4 sm:gap-4">
                 <h3 className="text-4xl font-black text-white sm:text-5xl">LV {level}</h3>
                 <p className="pb-2 text-sm font-bold text-orange-200">
-                  🔥 {Math.max(xpTarget - xpIntoLevel, 0)} XP to Level Up
+                  🔥 {Math.max(xpTarget - xpIntoLevel, 0)} {t.xpToLevelUp}
                 </p>
               </div>
 
@@ -347,7 +351,7 @@ export default function QuestLeaderboardPanel({
             <div className="relative z-10 mt-4 grid grid-cols-3 gap-2 sm:mt-6 sm:gap-3">
               <div className="rounded-2xl border border-white/10 bg-black/25 p-3 sm:p-4">
                 <p className="text-[10px] uppercase tracking-[0.24em] text-slate-400">
-                  Wallet
+                  {t.wallet}
                 </p>
                 <p className="mt-1 text-xl font-black text-white sm:mt-2 sm:text-2xl">
                   {walletBalance.toLocaleString()}
@@ -355,7 +359,7 @@ export default function QuestLeaderboardPanel({
               </div>
               <div className="rounded-2xl border border-white/10 bg-black/25 p-3 sm:p-4">
                 <p className="text-[10px] uppercase tracking-[0.24em] text-slate-400">
-                  Tickets
+                  {t.tickets}
                 </p>
                 <p className="mt-1 text-xl font-black text-amber-200 sm:mt-2 sm:text-2xl">
                   {raffleTickets.toLocaleString()}
@@ -363,7 +367,7 @@ export default function QuestLeaderboardPanel({
               </div>
               <div className="rounded-2xl border border-white/10 bg-black/25 p-3 sm:p-4">
                 <p className="text-[10px] uppercase tracking-[0.24em] text-slate-400">
-                  Claimed
+                  {t.claimed}
                 </p>
                 <p className="mt-1 text-xl font-black text-emerald-200 sm:mt-2 sm:text-2xl">
                   {claimedCount} / {questDefinitions.length}
@@ -376,7 +380,7 @@ export default function QuestLeaderboardPanel({
               <div className="relative z-10 grid gap-4 md:grid-cols-[1fr_auto] md:items-center">
                 <div>
                   <p className="text-xs font-black uppercase tracking-[0.28em] text-orange-200">
-                    Free Raffle
+                    {t.freeRaffle}
                   </p>
                   <div className="mt-3 flex items-center gap-3">
                     <span className="text-3xl font-black text-white sm:text-4xl">
@@ -389,7 +393,7 @@ export default function QuestLeaderboardPanel({
                 </div>
                 <div className="text-left md:text-right">
                   <p className="text-xs font-black uppercase tracking-[0.28em] text-orange-300">
-                    Next Draw
+                    {t.nextDraw}
                   </p>
                   <p className="mt-1 text-3xl font-black text-white sm:mt-2 sm:text-4xl">
                     {raffleCountdown}
@@ -405,12 +409,12 @@ export default function QuestLeaderboardPanel({
               <div className="mb-4 flex items-center justify-between gap-3">
                 <div>
                   <p className="text-xs font-black uppercase tracking-[0.28em] text-orange-200">
-                    Daily Login Rewards
+                    {t.dailyLoginRewards}
                   </p>
                   <p className="mt-1 text-sm text-slate-400">
                     {claimedToday
-                      ? 'Today claimed. Come back tomorrow.'
-                      : `Day ${activeDailyDay} is ready to claim.`}
+                      ? t.claimedToday
+                      : `${t.day} ${activeDailyDay} ${t.claimDaily}`}
                   </p>
                 </div>
                 <button
@@ -418,7 +422,7 @@ export default function QuestLeaderboardPanel({
                   onClick={onOpenDailyLogin}
                   className="rounded-2xl border border-orange-300/30 bg-orange-300/10 px-4 py-3 text-sm font-black text-orange-100 transition hover:scale-[1.02] hover:bg-orange-300/20"
                 >
-                  {claimedToday ? 'View Rewards' : 'Claim Daily'}
+                  {claimedToday ? t.viewRewards : t.claimDaily}
                 </button>
               </div>
 
@@ -440,7 +444,7 @@ export default function QuestLeaderboardPanel({
                         <CheckCircle2 className="absolute right-2 top-2 h-4 w-4 text-emerald-300" />
                       )}
                       <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/45">
-                        Day {reward.day}
+                        {t.day} {reward.day}
                       </p>
                       <p className="mt-1 text-sm font-black text-white sm:mt-3 sm:text-lg">
                         {reward.kind === 'free-pull'
@@ -468,10 +472,10 @@ export default function QuestLeaderboardPanel({
         >
           <div className="mb-5 flex items-center justify-between gap-4">
             <div>
-              <p className="hud-label text-sm">Daily Quest</p>
-              <h2 className="mt-2 text-2xl font-black sm:text-3xl">Claimable Missions</h2>
+              <p className="hud-label text-sm">{t.dailyQuest}</p>
+              <h2 className="mt-2 text-2xl font-black sm:text-3xl">{t.claimableMissions}</h2>
               <p className="mt-2 text-sm leading-6 text-slate-400">
-                Compact mission grid aligned with the Player Level hub.
+                {t.claimableMissionsDesc}
               </p>
             </div>
 
@@ -483,7 +487,7 @@ export default function QuestLeaderboardPanel({
           <div className="mb-4 grid grid-cols-3 gap-2 sm:gap-3">
             <div className="rounded-2xl border border-cyan-300/10 bg-cyan-300/[0.04] p-3">
               <p className="text-[10px] uppercase tracking-[0.24em] text-slate-500">
-                Opened
+                {t.opened}
               </p>
               <p className="mt-1 text-xl font-black text-white">
                 {questStats.openPacks.toLocaleString()}
@@ -491,7 +495,7 @@ export default function QuestLeaderboardPanel({
             </div>
             <div className="rounded-2xl border border-emerald-300/10 bg-emerald-300/[0.04] p-3">
               <p className="text-[10px] uppercase tracking-[0.24em] text-slate-500">
-                Done
+                {t.done}
               </p>
               <p className="mt-1 text-xl font-black text-emerald-300">
                 {completedQuestCount} / {questDefinitions.length}
@@ -499,7 +503,7 @@ export default function QuestLeaderboardPanel({
             </div>
             <div className="rounded-2xl border border-amber-300/10 bg-amber-300/[0.04] p-3">
               <p className="text-[10px] uppercase tracking-[0.24em] text-slate-500">
-                Value
+                {t.value}
               </p>
               <p className="mt-1 text-xl font-black text-amber-300">
                 {vaultValue.toLocaleString()}
