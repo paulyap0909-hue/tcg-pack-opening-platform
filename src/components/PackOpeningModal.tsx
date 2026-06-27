@@ -2,11 +2,8 @@ import { AnimatePresence, motion } from 'framer-motion'
 import {
   ArrowLeft,
   CheckCircle2,
-  Gem,
   PackageOpen,
   ShieldCheck,
-  Sparkles,
-  Stars,
   X,
 } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
@@ -15,6 +12,7 @@ import type { Pack, RevealCard } from '../data/cardPool'
 import { getOpenedTime, getWeightedRandomCard } from '../data/cardPool'
 import type { VaultCard } from './VaultDrawer'
 import { audioManager } from '../lib/audioManager'
+import sealedCardPremium from '../assets/ui/sealed-card-premium.png'
 
 type PackOpeningModalProps = {
   pack: Pack | null
@@ -205,7 +203,7 @@ export default function PackOpeningModal({
                         />
                       ) : (
                         <motion.div
-                          className="relative flex h-full w-full items-center justify-center overflow-hidden rounded-[1.3rem] border border-cyan-300/15 bg-[radial-gradient(circle_at_50%_22%,rgba(56,189,248,0.18),transparent_30%),radial-gradient(circle_at_50%_78%,rgba(168,85,247,0.18),transparent_38%),linear-gradient(145deg,#040816,#081126_45%,#050710)] text-center sm:rounded-3xl"
+                          className="relative flex h-full w-full items-center justify-center overflow-hidden rounded-[1.3rem] bg-black text-center sm:rounded-3xl"
                           animate={
                             stage === 'opening'
                               ? { rotateY: [0, 120, 260, 360], scale: [1, 1.04, 0.96, 1] }
@@ -213,49 +211,12 @@ export default function PackOpeningModal({
                           }
                           transition={{ duration: 0.65 }}
                         >
-                          <div className="pointer-events-none absolute inset-0 opacity-[0.12] [background-image:linear-gradient(rgba(103,232,249,0.22)_1px,transparent_1px),linear-gradient(90deg,rgba(103,232,249,0.22)_1px,transparent_1px)] [background-size:34px_34px]" />
-                          <div className="pointer-events-none absolute inset-5 rounded-[1.2rem] border border-cyan-300/20 bg-gradient-to-br from-slate-950/80 via-[#091129]/70 to-slate-950/80 shadow-[inset_0_0_55px_rgba(34,211,238,0.09)] sm:rounded-[1.6rem]" />
-                          <div className="pointer-events-none absolute inset-4 rounded-[1.4rem] border border-purple-300/35 shadow-[0_0_45px_rgba(168,85,247,0.18)] sm:rounded-[1.9rem]" />
-                          <div className="pointer-events-none absolute left-1/2 top-1/2 h-40 w-40 -translate-x-1/2 -translate-y-1/2 rounded-full bg-cyan-300/10 blur-3xl" />
-                          <div className="pointer-events-none absolute left-1/2 top-1/2 h-52 w-52 -translate-x-1/2 -translate-y-1/2 rounded-full bg-purple-300/10 blur-3xl" />
-
-                          <div className="pointer-events-none absolute left-[12%] top-[14%] h-2 w-2 rounded-full bg-cyan-300/80 shadow-[0_0_18px_rgba(103,232,249,0.85)]" />
-                          <div className="pointer-events-none absolute right-[14%] top-[19%] h-1.5 w-1.5 rounded-full bg-purple-300/80 shadow-[0_0_18px_rgba(216,180,254,0.85)]" />
-                          <div className="pointer-events-none absolute left-[18%] bottom-[20%] h-1.5 w-1.5 rounded-full bg-cyan-300/80 shadow-[0_0_18px_rgba(103,232,249,0.85)]" />
-                          <div className="pointer-events-none absolute right-[17%] bottom-[15%] h-2 w-2 rounded-full bg-purple-300/80 shadow-[0_0_18px_rgba(216,180,254,0.85)]" />
-
-                          <div className="relative z-10 flex w-full flex-col items-center justify-center px-6">
-                            <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-cyan-300/20 bg-cyan-300/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.25em] text-cyan-200">
-                              <Stars className="h-3.5 w-3.5" />
-                              Premium Reveal
-                            </div>
-
-                            <div className="relative flex h-[220px] w-[78%] max-w-[260px] items-center justify-center rounded-[1.8rem] border border-cyan-300/35 bg-[linear-gradient(145deg,rgba(4,10,24,0.96),rgba(9,17,41,0.86),rgba(6,8,18,0.96))] shadow-[0_0_30px_rgba(34,211,238,0.14),0_0_65px_rgba(168,85,247,0.12)] sm:h-[270px]">
-                              <div className="absolute inset-[8px] rounded-[1.45rem] border border-white/8 bg-gradient-to-br from-slate-950/90 via-[#081126]/85 to-slate-950/90" />
-                              <div className="absolute inset-0 rounded-[1.8rem] bg-[conic-gradient(from_120deg,rgba(34,211,238,0.0),rgba(34,211,238,0.22),rgba(168,85,247,0.18),rgba(34,211,238,0.0))] opacity-80 blur-[1px]" />
-                              <div className="relative z-10 flex flex-col items-center">
-                                <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl border border-cyan-300/20 bg-cyan-300/10 text-cyan-200 shadow-[0_0_24px_rgba(34,211,238,0.25)]">
-                                  <Sparkles className="h-8 w-8" />
-                                </div>
-                                <p className="text-sm font-black uppercase tracking-[0.32em] text-cyan-200">
-                                  Sealed Card
-                                </p>
-                                <p className="mt-2 text-xs font-bold uppercase tracking-[0.22em] text-purple-200">
-                                  Vault Protected
-                                </p>
-                              </div>
-                              <div className="absolute left-4 top-4 h-6 w-6 border-l-2 border-t-2 border-cyan-200/80" />
-                              <div className="absolute bottom-4 right-4 h-6 w-6 border-b-2 border-r-2 border-purple-200/80" />
-                            </div>
-
-                            <div className="mt-6 flex items-center gap-2 rounded-full border border-purple-300/20 bg-purple-300/10 px-3.5 py-1.5 text-[11px] font-black uppercase tracking-[0.22em] text-purple-200">
-                              <Gem className="h-3.5 w-3.5" />
-                              Tap to Reveal
-                            </div>
-                            <p className="mt-4 max-w-[240px] text-sm leading-6 text-slate-400">
-                              A premium sealed reveal is waiting inside. Flip to uncover your card.
-                            </p>
-                          </div>
+                          <img
+                            src={sealedCardPremium}
+                            alt="Premium sealed card reveal"
+                            className="h-full w-full object-cover"
+                            draggable={false}
+                          />
                         </motion.div>
                       )}
                     </div>
