@@ -1,16 +1,14 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { X, Wallet, Sparkles, Zap, Crown, ShieldCheck } from 'lucide-react'
-import { useEffect } from 'react'
-
-type TopUpPackage = {
-  name: string
-  price: string
-  points: number
-  bonus: number
-  tag: string
-  highlight?: boolean
-  icon: 'starter' | 'popular' | 'best'
-}
+import {
+  CheckCircle2,
+  CreditCard,
+  Gem,
+  Sparkles,
+  Wallet,
+  X,
+  Zap,
+} from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
 
 type TopUpModalProps = {
   isOpen: boolean
@@ -18,52 +16,98 @@ type TopUpModalProps = {
   onTopUp: (points: number) => void
 }
 
+type TopUpPackage = {
+  id: string
+  label: string
+  price: string
+  points: number
+  bonus: number
+  icon: 'gem' | 'spark' | 'wallet' | 'zap'
+  popular?: boolean
+}
+
 const topUpPackages: TopUpPackage[] = [
   {
-    name: 'Starter',
-    price: 'RM25',
-    points: 500,
-    bonus: 0,
-    tag: 'Quick reload',
-    icon: 'starter',
+    id: 'starter',
+    label: 'Starter',
+    price: 'RM10',
+    points: 300,
+    bonus: 30,
+    icon: 'gem',
   },
   {
-    name: 'Most Popular',
-    price: 'RM60',
-    points: 1200,
-    bonus: 100,
-    tag: 'Best for Open 10',
-    highlight: true,
-    icon: 'popular',
+    id: 'open10',
+    label: 'Open 10',
+    price: 'RM50',
+    points: 1500,
+    bonus: 150,
+    icon: 'spark',
+    popular: true,
   },
   {
-    name: 'Best Value',
-    price: 'RM138',
-    points: 2800,
-    bonus: 300,
-    tag: 'High chase mode',
-    icon: 'best',
+    id: 'chase',
+    label: 'Chase',
+    price: 'RM200',
+    points: 6000,
+    bonus: 600,
+    icon: 'wallet',
+  },
+  {
+    id: 'highroller',
+    label: 'High Roller',
+    price: 'RM800',
+    points: 24000,
+    bonus: 2400,
+    icon: 'zap',
+  },
+  {
+    id: 'vault',
+    label: 'Vault',
+    price: 'RM2000',
+    points: 60000,
+    bonus: 6000,
+    icon: 'wallet',
+  },
+  {
+    id: 'legend',
+    label: 'Legend',
+    price: 'RM5000',
+    points: 150000,
+    bonus: 15000,
+    icon: 'spark',
   },
 ]
 
-function getPackageIcon(icon: TopUpPackage['icon']) {
-  if (icon === 'popular') return <Zap className="h-6 w-6 text-amber-300" />
-  if (icon === 'best') return <Crown className="h-6 w-6 text-purple-300" />
-  return <Wallet className="h-6 w-6 text-cyan-300" />
+const packageIconMap = {
+  gem: Gem,
+  spark: Sparkles,
+  wallet: Wallet,
+  zap: Zap,
 }
+
+const formatPoints = (value: number) => value.toLocaleString()
 
 export default function TopUpModal({
   isOpen,
   onClose,
   onTopUp,
 }: TopUpModalProps) {
+  const [selectedPackageId, setSelectedPackageId] = useState('open10')
+
+  const selectedPackage = useMemo(() => {
+    return (
+      topUpPackages.find((item) => item.id === selectedPackageId) ??
+      topUpPackages[0]
+    )
+  }, [selectedPackageId])
+
+  const totalPoints = selectedPackage.points + selectedPackage.bonus
+
   useEffect(() => {
     if (!isOpen) return
 
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        onClose()
-      }
+      if (event.key === 'Escape') onClose()
     }
 
     document.body.style.overflow = 'hidden'
@@ -75,9 +119,7 @@ export default function TopUpModal({
     }
   }, [isOpen, onClose])
 
-  const handleSelectPackage = (topUpPackage: TopUpPackage) => {
-    const totalPoints = topUpPackage.points + topUpPackage.bonus
-
+  const handleConfirm = () => {
     onTopUp(totalPoints)
     onClose()
   }
@@ -86,150 +128,138 @@ export default function TopUpModal({
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          className="fixed inset-0 z-[999999] flex items-center justify-center overflow-y-auto bg-black/85 px-4 py-8 text-white backdrop-blur-xl"
+          className="fixed inset-0 z-[1000000] flex items-end justify-center bg-black/78 px-0 py-0 backdrop-blur-xl sm:items-center sm:px-4 sm:py-8"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
         >
-          <div
-            className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.16),transparent_42%),radial-gradient(circle_at_bottom_right,rgba(168,85,247,0.14),transparent_36%)]"
-            onClick={onClose}
-          />
-
           <motion.div
-            className="relative z-[1000000] w-full max-w-5xl rounded-[2rem] border border-cyan-300/25 bg-[#050914] p-5 shadow-[0_0_80px_rgba(34,211,238,0.28)] sm:p-7"
-            initial={{ scale: 0.9, y: 24, opacity: 0 }}
-            animate={{ scale: 1, y: 0, opacity: 1 }}
-            exit={{ scale: 0.9, y: 24, opacity: 0 }}
-            transition={{ type: 'spring', stiffness: 180, damping: 22 }}
+            className="relative flex h-[86svh] w-full max-w-[540px] flex-col overflow-hidden rounded-t-[2rem] border border-orange-300/25 bg-[#120906] text-white shadow-[0_-30px_120px_rgba(249,115,22,0.22)] sm:h-auto sm:max-h-[88vh] sm:rounded-[2rem]"
+            initial={{ y: 80, scale: 0.98 }}
+            animate={{ y: 0, scale: 1 }}
+            exit={{ y: 80, scale: 0.98 }}
+            transition={{ type: 'spring', damping: 26, stiffness: 260 }}
           >
-            <button
-              type="button"
-              onClick={onClose}
-              aria-label="Close top up modal"
-              className="absolute right-5 top-5 z-[1000001] flex h-12 w-12 items-center justify-center rounded-full border border-cyan-300/40 bg-slate-950 text-cyan-100 shadow-[0_0_35px_rgba(34,211,238,0.35)] transition hover:scale-105 hover:bg-cyan-300/10"
-            >
-              <X className="h-6 w-6" />
-            </button>
+            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(249,115,22,0.28),transparent_36%),linear-gradient(180deg,rgba(255,255,255,0.06),transparent_28%)]" />
 
-            <div className="pr-14">
-              <p className="text-sm font-black uppercase tracking-[0.35em] text-cyan-300">
-                Wallet Top Up
-              </p>
-
-              <h2 className="mt-3 text-3xl font-black sm:text-4xl">
-                Add Points
-              </h2>
-
-              <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-400">
-                Choose a points package to continue opening packs. This is a mock
-                wallet flow for the MVP version.
-              </p>
+            <div className="relative z-10 flex h-12 shrink-0 items-center justify-center border-b border-white/8">
+              <div className="absolute top-3 h-1 w-14 rounded-full bg-white/25" />
+              <button
+                type="button"
+                onClick={onClose}
+                aria-label="Close top up"
+                className="absolute right-4 top-3 flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/[0.06] text-white"
+              >
+                <X className="h-5 w-5" />
+              </button>
             </div>
 
-            <div className="mt-7 grid items-stretch gap-5 md:grid-cols-3">
-              {topUpPackages.map((topUpPackage) => {
-                const totalPoints = topUpPackage.points + topUpPackage.bonus
-
-                return (
-                  <button
-                    key={topUpPackage.name}
-                    type="button"
-                    onClick={() => handleSelectPackage(topUpPackage)}
-                    className={`group flex h-full min-h-[420px] flex-col rounded-[2rem] border p-5 text-left transition hover:-translate-y-1 hover:scale-[1.01] ${
-                      topUpPackage.highlight
-                        ? 'border-amber-300/45 bg-amber-300/[0.08] shadow-[0_0_45px_rgba(251,191,36,0.16)]'
-                        : 'border-cyan-300/15 bg-cyan-300/[0.04] hover:border-cyan-300/35 hover:bg-cyan-300/[0.07]'
-                    }`}
-                  >
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-cyan-300/20 bg-black/45">
-                        {getPackageIcon(topUpPackage.icon)}
-                      </div>
-
-                      {topUpPackage.highlight && (
-                        <span className="rounded-full border border-amber-300/30 bg-amber-300/15 px-3 py-1 text-[10px] font-black uppercase tracking-[0.22em] text-amber-200">
-                          Popular
-                        </span>
-                      )}
-                    </div>
-
-                    <div className="mt-5">
-                      <p className="text-[10px] font-black uppercase tracking-[0.28em] text-slate-500">
-                        {topUpPackage.tag}
-                      </p>
-
-                      <h3 className="mt-2 text-2xl font-black text-white">
-                        {topUpPackage.name}
-                      </h3>
-
-                      <p className="mt-4 text-4xl font-black text-cyan-200">
-                        {topUpPackage.price}
-                      </p>
-                    </div>
-
-                    <div className="mt-5 flex min-h-[168px] flex-col justify-between rounded-2xl border border-cyan-300/10 bg-black/35 p-4">
-                      <div>
-                        <p className="text-[10px] font-black uppercase tracking-[0.28em] text-slate-500">
-                          Receive
-                        </p>
-
-                        <p className="mt-2 text-3xl font-black text-white">
-                          {topUpPackage.points.toLocaleString()}
-                        </p>
-
-                        <p className="mt-1 text-sm text-slate-400">
-                          base points
-                        </p>
-                      </div>
-
-                      {topUpPackage.bonus > 0 ? (
-                        <div className="mt-4 rounded-xl border border-emerald-300/20 bg-emerald-300/10 px-3 py-2 text-sm font-black text-emerald-300">
-                          +{topUpPackage.bonus.toLocaleString()} Bonus Points
-                        </div>
-                      ) : (
-                        <div className="mt-4 rounded-xl border border-slate-500/20 bg-slate-500/10 px-3 py-2 text-sm font-black text-slate-400">
-                          No Bonus
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="mt-5 rounded-2xl border border-purple-300/10 bg-purple-300/[0.04] p-4">
-                      <p className="text-[10px] font-black uppercase tracking-[0.28em] text-slate-500">
-                        Total
-                      </p>
-
-                      <p className="mt-2 text-2xl font-black text-purple-200">
-                        {totalPoints.toLocaleString()} Points
-                      </p>
-                    </div>
-
-                    <div
-                      className={`mt-auto flex items-center justify-center gap-2 rounded-2xl px-5 py-4 text-sm font-black uppercase tracking-wider transition ${
-                        topUpPackage.highlight
-                          ? 'bg-gradient-to-r from-amber-300 to-red-500 text-black group-hover:shadow-[0_0_35px_rgba(251,191,36,0.3)]'
-                          : 'bg-gradient-to-r from-cyan-300 to-blue-500 text-black group-hover:shadow-[0_0_35px_rgba(34,211,238,0.3)]'
-                      }`}
-                    >
-                      <Sparkles className="h-4 w-4" />
-                      Select Package
-                    </div>
-                  </button>
-                )
-              })}
-            </div>
-
-            <div className="mt-6 rounded-2xl border border-cyan-300/15 bg-cyan-300/[0.04] p-5">
-              <div className="mb-2 flex items-center gap-2">
-                <ShieldCheck className="h-4 w-4 text-cyan-300" />
-                <p className="text-xs font-black uppercase tracking-[0.28em] text-cyan-300">
-                  MVP Notice
+            <div className="relative z-10 flex-1 overflow-y-auto px-4 pb-4">
+              <div className="text-center">
+                <p className="text-[10px] font-black uppercase tracking-[0.32em] text-orange-200/80">
+                  Wallet Top Up
+                </p>
+                <h2 className="mt-1 text-3xl font-black tracking-tight">
+                  Top Up
+                </h2>
+                <p className="mt-1 text-xs text-orange-100/60">
+                  Choose a points package to continue opening packs.
                 </p>
               </div>
 
-              <p className="text-sm leading-6 text-slate-400">
-                This top up modal is currently simulated. Later, it can connect to
-                Stripe, ToyyibPay, Billplz, FPX, or another payment gateway.
+              <div className="mt-5 grid grid-cols-3 gap-2">
+                {topUpPackages.map((item) => {
+                  const isSelected = item.id === selectedPackageId
+                  const Icon = packageIconMap[item.icon]
+
+                  return (
+                    <button
+                      key={item.id}
+                      type="button"
+                      onClick={() => setSelectedPackageId(item.id)}
+                      className={`relative min-h-[128px] rounded-2xl border p-2.5 text-center transition active:scale-95 ${
+                        isSelected
+                          ? 'border-orange-200 bg-orange-300/16 shadow-[0_0_32px_rgba(249,115,22,0.22)]'
+                          : 'border-orange-200/28 bg-white/[0.045]'
+                      }`}
+                    >
+                      {item.popular && (
+                        <span className="absolute -top-2 left-1/2 -translate-x-1/2 rounded-full bg-orange-400 px-2 py-0.5 text-[8px] font-black uppercase tracking-[0.16em] text-black">
+                          Hot
+                        </span>
+                      )}
+
+                      <div className="mx-auto flex h-11 w-11 items-center justify-center rounded-2xl border border-orange-200/20 bg-black/25">
+                        <Icon className="h-5 w-5 text-orange-200" />
+                      </div>
+
+                      <p className="mt-2 text-xl font-black text-orange-300">
+                        {formatPoints(item.points)}
+                      </p>
+
+                      <p className="mt-1 rounded-full border border-orange-200/18 bg-orange-200/8 px-1 py-0.5 text-[10px] font-black text-orange-100/85">
+                        +{formatPoints(item.bonus)} bonus
+                      </p>
+
+                      <p className="mt-2 text-sm font-black text-white">
+                        {item.price}
+                      </p>
+                    </button>
+                  )
+                })}
+              </div>
+
+              <button
+                type="button"
+                className="mt-3 flex w-full items-center justify-between rounded-2xl border border-orange-200/28 bg-white/[0.06] px-4 py-3 text-left"
+              >
+                <div>
+                  <p className="text-lg font-black text-white">Custom Amount</p>
+                  <p className="text-xs text-orange-100/55">min. RM10,000</p>
+                </div>
+                <Gem className="h-8 w-8 text-orange-300" />
+              </button>
+
+              <div className="mt-3 rounded-2xl border border-orange-200/18 bg-black/20 p-3">
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <p className="text-[10px] font-black uppercase tracking-[0.24em] text-orange-100/45">
+                      Selected Package
+                    </p>
+                    <p className="mt-1 text-lg font-black text-white">
+                      {selectedPackage.label} · {selectedPackage.price}
+                    </p>
+                  </div>
+
+                  <div className="text-right">
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-orange-100/45">
+                      Receive
+                    </p>
+                    <p className="mt-1 text-lg font-black text-orange-200">
+                      {formatPoints(totalPoints)}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="mt-3 rounded-xl border border-emerald-300/18 bg-emerald-300/10 px-3 py-2 text-xs font-black text-emerald-200">
+                  <CheckCircle2 className="mr-1 inline h-4 w-4" />
+                  Demo top up only. Payment gateway can be connected later.
+                </div>
+              </div>
+            </div>
+
+            <div className="relative z-10 shrink-0 border-t border-white/8 bg-[#120906]/95 px-4 pb-[calc(14px+env(safe-area-inset-bottom))] pt-3 backdrop-blur-xl">
+              <button
+                type="button"
+                onClick={handleConfirm}
+                className="flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-orange-500 via-orange-400 to-yellow-300 px-5 py-4 text-sm font-black uppercase tracking-[0.12em] text-black shadow-[0_16px_38px_rgba(249,115,22,0.32)]"
+              >
+                <CreditCard className="h-5 w-5" />
+                Select Package
+              </button>
+
+              <p className="mt-2 text-center text-[10px] text-orange-100/45">
+                + RM1 processing fee shown later in real payment flow.
               </p>
             </div>
           </motion.div>
