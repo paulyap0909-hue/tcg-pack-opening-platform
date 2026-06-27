@@ -8,7 +8,6 @@ import {
   Gift,
   Home,
   PackageOpen,
-  Search,
   Trophy,
   UserCircle,
   Volume2,
@@ -72,6 +71,8 @@ import {
 } from '../../data/dailyLoginRewards'
 
 import heroPremiumShinyPack from '../../assets/decks/hero-premium-shiny-pack.png'
+import pikachuPackWorld from '../../assets/ui/pikachu-pack-world.jpg'
+import luffyPackWorld from '../../assets/ui/luffy-pack-world.webp'
 
 type ActiveModal = 'detail' | 'opening' | 'multi-opening' | null
 
@@ -127,11 +128,6 @@ type PackCategory =
   | 'Premium Mystery Pack'
   | 'Nearly Sold Out'
 
-type PackSortOption =
-  | 'Latest'
-  | 'Price: Low to High'
-  | 'Price: High to Low'
-  | 'A-Z'
 
 type QuestStatIncrement = Partial<
   Pick<
@@ -168,6 +164,8 @@ const packUniverseOptions: Array<{
   activeClass: string
   inactiveClass: string
   iconClass: string
+  image: string
+  imageAlt: string
 }> = [
   {
     id: 'pokemon',
@@ -177,6 +175,8 @@ const packUniverseOptions: Array<{
     activeClass: 'border-yellow-300/70 bg-yellow-300/16 text-yellow-100 shadow-[0_0_38px_rgba(250,204,21,0.18)]',
     inactiveClass: 'border-white/10 bg-white/[0.045] text-slate-300',
     iconClass: 'from-yellow-300 to-cyan-300',
+    image: pikachuPackWorld,
+    imageAlt: 'Pikachu pack world',
   },
   {
     id: 'onePiece',
@@ -186,6 +186,8 @@ const packUniverseOptions: Array<{
     activeClass: 'border-red-300/70 bg-red-300/14 text-red-100 shadow-[0_0_38px_rgba(248,113,113,0.18)]',
     inactiveClass: 'border-white/10 bg-white/[0.045] text-slate-300',
     iconClass: 'from-red-300 to-amber-300',
+    image: luffyPackWorld,
+    imageAlt: 'Luffy pack world',
   },
 ]
 
@@ -790,8 +792,6 @@ function PlayerAdminDemoShell({
   const [isAdminShippingOpen, setIsAdminShippingOpen] = useState(initialAdminOpen)
   const [selectedCategory, setSelectedCategory] =
     useState<PackCategory>('All')
-  const [packSearchQuery, setPackSearchQuery] = useState('')
-  const [packSortBy, setPackSortBy] = useState<PackSortOption>('Latest')
   const [mobilePage, setMobilePage] = useState<MobilePage>('home')
   const [selectedPackUniverse, setSelectedPackUniverse] = useState<PackUniverse>('pokemon')
   const [vaultCards, setVaultCards] = useState<VaultCard[]>(() =>
@@ -1639,9 +1639,7 @@ function PlayerAdminDemoShell({
     packUniverseOptions[0]
 
   const filteredPacks = useMemo(() => {
-    const normalizedSearch = packSearchQuery.trim().toLowerCase()
-
-    const basePacks = playerVisiblePacks.filter((pack) => {
+    return playerVisiblePacks.filter((pack) => {
       const matchesUniverse = getPackUniverse(pack) === selectedPackUniverse
       const matchesCategory =
         selectedCategory === 'All'
@@ -1650,27 +1648,9 @@ function PlayerAdminDemoShell({
             ? isNearlySoldOut(pack)
             : pack.category === selectedCategory
 
-      const matchesSearch =
-        normalizedSearch.length === 0 ||
-        pack.name.toLowerCase().includes(normalizedSearch) ||
-        pack.category.toLowerCase().includes(normalizedSearch) ||
-        pack.badge.toLowerCase().includes(normalizedSearch)
-
-      return matchesUniverse && matchesCategory && matchesSearch
+      return matchesUniverse && matchesCategory
     })
-
-    const sortedPacks = [...basePacks]
-
-    if (packSortBy === 'Price: Low to High') {
-      sortedPacks.sort((firstPack, secondPack) => getPackCost(firstPack) - getPackCost(secondPack))
-    } else if (packSortBy === 'Price: High to Low') {
-      sortedPacks.sort((firstPack, secondPack) => getPackCost(secondPack) - getPackCost(firstPack))
-    } else if (packSortBy === 'A-Z') {
-      sortedPacks.sort((firstPack, secondPack) => firstPack.name.localeCompare(secondPack.name))
-    }
-
-    return sortedPacks
-  }, [packSearchQuery, packSortBy, playerVisiblePacks, selectedCategory, selectedPackUniverse])
+  }, [playerVisiblePacks, selectedCategory, selectedPackUniverse])
 
   const changeMobilePage = (page: MobilePage) => {
     setMobilePage(page)
@@ -1761,32 +1741,7 @@ function PlayerAdminDemoShell({
               </p>
             </div>
 
-            <div className="flex w-full flex-col gap-3 lg:max-w-xl lg:flex-row lg:justify-end">
-              <div className="relative flex-1">
-                <Search className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-500" />
-                <input
-                  type="text"
-                  value={packSearchQuery}
-                  onChange={(event) => setPackSearchQuery(event.target.value)}
-                  placeholder="Search"
-                  className="w-full rounded-2xl border border-white/8 bg-white/[0.04] py-3.5 pl-12 pr-4 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300/35 focus:bg-white/[0.06]"
-                />
-              </div>
 
-              <div className="relative min-w-[180px]">
-                <select
-                  value={packSortBy}
-                  onChange={(event) => setPackSortBy(event.target.value as PackSortOption)}
-                  className="w-full appearance-none rounded-2xl border border-white/8 bg-white/[0.04] px-4 py-3.5 pr-10 text-sm font-semibold text-white outline-none transition focus:border-cyan-300/35 focus:bg-white/[0.06]"
-                >
-                  <option value="Latest">Latest</option>
-                  <option value="Price: Low to High">Price: Low to High</option>
-                  <option value="Price: High to Low">Price: High to Low</option>
-                  <option value="A-Z">A-Z</option>
-                </select>
-                <ChevronRight className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 text-slate-500" />
-              </div>
-            </div>
           </div>
 
           <div className="mb-5 overflow-hidden rounded-[1.65rem] border border-white/10 bg-white/[0.035] p-3 shadow-[0_20px_70px_rgba(0,0,0,0.25)]">
@@ -1819,26 +1774,39 @@ function PlayerAdminDemoShell({
                       setSelectedCategory('All')
                       void audioManager.playBgm(option.id === 'pokemon' ? 'pokemon' : 'onePiece')
                     }}
-                    className={`relative overflow-hidden rounded-[1.35rem] border p-3 text-left transition active:scale-[0.98] ${
+                    className={`group relative min-h-[190px] overflow-hidden rounded-[1.35rem] border p-0 text-left transition active:scale-[0.98] ${
                       isSelected ? option.activeClass : option.inactiveClass
                     }`}
                   >
-                    <div className={`pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full bg-gradient-to-br ${option.iconClass} opacity-20 blur-xl`} />
-                    <div className="relative flex items-start justify-between gap-2">
-                      <div className="min-w-0">
-                        <p className="text-[10px] font-black uppercase tracking-[0.18em] text-current/60">
+                    <div className={`pointer-events-none absolute inset-0 bg-gradient-to-br ${option.iconClass} opacity-[0.14]`} />
+                    <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(255,255,255,0.22),transparent_28%),linear-gradient(180deg,rgba(0,0,0,0.05),rgba(0,0,0,0.55))]" />
+
+                    <img
+                      src={option.image}
+                      alt={option.imageAlt}
+                      className={`pointer-events-none absolute bottom-0 right-[-18px] h-[128px] w-[128px] object-contain drop-shadow-[0_0_28px_rgba(255,255,255,0.2)] transition duration-300 ${
+                        isSelected ? 'scale-110 opacity-100' : 'scale-100 opacity-70 grayscale-[0.25]'
+                      }`}
+                      draggable={false}
+                    />
+
+                    <div className="relative z-10 flex h-full min-h-[190px] flex-col justify-between p-4">
+                      <div>
+                        <p className="max-w-[112px] text-[10px] font-black uppercase leading-5 tracking-[0.22em] text-current/65">
                           {option.eyebrow}
                         </p>
-                        <h3 className="mt-1 text-lg font-black tracking-tight text-white">
+                        <h3 className="mt-2 text-2xl font-black tracking-tight text-white">
                           {option.label}
                         </h3>
-                        <p className="mt-1 text-[11px] font-bold text-current/65">
-                          {packCount} active packs
-                        </p>
                       </div>
 
-                      <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br ${option.iconClass} text-black shadow-[0_0_24px_rgba(255,255,255,0.12)]`}>
-                        <PackageOpen className="h-5 w-5" />
+                      <div className="pr-16">
+                        <p className="text-xs font-black text-current/72">
+                          {packCount} active packs
+                        </p>
+                        <div className={`mt-2 h-1.5 rounded-full bg-gradient-to-r ${option.iconClass} ${
+                          isSelected ? 'opacity-100' : 'opacity-35'
+                        }`} />
                       </div>
                     </div>
                   </button>
@@ -2135,32 +2103,7 @@ function PlayerAdminDemoShell({
               </p>
             </div>
 
-            <div className="flex w-full flex-col gap-3 lg:max-w-xl lg:flex-row lg:justify-end">
-              <div className="relative flex-1">
-                <Search className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-500" />
-                <input
-                  type="text"
-                  value={packSearchQuery}
-                  onChange={(event) => setPackSearchQuery(event.target.value)}
-                  placeholder="Search"
-                  className="w-full rounded-2xl border border-white/8 bg-white/[0.04] py-3.5 pl-12 pr-4 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300/35 focus:bg-white/[0.06]"
-                />
-              </div>
 
-              <div className="relative min-w-[180px]">
-                <select
-                  value={packSortBy}
-                  onChange={(event) => setPackSortBy(event.target.value as PackSortOption)}
-                  className="w-full appearance-none rounded-2xl border border-white/8 bg-white/[0.04] px-4 py-3.5 pr-10 text-sm font-semibold text-white outline-none transition focus:border-cyan-300/35 focus:bg-white/[0.06]"
-                >
-                  <option value="Latest">Latest</option>
-                  <option value="Price: Low to High">Price: Low to High</option>
-                  <option value="Price: High to Low">Price: High to Low</option>
-                  <option value="A-Z">A-Z</option>
-                </select>
-                <ChevronRight className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 text-slate-500" />
-              </div>
-            </div>
           </div>
 
           <div className="mb-5 overflow-hidden rounded-[1.65rem] border border-white/10 bg-white/[0.035] p-3 shadow-[0_20px_70px_rgba(0,0,0,0.25)]">
