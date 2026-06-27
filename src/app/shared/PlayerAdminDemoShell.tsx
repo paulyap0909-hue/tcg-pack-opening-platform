@@ -1,11 +1,17 @@
 import { useEffect, useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
 import {
+  Bell,
   ChevronRight,
   Filter,
+  Gavel,
   Gem,
+  Gift,
+  Home,
+  PackageOpen,
   Search,
   Trophy,
+  UserCircle,
 } from 'lucide-react'
 
 import '../../styles/sci-fi-hud.css'
@@ -44,6 +50,7 @@ import ListForSaleModal from '../../components/ListForSaleModal'
 import HeroPackSection from '../../components/HeroPackSection'
 import DailyLoginRewardModal from '../../components/DailyLoginRewardModal'
 import LiveAuctionPanel from '../../components/LiveAuctionPanel'
+import MobileAuctionPanel from '../../components/MobileAuctionPanel'
 import PlayerWalletPanel from '../../components/PlayerWalletPanel'
 
 import type { Pack } from '../../data/cardPool'
@@ -1496,40 +1503,77 @@ function PlayerAdminDemoShell({
     <div className="relative min-h-screen overflow-hidden bg-[#030712] text-white">
       <SciFiBackground />
 
-      <main className="relative z-10">
-        <header className="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-4 sm:px-5 lg:px-8">
-          <button
-            type="button"
-            className="group flex items-center gap-3 text-left"
-          >
-            <div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-cyan-300/30 bg-cyan-300/10 shadow-[0_0_35px_rgba(34,211,238,0.22)] sm:h-12 sm:w-12">
-              <Trophy className="h-5 w-5 text-cyan-300 sm:h-6 sm:w-6" />
+      <main className="relative z-10 pb-24 lg:pb-0">
+        <header className="mx-auto w-full max-w-7xl px-4 py-3 sm:px-5 lg:px-8">
+          <div className="hidden items-center justify-between lg:flex">
+            <button
+              type="button"
+              className="group flex items-center gap-3 text-left"
+            >
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-cyan-300/30 bg-cyan-300/10 shadow-[0_0_35px_rgba(34,211,238,0.22)]">
+                <Trophy className="h-6 w-6 text-cyan-300" />
+              </div>
+
+              <div>
+                <p className="text-[10px] uppercase tracking-[0.35em] text-cyan-300">
+                  Jomluffyz
+                </p>
+                <h1 className="text-xl font-black leading-tight">
+                  Treasure Pack TCG
+                </h1>
+              </div>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setIsPlayerWalletOpen(true)}
+              className="group flex items-center gap-2 rounded-2xl border border-white/10 bg-white/[0.04] px-2 py-2 transition hover:scale-105 hover:border-purple-300/30 hover:bg-purple-300/10"
+            >
+              <span className="pl-2 text-sm font-black text-white">
+                Profile
+              </span>
+              <img
+                src="https://api.dicebear.com/9.x/adventurer/svg?seed=detailedpower3615&radius=50&backgroundColor=8b5cf6"
+                alt="Player account"
+                className="h-9 w-9 rounded-xl border border-white/10 object-cover"
+              />
+            </button>
+          </div>
+
+          <div className="sticky top-0 z-40 -mx-4 flex items-center gap-2 border-b border-white/8 bg-[#050b18]/88 px-4 py-3 backdrop-blur-xl lg:hidden">
+            <div className="relative flex-1">
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
+              <input
+                type="text"
+                value={packSearchQuery}
+                onChange={(event) => setPackSearchQuery(event.target.value)}
+                placeholder="Search packs, cards"
+                className="h-11 w-full rounded-full border border-white/10 bg-white/[0.06] pl-10 pr-4 text-sm font-semibold text-white outline-none placeholder:text-slate-400 focus:border-cyan-300/40"
+              />
             </div>
 
-            <div>
-              <p className="text-[9px] uppercase tracking-[0.28em] text-cyan-300 sm:text-[10px] sm:tracking-[0.35em]">
-                Jomluffyz
-              </p>
-              <h1 className="text-base font-black leading-tight sm:text-xl">
-                Treasure Pack TCG
-              </h1>
-            </div>
-          </button>
+            <button
+              type="button"
+              className="relative flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/[0.06] text-slate-200"
+            >
+              <Bell className="h-5 w-5" />
+              <span className="absolute right-0 top-0 flex h-5 min-w-5 items-center justify-center rounded-full bg-pink-500 px-1 text-[10px] font-black text-white">
+                2
+              </span>
+            </button>
 
-          <button
-            type="button"
-            onClick={() => setIsPlayerWalletOpen(true)}
-            className="group flex items-center gap-2 rounded-2xl border border-white/10 bg-white/[0.04] px-2 py-2 transition hover:scale-105 hover:border-purple-300/30 hover:bg-purple-300/10"
-          >
-            <span className="hidden pl-2 text-sm font-black text-white sm:inline">
-              Profile
-            </span>
-            <img
-              src="https://api.dicebear.com/9.x/adventurer/svg?seed=detailedpower3615&radius=50&backgroundColor=8b5cf6"
-              alt="Player account"
-              className="h-9 w-9 rounded-xl border border-white/10 object-cover"
-            />
-          </button>
+            <button
+              type="button"
+              onClick={() => setIsPlayerWalletOpen(true)}
+              className="flex h-11 w-11 items-center justify-center rounded-full border border-purple-300/20 bg-purple-300/10"
+            >
+              <img
+                src="https://api.dicebear.com/9.x/adventurer/svg?seed=detailedpower3615&radius=50&backgroundColor=8b5cf6"
+                alt="Player account"
+                className="h-9 w-9 rounded-full object-cover"
+              />
+            </button>
+          </div>
         </header>
 
         <HeroPackSection
@@ -1624,7 +1668,7 @@ function PlayerAdminDemoShell({
               </p>
             </div>
           ) : (
-            <div className="flex snap-x gap-3 overflow-x-auto pb-4 [-webkit-overflow-scrolling:touch] sm:grid sm:grid-cols-2 sm:gap-4 sm:overflow-visible sm:pb-0 xl:grid-cols-4">
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 sm:gap-4 xl:grid-cols-4">
               {filteredPacks.map((pack, index) => {
                 const isSoldOut = pack.remainingQuantity <= 0
 
@@ -1637,15 +1681,15 @@ function PlayerAdminDemoShell({
                     onClick={() => {
                       if (!isSoldOut) openPackDetail(pack)
                     }}
-                    className={`group relative w-[245px] shrink-0 snap-start overflow-hidden rounded-[1.35rem] border border-white/6 bg-[#0a1322]/95 p-3 shadow-[0_12px_40px_rgba(0,0,0,0.28)] transition duration-300 hover:-translate-y-1 hover:border-cyan-300/20 hover:shadow-[0_18px_55px_rgba(8,145,178,0.18)] sm:w-auto sm:rounded-[1.55rem] sm:p-4 ${
+                    className={`group relative overflow-hidden rounded-[1.25rem] border border-white/6 bg-[#0a1322]/95 p-2.5 shadow-[0_12px_40px_rgba(0,0,0,0.28)] transition duration-300 hover:-translate-y-1 hover:border-cyan-300/20 hover:shadow-[0_18px_55px_rgba(8,145,178,0.18)] sm:rounded-[1.55rem] sm:p-4 ${
                       isSoldOut ? 'cursor-not-allowed opacity-60 grayscale' : 'cursor-pointer'
                     }`}
                   >
                     <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.07),transparent_36%),linear-gradient(180deg,rgba(255,255,255,0.02),transparent)]" />
 
-                    <div className="relative flex min-h-[315px] flex-col sm:min-h-[400px]">
+                    <div className="relative flex min-h-[245px] flex-col sm:min-h-[400px]">
                       <div className="text-center">
-                        <h3 className="line-clamp-2 min-h-[2.7rem] text-sm font-black leading-tight text-white sm:min-h-[3.4rem] sm:text-[1.05rem]">
+                        <h3 className="line-clamp-2 min-h-[2.3rem] text-xs font-black leading-tight text-white sm:min-h-[3.4rem] sm:text-[1.05rem]">
                           {pack.name}
                         </h3>
                         <p className="mt-1 text-xs text-slate-500 sm:text-sm">{pack.category}</p>
@@ -1656,12 +1700,12 @@ function PlayerAdminDemoShell({
                           src={pack.cover}
                           alt={pack.name}
                           loading="lazy"
-                          className="max-h-[165px] w-auto object-contain drop-shadow-[0_18px_35px_rgba(0,0,0,0.45)] transition duration-300 group-hover:scale-[1.03] sm:max-h-[215px]"
+                          className="max-h-[128px] w-auto object-contain drop-shadow-[0_18px_35px_rgba(0,0,0,0.45)] transition duration-300 group-hover:scale-[1.03] sm:max-h-[215px]"
                         />
                       </div>
 
                       <div className="mt-auto flex items-center justify-between gap-4 pt-2">
-                        <div className="flex items-center gap-2 text-base font-black text-white sm:text-lg">
+                        <div className="flex items-center gap-1.5 text-sm font-black text-white sm:gap-2 sm:text-lg">
                           <div className="flex h-6 w-6 items-center justify-center rounded-full bg-amber-300/15 text-amber-300">
                             <Gem className="h-4 w-4 fill-current" />
                           </div>
@@ -1675,7 +1719,7 @@ function PlayerAdminDemoShell({
                             event.stopPropagation()
                             if (!isSoldOut) openPackDetail(pack)
                           }}
-                          className={`inline-flex items-center gap-1 text-base font-bold transition ${
+                          className={`inline-flex items-center gap-1 text-sm font-bold transition sm:text-base ${
                             isSoldOut ? 'text-slate-500' : 'text-slate-300 hover:text-white'
                           }`}
                         >
@@ -1704,11 +1748,21 @@ function PlayerAdminDemoShell({
         />
         </section>
 
-        <LiveAuctionPanel
-          walletBalance={walletBalance}
-          onBid={handleAuctionBid}
-          onNeedTopUp={openTopUpModal}
-        />
+        <div className="lg:hidden">
+          <MobileAuctionPanel
+            walletBalance={walletBalance}
+            onBid={handleAuctionBid}
+            onNeedTopUp={openTopUpModal}
+          />
+        </div>
+
+        <div id="auction" className="hidden lg:block">
+          <LiveAuctionPanel
+            walletBalance={walletBalance}
+            onBid={handleAuctionBid}
+            onNeedTopUp={openTopUpModal}
+          />
+        </div>
 
         <RaffleCenterPanel
           ticketBalance={raffleTickets}
@@ -1721,6 +1775,55 @@ function PlayerAdminDemoShell({
         {/* Real Card Catalog Preview is hidden for boss/demo presentation. */}
 
       </main>
+
+      <nav className="fixed bottom-0 left-0 right-0 z-[99990] border-t border-white/10 bg-[#05070d]/94 px-2 pb-[env(safe-area-inset-bottom)] pt-2 backdrop-blur-xl lg:hidden">
+        <div className="mx-auto grid max-w-md grid-cols-5">
+          <button
+            type="button"
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            className="flex flex-col items-center gap-1 rounded-2xl px-2 py-2 text-[11px] font-black text-cyan-200"
+          >
+            <Home className="h-5 w-5" />
+            Home
+          </button>
+
+          <button
+            type="button"
+            onClick={() => document.getElementById('packs')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+            className="flex flex-col items-center gap-1 rounded-2xl px-2 py-2 text-[11px] font-black text-slate-400"
+          >
+            <PackageOpen className="h-5 w-5" />
+            Packs
+          </button>
+
+          <button
+            type="button"
+            onClick={() => document.getElementById('auction')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+            className="flex flex-col items-center gap-1 rounded-2xl px-2 py-2 text-[11px] font-black text-yellow-300"
+          >
+            <Gavel className="h-5 w-5" />
+            Auction
+          </button>
+
+          <button
+            type="button"
+            onClick={() => document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+            className="flex flex-col items-center gap-1 rounded-2xl px-2 py-2 text-[11px] font-black text-slate-400"
+          >
+            <Gift className="h-5 w-5" />
+            Rewards
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setIsPlayerWalletOpen(true)}
+            className="flex flex-col items-center gap-1 rounded-2xl px-2 py-2 text-[11px] font-black text-slate-400"
+          >
+            <UserCircle className="h-5 w-5" />
+            Account
+          </button>
+        </div>
+      </nav>
 
       <PackDetailModal
         pack={activeModal === 'detail' ? activePack : null}
