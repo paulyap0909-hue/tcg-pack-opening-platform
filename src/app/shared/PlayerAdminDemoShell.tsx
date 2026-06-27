@@ -1748,24 +1748,26 @@ function PlayerAdminDemoShell({
           )}
 
           {mobilePage === 'rewards' && (
-            <section id="how-it-works" className="mx-auto w-full max-w-7xl px-4 py-7">
-              <div className="mb-4 rounded-[1.5rem] border border-purple-300/18 bg-purple-300/[0.06] p-4">
-                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-purple-300">
-                  Rewards
-                </p>
-                <h2 className="mt-1 text-2xl font-black text-white">
-                  Raffle & Daily Bonus
-                </h2>
-                <p className="mt-2 text-sm leading-6 text-slate-400">
-                  Player level and daily quests are now placed on Home for faster mobile access.
-                </p>
-                <button
-                  type="button"
-                  onClick={() => setIsDailyLoginOpen(true)}
-                  className="mt-4 w-full rounded-2xl bg-gradient-to-r from-orange-300 to-yellow-300 px-4 py-3 text-sm font-black text-black"
-                >
-                  Open Daily Login Rewards
-                </button>
+            <section id="how-it-works" className="mx-auto w-full max-w-7xl px-4 py-5">
+              <div className="mb-3 rounded-[1.35rem] border border-purple-300/18 bg-purple-300/[0.06] p-3">
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <p className="text-[10px] font-black uppercase tracking-[0.26em] text-purple-300">
+                      Rewards
+                    </p>
+                    <h2 className="mt-1 text-xl font-black text-white">
+                      Raffle & Daily Bonus
+                    </h2>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => setIsDailyLoginOpen(true)}
+                    className="shrink-0 rounded-2xl bg-gradient-to-r from-orange-300 to-yellow-300 px-3 py-2 text-xs font-black text-black"
+                  >
+                    Daily Login
+                  </button>
+                </div>
               </div>
 
               <RaffleCenterPanel
