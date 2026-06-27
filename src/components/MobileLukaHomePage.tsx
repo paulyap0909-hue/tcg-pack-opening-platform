@@ -15,7 +15,7 @@ import {
 } from 'lucide-react'
 
 import type { Pack } from '../data/cardPool'
-import onePieceMasterPackCover from '../assets/decks/onepiece-pack-01.png'
+import onePieceMasterPackCover from '../assets/decks/onepiece-pack-07.png'
 
 type MobileLukaHomePageProps = {
   packs: Pack[]
