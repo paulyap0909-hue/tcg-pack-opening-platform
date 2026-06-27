@@ -871,7 +871,6 @@ function PlayerAdminDemoShell({
   }
 
   const openTopUpModal = () => {
-    playSfx('buttonClick')
     setActiveModal(null)
     setActivePack(null)
 
@@ -1076,7 +1075,6 @@ function PlayerAdminDemoShell({
       return
     }
 
-    playSfx('buttonClick')
     setActivePack(latestPack)
     setActiveModal('detail')
   }
@@ -1110,7 +1108,6 @@ function PlayerAdminDemoShell({
       return false
     }
 
-    playSfx('bidClick')
     const nextBalance = walletBalance - cost
 
     setWalletBalance(nextBalance)
@@ -1540,10 +1537,6 @@ function PlayerAdminDemoShell({
   }, [playerVisiblePacks, selectedCategory, packSearchQuery, packSortBy])
 
   const changeMobilePage = (page: MobilePage) => {
-    if (page !== mobilePage) {
-      playSfx('navSwitch')
-    }
-
     setMobilePage(page)
 
     if (typeof window !== 'undefined') {
@@ -1770,7 +1763,6 @@ function PlayerAdminDemoShell({
                   <button
                     type="button"
                     onClick={() => {
-                      playSfx('buttonClick')
                       setIsDailyLoginOpen(true)
                     }}
                     className="shrink-0 rounded-2xl bg-gradient-to-r from-orange-300 to-yellow-300 px-3 py-2 text-xs font-black text-black"

@@ -1,9 +1,7 @@
 import bgmLobbySrc from '../assets/audio/bgm-lobby.mp3'
-import bidClickSrc from '../assets/audio/bid-click.mp3'
 import buttonClickSrc from '../assets/audio/button-click.mp3'
 import cardFlipSrc from '../assets/audio/card-flip.mp3'
 import errorSrc from '../assets/audio/error.mp3'
-import navSwitchSrc from '../assets/audio/nav-switch.mp3'
 import packOpenSrc from '../assets/audio/pack-open.mp3'
 import rareHitSrc from '../assets/audio/rare-hit.mp3'
 import secretHitSrc from '../assets/audio/secret-hit.mp3'
@@ -13,12 +11,10 @@ export type BgmName = 'lobby'
 
 export type SfxName =
   | 'buttonClick'
-  | 'navSwitch'
   | 'packOpen'
   | 'cardFlip'
   | 'rareHit'
   | 'secretHit'
-  | 'bidClick'
   | 'success'
   | 'error'
 
@@ -32,12 +28,10 @@ const bgmSources: Record<BgmName, string> = {
 
 const sfxSources: Record<SfxName, string> = {
   buttonClick: buttonClickSrc,
-  navSwitch: navSwitchSrc,
   packOpen: packOpenSrc,
   cardFlip: cardFlipSrc,
   rareHit: rareHitSrc,
   secretHit: secretHitSrc,
-  bidClick: bidClickSrc,
   success: successSrc,
   error: errorSrc,
 }
