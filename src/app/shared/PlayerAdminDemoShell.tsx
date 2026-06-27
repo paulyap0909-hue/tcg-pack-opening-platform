@@ -1,17 +1,19 @@
 import { useEffect, useMemo, useState } from 'react'
-import { motion } from 'framer-motion'
+import { AnimatePresence, motion } from 'framer-motion'
 import {
-  Bell,
+  Check,
   ChevronRight,
   Gavel,
   Gem,
   Gift,
+  Globe2,
   Home,
   PackageOpen,
   Trophy,
   UserCircle,
   Volume2,
   VolumeX,
+  X,
 } from 'lucide-react'
 
 import '../../styles/sci-fi-hud.css'
@@ -60,6 +62,7 @@ import useAudio from '../../hooks/useAudio'
 import { audioManager } from '../../lib/audioManager'
 import {
   getLanguageLabel,
+  languageOptions,
   loadStoredLanguage,
   saveStoredLanguage,
   translations,
@@ -847,6 +850,7 @@ function PlayerAdminDemoShell({
   const [isPlayerWalletOpen, setIsPlayerWalletOpen] = useState(false)
   const [isShippingCenterOpen, setIsShippingCenterOpen] = useState(false)
   const [isProfileSettingsOpen, setIsProfileSettingsOpen] = useState(false)
+  const [isAccountLanguageOpen, setIsAccountLanguageOpen] = useState(false)
   const [isAdminShippingOpen, setIsAdminShippingOpen] = useState(initialAdminOpen)
   const [selectedCategory, setSelectedCategory] =
     useState<PackCategory>('All')
@@ -2126,9 +2130,12 @@ function PlayerAdminDemoShell({
                       <span className="flex items-center gap-3 text-sm font-black text-white"><UserCircle className="h-5 w-5 text-emerald-200" />{t.accountSettings}</span>
                       <ChevronRight className="h-4 w-4 text-slate-500" />
                     </button>
-                    <button type="button" className="flex w-full items-center justify-between gap-3 px-4 py-3.5 text-left">
-                      <span className="flex items-center gap-3 text-sm font-black text-white"><Bell className="h-5 w-5 text-slate-300" />{t.supportLanguage}</span>
-                      <ChevronRight className="h-4 w-4 text-slate-500" />
+                    <button type="button" onClick={() => setIsAccountLanguageOpen(true)} className="flex w-full items-center justify-between gap-3 px-4 py-3.5 text-left">
+                      <span className="flex items-center gap-3 text-sm font-black text-white"><Globe2 className="h-5 w-5 text-cyan-200" />{t.language}</span>
+                      <span className="flex items-center gap-2 text-xs font-black text-slate-400">
+                        {getLanguageLabel(language)}
+                        <ChevronRight className="h-4 w-4 text-slate-500" />
+                      </span>
                     </button>
                   </div>
 
@@ -2477,11 +2484,82 @@ function PlayerAdminDemoShell({
         onClose={() => setIsShippingCenterOpen(false)}
       />
 
+      <AnimatePresence>
+        {isAccountLanguageOpen && (
+          <motion.div
+            className="fixed inset-0 z-[1000000] flex items-end justify-center bg-black/60 px-4 pb-4 backdrop-blur-sm sm:items-center"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div
+              className="w-full max-w-md overflow-hidden rounded-[1.6rem] border border-cyan-300/18 bg-[#07111f] text-white shadow-[0_-20px_80px_rgba(34,211,238,0.18)]"
+              initial={{ y: 80, scale: 0.98 }}
+              animate={{ y: 0, scale: 1 }}
+              exit={{ y: 80, scale: 0.98 }}
+              transition={{ type: 'spring', damping: 26, stiffness: 260 }}
+            >
+              <div className="flex items-center justify-between border-b border-white/10 px-4 py-4">
+                <div>
+                  <p className="text-[10px] font-black uppercase tracking-[0.26em] text-cyan-200">
+                    {t.language}
+                  </p>
+                  <h3 className="mt-1 text-xl font-black text-white">
+                    {t.chooseLanguage}
+                  </h3>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsAccountLanguageOpen(false)}
+                  className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/[0.07]"
+                  aria-label={t.cancel}
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+
+              <div className="p-4">
+                <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04]">
+                  {languageOptions.map((option) => {
+                    const isSelected = language === option.code
+
+                    return (
+                      <button
+                        key={option.code}
+                        type="button"
+                        onClick={() => {
+                          setLanguage(option.code)
+                          setIsAccountLanguageOpen(false)
+                        }}
+                        className="flex w-full items-center justify-between border-b border-white/10 px-4 py-4 text-left last:border-b-0"
+                      >
+                        <div>
+                          <p className="text-sm font-black text-white">
+                            {option.nativeLabel}
+                          </p>
+                          <p className="mt-1 text-xs font-semibold text-slate-500">
+                            {option.label}
+                          </p>
+                        </div>
+
+                        {isSelected && (
+                          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-cyan-300 text-black">
+                            <Check className="h-4 w-4" />
+                          </span>
+                        )}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <ProfileSettingsDrawer
         isOpen={isProfileSettingsOpen}
         language={language}
-        languageLabel={getLanguageLabel(language)}
-        onChangeLanguage={setLanguage}
         playerProfile={playerProfile}
         isSoundEnabled={isSoundEnabled}
         walletBalance={walletBalance}

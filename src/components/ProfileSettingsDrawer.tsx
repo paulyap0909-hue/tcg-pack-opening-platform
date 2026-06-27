@@ -1,10 +1,8 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import {
   Bell,
-  Check,
   ChevronRight,
   Gem,
-  Globe2,
   LockKeyhole,
   LogOut,
   MapPin,
@@ -20,7 +18,7 @@ import {
 import { useEffect, useState } from 'react'
 
 import { audioManager } from '../lib/audioManager'
-import { languageOptions, translations, type AppLanguage } from '../lib/i18n'
+import { translations, type AppLanguage } from '../lib/i18n'
 
 export type PlayerProfile = {
   displayName: string
@@ -36,8 +34,6 @@ type ProfileSettingsDrawerProps = {
   isOpen: boolean
   onClose: () => void
   language: AppLanguage
-  languageLabel: string
-  onChangeLanguage: (language: AppLanguage) => void
   playerProfile: PlayerProfile
   isSoundEnabled: boolean
   onToggleSound: () => void
@@ -199,8 +195,6 @@ export default function ProfileSettingsDrawer({
   isOpen,
   onClose,
   language,
-  languageLabel,
-  onChangeLanguage,
   playerProfile,
   isSoundEnabled,
   onToggleSound,
@@ -213,7 +207,6 @@ export default function ProfileSettingsDrawer({
   const [notifications, setNotifications] = useState(notificationDefaults)
   const [soundOptions, setSoundOptions] = useState(soundDefaults)
   const [isEditOpen, setIsEditOpen] = useState(false)
-  const [isLanguageOpen, setIsLanguageOpen] = useState(false)
   const [draftDisplayName, setDraftDisplayName] = useState(playerProfile.displayName)
   const [draftUsername, setDraftUsername] = useState(playerProfile.username)
   const [editError, setEditError] = useState('')
@@ -224,11 +217,6 @@ export default function ProfileSettingsDrawer({
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
-        if (isLanguageOpen) {
-          setIsLanguageOpen(false)
-          return
-        }
-
         if (isEditOpen) {
           setIsEditOpen(false)
           return
@@ -245,7 +233,7 @@ export default function ProfileSettingsDrawer({
       document.body.style.overflow = ''
       window.removeEventListener('keydown', handleKeyDown)
     }
-  }, [isEditOpen, isLanguageOpen, isOpen, onClose])
+  }, [isEditOpen, isOpen, onClose])
 
   useEffect(() => {
     if (!isEditOpen) return
@@ -287,10 +275,6 @@ export default function ProfileSettingsDrawer({
     setIsEditOpen(true)
   }
 
-  const handleChooseLanguage = (nextLanguage: AppLanguage) => {
-    onChangeLanguage(nextLanguage)
-    setIsLanguageOpen(false)
-  }
 
   const handleSaveProfile = () => {
     const saveResult = onSaveProfile({
@@ -556,12 +540,6 @@ export default function ProfileSettingsDrawer({
                   value="Malaysia"
                 />
                 <SettingsRow
-                  icon={Globe2}
-                  title={t.language}
-                  value={languageLabel}
-                  onClick={() => setIsLanguageOpen(true)}
-                />
-                <SettingsRow
                   icon={Volume2}
                   title={t.displayMode}
                   value="Dark"
@@ -702,75 +680,7 @@ export default function ProfileSettingsDrawer({
             )}
           </AnimatePresence>
 
-          <AnimatePresence>
-            {isLanguageOpen && (
-              <motion.div
-                className="absolute inset-0 z-40 flex items-end justify-center bg-black/55 px-4 pb-4 backdrop-blur-sm"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-              >
-                <motion.div
-                  className="w-full max-w-md overflow-hidden rounded-[1.6rem] border border-cyan-300/18 bg-[#07111f] text-white shadow-[0_-20px_80px_rgba(34,211,238,0.18)]"
-                  initial={{ y: 80, scale: 0.98 }}
-                  animate={{ y: 0, scale: 1 }}
-                  exit={{ y: 80, scale: 0.98 }}
-                  transition={{ type: 'spring', damping: 26, stiffness: 260 }}
-                >
-                  <div className="flex items-center justify-between border-b border-white/10 px-4 py-4">
-                    <div>
-                      <p className="text-[10px] font-black uppercase tracking-[0.26em] text-cyan-200">
-                        {t.language}
-                      </p>
-                      <h3 className="mt-1 text-xl font-black text-white">
-                        {t.chooseLanguage}
-                      </h3>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => setIsLanguageOpen(false)}
-                      className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/[0.07]"
-                      aria-label={t.cancel}
-                    >
-                      <X className="h-5 w-5" />
-                    </button>
-                  </div>
 
-                  <div className="p-4">
-                    <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04]">
-                      {languageOptions.map((option) => {
-                        const isSelected = language === option.code
-
-                        return (
-                          <button
-                            key={option.code}
-                            type="button"
-                            onClick={() => handleChooseLanguage(option.code)}
-                            className="flex w-full items-center justify-between border-b border-white/10 px-4 py-4 text-left last:border-b-0"
-                          >
-                            <div>
-                              <p className="text-sm font-black text-white">
-                                {option.nativeLabel}
-                              </p>
-                              <p className="mt-1 text-xs font-semibold text-slate-500">
-                                {option.label}
-                              </p>
-                            </div>
-
-                            {isSelected && (
-                              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-cyan-300 text-black">
-                                <Check className="h-4 w-4" />
-                              </span>
-                            )}
-                          </button>
-                        )
-                      })}
-                    </div>
-                  </div>
-                </motion.div>
-              </motion.div>
-            )}
-          </AnimatePresence>
         </motion.div>
       )}
     </AnimatePresence>
