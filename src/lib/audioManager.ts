@@ -1,13 +1,13 @@
 import { Howl, Howler } from 'howler'
 
 import bgmLobbySrc from '../assets/audio/bgm-lobby.mp3'
-import buttonClickSrc from '../assets/audio/button-click.mp3'
-import cardFlipSrc from '../assets/audio/card-flip.mp3'
-import errorSrc from '../assets/audio/error.mp3'
+import buttonClickSrc from '../assets/audio/button-click.wav'
+import cardFlipSrc from '../assets/audio/card-flip.wav'
+import errorSrc from '../assets/audio/error.wav'
 import packOpenSrc from '../assets/audio/pack-open.mp3'
 import rareHitSrc from '../assets/audio/rare-hit.mp3'
 import secretHitSrc from '../assets/audio/secret-hit.mp3'
-import successSrc from '../assets/audio/success.mp3'
+import successSrc from '../assets/audio/success.wav'
 
 export type BgmName = 'lobby'
 
@@ -25,7 +25,7 @@ const BGM_VOLUME_KEY = 'tcg_bgm_volume'
 const SFX_VOLUME_KEY = 'tcg_sfx_volume'
 
 const DEFAULT_BGM_VOLUME = 0.24
-const DEFAULT_SFX_VOLUME = 0.75
+const DEFAULT_SFX_VOLUME = 0.85
 
 const bgmSources: Record<BgmName, string> = {
   lobby: bgmLobbySrc,
@@ -39,6 +39,16 @@ const sfxSources: Record<SfxName, string> = {
   secretHit: secretHitSrc,
   success: successSrc,
   error: errorSrc,
+}
+
+const sfxVolumeMultipliers: Record<SfxName, number> = {
+  buttonClick: 1.18,
+  packOpen: 0.9,
+  cardFlip: 1.2,
+  rareHit: 0.95,
+  secretHit: 0.95,
+  success: 0.9,
+  error: 0.82,
 }
 
 const isBrowser = () => typeof window !== 'undefined'
@@ -106,6 +116,13 @@ class TcgAudioManager {
     return safeStoredVolume(SFX_VOLUME_KEY, DEFAULT_SFX_VOLUME)
   }
 
+  private getSfxEffectiveVolume(name: SfxName, requestedVolume?: number) {
+    const baseVolume = requestedVolume ?? this.getSfxVolume()
+    const multiplier = sfxVolumeMultipliers[name] ?? 1
+
+    return Math.max(0.01, Math.min(1, baseVolume * multiplier))
+  }
+
   setBgmVolume(volume: number) {
     const normalizedVolume = Math.max(0.01, Math.min(1, volume))
 
@@ -124,8 +141,8 @@ class TcgAudioManager {
     const normalizedVolume = Math.max(0.01, Math.min(1, volume))
     window.localStorage.setItem(SFX_VOLUME_KEY, String(normalizedVolume))
 
-    this.sfxHowls.forEach((sound) => {
-      sound.volume(normalizedVolume)
+    this.sfxHowls.forEach((sound, name) => {
+      sound.volume(this.getSfxEffectiveVolume(name, normalizedVolume))
     })
   }
 
@@ -197,7 +214,7 @@ class TcgAudioManager {
       html5: false,
       preload: true,
       pool: name === 'buttonClick' ? 12 : 6,
-      volume: this.getSfxVolume(),
+      volume: this.getSfxEffectiveVolume(name),
     })
 
     this.sfxHowls.set(name, sound)
@@ -280,7 +297,7 @@ class TcgAudioManager {
     this.lastSfxPlayedAt.set(name, now)
 
     const sound = this.getSfxHowl(name)
-    sound.volume(options?.volume ?? this.getSfxVolume())
+    sound.volume(this.getSfxEffectiveVolume(name, options?.volume))
 
     try {
       sound.play()
