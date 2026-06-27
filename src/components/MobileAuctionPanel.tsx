@@ -271,7 +271,12 @@ export default function MobileAuctionPanel({
     const nextBid = Number((selectedItem.currentBid + bidStep).toFixed(2))
     const success = onBid(bidStep, selectedItem.title, nextBid)
 
-    if (!success) return
+    if (!success) {
+      audioManager.playSfx('error')
+      return
+    }
+
+    audioManager.playSfx('bidClick', { throttleMs: 0, volume: 0.85 })
 
     setSelectedItem({
       ...selectedItem,

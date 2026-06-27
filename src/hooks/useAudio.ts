@@ -39,6 +39,26 @@ export default function useAudio() {
     return undefined
   }, [])
 
+  useEffect(() => {
+    const keepBgmLooping = () => {
+      audioManager.ensureBgmLoop('lobby')
+    }
+
+    document.addEventListener('visibilitychange', keepBgmLooping)
+    window.addEventListener('focus', keepBgmLooping)
+    window.addEventListener('pageshow', keepBgmLooping)
+    window.addEventListener('pointerdown', keepBgmLooping)
+    window.addEventListener('touchstart', keepBgmLooping)
+
+    return () => {
+      document.removeEventListener('visibilitychange', keepBgmLooping)
+      window.removeEventListener('focus', keepBgmLooping)
+      window.removeEventListener('pageshow', keepBgmLooping)
+      window.removeEventListener('pointerdown', keepBgmLooping)
+      window.removeEventListener('touchstart', keepBgmLooping)
+    }
+  }, [])
+
   const enterWithSound = useCallback(async () => {
     setIsSoundEnabled(true)
     setIsAudioGateOpen(false)

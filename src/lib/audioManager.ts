@@ -1,6 +1,7 @@
 import { Howl, Howler } from 'howler'
 
 import bgmLobbySrc from '../assets/audio/bgm-lobby.mp3'
+import bidClickSrc from '../assets/audio/bid-click.wav'
 import cardFlipSrc from '../assets/audio/card-flip.wav'
 import errorSrc from '../assets/audio/error.wav'
 import packOpenSrc from '../assets/audio/pack-open.mp3'
@@ -11,6 +12,7 @@ import successSrc from '../assets/audio/success.wav'
 export type BgmName = 'lobby'
 
 export type SfxName =
+  | 'bidClick'
   | 'packOpen'
   | 'cardFlip'
   | 'rareHit'
@@ -30,6 +32,7 @@ const bgmSources: Record<BgmName, string> = {
 }
 
 const sfxSources: Record<SfxName, string> = {
+  bidClick: bidClickSrc,
   packOpen: packOpenSrc,
   cardFlip: cardFlipSrc,
   rareHit: rareHitSrc,
@@ -39,6 +42,7 @@ const sfxSources: Record<SfxName, string> = {
 }
 
 const sfxVolumeMultipliers: Record<SfxName, number> = {
+  bidClick: 0.85,
   packOpen: 0.9,
   cardFlip: 1.2,
   rareHit: 0.95,
@@ -256,6 +260,7 @@ class TcgAudioManager {
     }
 
     const bgm = this.getBgmHowl(name)
+    bgm.loop(true)
     bgm.volume(this.getBgmVolume())
 
     this.activeBgm = bgm
@@ -272,6 +277,20 @@ class TcgAudioManager {
     }
   }
 
+  ensureBgmLoop(name: BgmName = 'lobby') {
+    if (!isBrowser() || !this.enabled) return
+
+    const bgm = this.getBgmHowl(name)
+    bgm.loop(true)
+    bgm.volume(this.getBgmVolume())
+
+    this.activeBgm = bgm
+    this.activeBgmName = name
+
+    if (!bgm.playing()) {
+      void this.playBgm(name)
+    }
+  }
 
   playSfx(name: SfxName, options?: { throttleMs?: number; volume?: number }) {
     if (!isBrowser() || !this.enabled) return

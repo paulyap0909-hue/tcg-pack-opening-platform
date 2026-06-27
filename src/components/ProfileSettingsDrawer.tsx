@@ -270,6 +270,10 @@ export default function ProfileSettingsDrawer({
     audioManager.playSfx('success', { throttleMs: 0, volume: 0.9 })
   }
 
+  const testBidSound = () => {
+    audioManager.playSfx('bidClick', { throttleMs: 0, volume: 0.85 })
+  }
+
   const resetAudioSettings = () => {
     audioManager.resetAudioSettings()
     onToggleSound()
@@ -455,7 +459,15 @@ export default function ProfileSettingsDrawer({
                   <p className="text-sm font-black text-white">Audio Test</p>
                 </div>
 
-                <div className="grid grid-cols-3 gap-2 px-4 py-3">
+                <div className="grid grid-cols-2 gap-2 px-4 py-3">
+                  <button
+                    type="button"
+                    data-audio-silent="true"
+                    onClick={testBidSound}
+                    className="rounded-2xl border border-yellow-300/18 bg-yellow-300/[0.07] px-3 py-3 text-xs font-black text-yellow-100"
+                  >
+                    Test Bid
+                  </button>
                   <button
                     type="button"
                     data-audio-silent="true"
