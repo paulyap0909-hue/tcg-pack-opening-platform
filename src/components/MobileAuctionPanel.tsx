@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   ArrowLeft,
   Bell,
@@ -150,6 +150,70 @@ const formatMoney = (value: number) => {
   return `MYR ${value.toLocaleString()}`
 }
 
+const parseAuctionSeconds = (endsIn: string) => {
+  if (endsIn.toLowerCase() === 'ended') return 0
+
+  const hourMatch = endsIn.match(/(\d+)h/i)
+  const minuteMatch = endsIn.match(/(\d+)m/i)
+  const secondMatch = endsIn.match(/(\d+)s/i)
+
+  const hours = hourMatch ? Number(hourMatch[1]) : 0
+  const minutes = minuteMatch ? Number(minuteMatch[1]) : 0
+  const seconds = secondMatch ? Number(secondMatch[1]) : 0
+
+  return hours * 3600 + minutes * 60 + seconds
+}
+
+const padTime = (value: number) => value.toString().padStart(2, '0')
+
+const formatAuctionCountdown = (secondsLeft: number) => {
+  if (secondsLeft <= 0) return 'Auction Ended'
+
+  const hours = Math.floor(secondsLeft / 3600)
+  const minutes = Math.floor((secondsLeft % 3600) / 60)
+  const seconds = secondsLeft % 60
+
+  if (hours > 0) return `${padTime(hours)}:${padTime(minutes)}:${padTime(seconds)}`
+
+  return `${padTime(minutes)}:${padTime(seconds)}`
+}
+
+const getCountdownStatus = (secondsLeft: number): MobileAuctionItem['status'] => {
+  if (secondsLeft <= 0) return 'Ended'
+  if (secondsLeft <= 120) return 'Ending'
+  return 'Live'
+}
+
+const getCountdownBadgeClass = (secondsLeft: number) => {
+  if (secondsLeft <= 0) {
+    return 'border-slate-600/40 bg-slate-900/85 text-slate-400'
+  }
+
+  if (secondsLeft <= 30) {
+    return 'animate-pulse border-red-400/60 bg-red-500/20 text-red-100 shadow-[0_0_18px_rgba(248,113,113,0.35)]'
+  }
+
+  if (secondsLeft <= 60) {
+    return 'border-orange-300/60 bg-orange-500/20 text-orange-100 shadow-[0_0_18px_rgba(251,146,60,0.25)]'
+  }
+
+  return 'border-yellow-300/35 bg-black/75 text-yellow-200 shadow-[0_0_16px_rgba(250,204,21,0.20)]'
+}
+
+const getCountdownTextClass = (secondsLeft: number) => {
+  if (secondsLeft <= 0) return 'text-slate-500'
+  if (secondsLeft <= 30) return 'animate-pulse text-red-300'
+  if (secondsLeft <= 60) return 'text-orange-300'
+  return 'text-yellow-300'
+}
+
+const getCountdownProgressClass = (secondsLeft: number) => {
+  if (secondsLeft <= 0) return 'bg-slate-700'
+  if (secondsLeft <= 30) return 'bg-red-400 shadow-[0_0_16px_rgba(248,113,113,0.55)]'
+  if (secondsLeft <= 60) return 'bg-orange-400 shadow-[0_0_16px_rgba(251,146,60,0.45)]'
+  return 'bg-yellow-300 shadow-[0_0_16px_rgba(250,204,21,0.45)]'
+}
+
 export default function MobileAuctionPanel({
   walletBalance,
   onBid,
@@ -158,6 +222,32 @@ export default function MobileAuctionPanel({
   const [selectedTab, setSelectedTab] = useState<'General' | 'Premier'>('General')
   const [selectedItem, setSelectedItem] = useState<MobileAuctionItem | null>(null)
   const [bidStep, setBidStep] = useState(50)
+  const [auctionStartAt] = useState(() => Date.now())
+  const [now, setNow] = useState(() => Date.now())
+
+  useEffect(() => {
+    const countdown = window.setInterval(() => {
+      setNow(Date.now())
+    }, 1000)
+
+    return () => window.clearInterval(countdown)
+  }, [])
+
+  const getInitialSeconds = (item: MobileAuctionItem) => {
+    return Math.max(parseAuctionSeconds(item.endsIn), 1)
+  }
+
+  const getTimeLeftSeconds = (item: MobileAuctionItem) => {
+    if (item.status === 'Ended') return 0
+
+    const endsAt = auctionStartAt + getInitialSeconds(item) * 1000
+    return Math.max(0, Math.ceil((endsAt - now) / 1000))
+  }
+
+  const selectedTimeLeftSeconds = selectedItem ? getTimeLeftSeconds(selectedItem) : 0
+  const selectedCountdownStatus = getCountdownStatus(selectedTimeLeftSeconds)
+  const selectedInitialSeconds = selectedItem ? getInitialSeconds(selectedItem) : 1
+  const selectedProgress = Math.max(0, Math.min(100, (selectedTimeLeftSeconds / selectedInitialSeconds) * 100))
 
   const visibleCards = useMemo(() => {
     return auctionCards.filter((item) => item.category === selectedTab)
@@ -166,12 +256,16 @@ export default function MobileAuctionPanel({
   const handleBid = () => {
     if (!selectedItem) return
 
+    if (getTimeLeftSeconds(selectedItem) <= 0) {
+      return
+    }
+
     if (walletBalance < bidStep) {
       onNeedTopUp()
       return
     }
 
-    const nextBid = Math.round(selectedItem.currentBid + bidStep)
+    const nextBid = Number((selectedItem.currentBid + bidStep).toFixed(2))
     const success = onBid(bidStep, selectedItem.title, nextBid)
 
     if (!success) return
@@ -180,7 +274,7 @@ export default function MobileAuctionPanel({
       ...selectedItem,
       currentBid: nextBid,
       bidCount: selectedItem.bidCount + 1,
-      status: 'Ending',
+      status: getCountdownStatus(getTimeLeftSeconds(selectedItem)),
     })
   }
 
@@ -256,7 +350,7 @@ export default function MobileAuctionPanel({
               </p>
 
               <div className="mt-4 inline-flex rounded-full bg-yellow-400 px-4 py-2 text-xs font-black text-black shadow-[0_0_24px_rgba(250,204,21,0.32)]">
-                {visibleCards.length} auctions live
+                {visibleCards.filter((item) => getTimeLeftSeconds(item) > 0).length} auctions live
               </div>
             </div>
 
@@ -291,49 +385,79 @@ export default function MobileAuctionPanel({
           </div>
 
           <div className="relative mt-4 grid grid-cols-2 gap-3">
-            {visibleCards.map((item) => (
-              <button
-                key={item.id}
-                type="button"
-                onClick={() => setSelectedItem(item)}
-                className="overflow-hidden rounded-2xl border border-white/10 bg-[#07111f] text-left shadow-[0_16px_38px_rgba(0,0,0,0.32)] transition active:scale-[0.98]"
-              >
-                <div className="relative aspect-[3/4] overflow-hidden bg-slate-950">
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(34,211,238,0.16),transparent_48%)]" />
-                  <img
-                    src={item.image}
-                    alt={item.title}
-                    loading="lazy"
-                    className={`relative z-10 h-full w-full object-cover ${
-                      item.status === 'Ended' ? 'opacity-35 grayscale' : ''
-                    }`}
-                  />
+            {visibleCards.map((item) => {
+              const timeLeftSeconds = getTimeLeftSeconds(item)
+              const countdownStatus = getCountdownStatus(timeLeftSeconds)
+              const countdownLabel = formatAuctionCountdown(timeLeftSeconds)
+              const initialSeconds = getInitialSeconds(item)
+              const cardProgress = Math.max(
+                0,
+                Math.min(100, (timeLeftSeconds / initialSeconds) * 100),
+              )
 
-                  <div className="absolute left-2 top-2 z-20 rounded-full bg-black/75 px-2 py-1 text-[10px] font-black text-white ring-1 ring-white/10">
-                    {item.status === 'Ended' ? 'Ended' : item.endsIn}
-                  </div>
+              return (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => setSelectedItem(item)}
+                  className="overflow-hidden rounded-2xl border border-white/10 bg-[#07111f] text-left shadow-[0_16px_38px_rgba(0,0,0,0.32)] transition active:scale-[0.98]"
+                >
+                  <div className="relative aspect-[3/4] overflow-hidden bg-slate-950">
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(34,211,238,0.16),transparent_48%)]" />
+                    <img
+                      src={item.image}
+                      alt={item.title}
+                      loading="lazy"
+                      className={`relative z-10 h-full w-full object-cover ${
+                        countdownStatus === 'Ended' ? 'opacity-35 grayscale' : ''
+                      }`}
+                    />
 
-                  {item.status === 'Ending' && (
-                    <div className="absolute bottom-0 left-0 right-0 z-20 bg-yellow-400 px-2 py-1 text-xs font-black text-black">
-                      {item.seller}
+                    <div
+                      className={`absolute left-2 top-2 z-20 rounded-full border px-2 py-1 text-[10px] font-black ${getCountdownBadgeClass(
+                        timeLeftSeconds,
+                      )}`}
+                    >
+                      {countdownStatus === 'Ended'
+                        ? 'ENDED'
+                        : `${countdownStatus === 'Ending' ? 'ENDING' : 'LIVE'} · ${countdownLabel}`}
                     </div>
-                  )}
-                </div>
 
-                <div className="border-t border-white/10 p-2.5">
-                  <p className="line-clamp-2 min-h-[2.5rem] text-sm font-semibold leading-5 text-white">
-                    {item.title}
-                  </p>
-                  <div className="mt-2 flex items-center gap-1 text-xs text-slate-400">
-                    <Clock3 className="h-3.5 w-3.5 text-cyan-200/70" />
-                    <span>{item.status === 'Ended' ? 'Sale closed' : item.endsIn}</span>
+                    <div className="absolute bottom-0 left-0 right-0 z-20 h-1 bg-black/50">
+                      <div
+                        className={`h-full rounded-r-full transition-all duration-500 ${getCountdownProgressClass(
+                          timeLeftSeconds,
+                        )}`}
+                        style={{ width: `${cardProgress}%` }}
+                      />
+                    </div>
+
+                    {countdownStatus === 'Ending' && (
+                      <div className="absolute bottom-1 left-0 right-0 z-20 bg-yellow-400 px-2 py-1 text-xs font-black text-black">
+                        {item.seller}
+                      </div>
+                    )}
                   </div>
-                  <p className="mt-1 text-sm font-black text-yellow-300">
-                    {formatMoney(item.currentBid)}
-                  </p>
-                </div>
-              </button>
-            ))}
+
+                  <div className="border-t border-white/10 p-2.5">
+                    <p className="line-clamp-2 min-h-[2.5rem] text-sm font-semibold leading-5 text-white">
+                      {item.title}
+                    </p>
+                    <div className="mt-2 flex items-center gap-1 text-xs text-slate-400">
+                      <Clock3
+                        className={`h-3.5 w-3.5 ${getCountdownTextClass(timeLeftSeconds)}`}
+                      />
+                      <span className={getCountdownTextClass(timeLeftSeconds)}>
+                        {countdownStatus === 'Ended' ? 'Sale closed' : countdownLabel}
+                      </span>
+                    </div>
+                    <p className="mt-1 text-sm font-black text-yellow-300">
+                      {formatMoney(item.currentBid)}
+                    </p>
+                  </div>
+                </button>
+              )
+            })}
           </div>
         </div>
       </div>
@@ -350,9 +474,22 @@ export default function MobileAuctionPanel({
                 <ArrowLeft className="h-5 w-5" />
               </button>
 
-              <div className="flex items-center gap-2 text-sm font-black text-yellow-300">
-                <Clock3 className="h-4 w-4" />
-                {selectedItem.status === 'Ended' ? 'Ended' : selectedItem.endsIn}
+              <div className="flex min-w-0 flex-col items-center">
+                <span
+                  className={`text-[9px] font-black uppercase tracking-[0.24em] ${
+                    selectedCountdownStatus === 'Ended' ? 'text-slate-500' : 'text-cyan-200/70'
+                  }`}
+                >
+                  {selectedCountdownStatus === 'Ended' ? 'Auction Closed' : 'Live Auction'}
+                </span>
+                <div
+                  className={`mt-0.5 flex items-center gap-1.5 text-sm font-black ${getCountdownTextClass(
+                    selectedTimeLeftSeconds,
+                  )}`}
+                >
+                  <Clock3 className="h-4 w-4" />
+                  {formatAuctionCountdown(selectedTimeLeftSeconds)}
+                </div>
               </div>
 
               <div className="flex gap-2">
@@ -400,13 +537,42 @@ export default function MobileAuctionPanel({
                   </span>
                 </div>
 
-                <div className="mt-5 rounded-2xl border border-white/10 bg-white/[0.06] p-4 text-center shadow-inner shadow-black/20">
-                  <p className="text-sm text-slate-400">
-                    Ends in{' '}
-                    <span className="font-black text-yellow-300">
-                      {selectedItem.endsIn}
-                    </span>
-                  </p>
+                <div className="mt-5 overflow-hidden rounded-2xl border border-white/10 bg-white/[0.06] p-4 shadow-inner shadow-black/20">
+                  <div className="flex items-center justify-between gap-3">
+                    <div>
+                      <p className="text-[10px] font-black uppercase tracking-[0.24em] text-cyan-200/70">
+                        Countdown
+                      </p>
+                      <p
+                        className={`mt-1 text-2xl font-black ${getCountdownTextClass(
+                          selectedTimeLeftSeconds,
+                        )}`}
+                      >
+                        {formatAuctionCountdown(selectedTimeLeftSeconds)}
+                      </p>
+                    </div>
+
+                    <div
+                      className={`rounded-full border px-3 py-1.5 text-xs font-black ${getCountdownBadgeClass(
+                        selectedTimeLeftSeconds,
+                      )}`}
+                    >
+                      {selectedCountdownStatus === 'Ended'
+                        ? 'ENDED'
+                        : selectedCountdownStatus === 'Ending'
+                          ? 'ENDING SOON'
+                          : 'LIVE'}
+                    </div>
+                  </div>
+
+                  <div className="mt-3 h-2 overflow-hidden rounded-full bg-black/40">
+                    <div
+                      className={`h-full rounded-full transition-all duration-500 ${getCountdownProgressClass(
+                        selectedTimeLeftSeconds,
+                      )}`}
+                      style={{ width: `${selectedProgress}%` }}
+                    />
+                  </div>
                 </div>
 
                 <div className="mt-5 flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.06] p-4 shadow-[0_16px_45px_rgba(0,0,0,0.24)]">
@@ -442,10 +608,13 @@ export default function MobileAuctionPanel({
                         key={step}
                         type="button"
                         onClick={() => setBidStep(step)}
+                        disabled={selectedCountdownStatus === 'Ended'}
                         className={`rounded-xl px-4 py-3 text-sm font-black ${
-                          bidStep === step
-                            ? 'bg-yellow-400 text-black shadow-[0_12px_24px_rgba(250,204,21,0.18)]'
-                            : 'border border-white/10 bg-black/20 text-slate-300'
+                          selectedCountdownStatus === 'Ended'
+                            ? 'border border-white/5 bg-black/20 text-slate-600'
+                            : bidStep === step
+                              ? 'bg-yellow-400 text-black shadow-[0_12px_24px_rgba(250,204,21,0.18)]'
+                              : 'border border-white/10 bg-black/20 text-slate-300'
                         }`}
                       >
                         +{step}
@@ -475,15 +644,15 @@ export default function MobileAuctionPanel({
               <button
                 type="button"
                 onClick={handleBid}
-                disabled={selectedItem.status === 'Ended'}
+                disabled={selectedCountdownStatus === 'Ended'}
                 className={`flex w-full items-center justify-center gap-2 rounded-full px-5 py-4 text-base font-black shadow-[0_12px_28px_rgba(234,179,8,0.25)] ${
-                  selectedItem.status === 'Ended'
+                  selectedCountdownStatus === 'Ended'
                     ? 'bg-slate-800 text-slate-500 shadow-none'
                     : 'bg-yellow-400 text-black'
                 }`}
               >
                 <Gavel className="h-5 w-5" />
-                {selectedItem.status === 'Ended'
+                {selectedCountdownStatus === 'Ended'
                   ? 'Auction Ended'
                   : walletBalance >= bidStep
                     ? `Bid Now +${bidStep}`
