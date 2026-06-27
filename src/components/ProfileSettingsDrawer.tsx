@@ -283,7 +283,7 @@ export default function ProfileSettingsDrawer({
     })
 
     if (!saveResult.ok) {
-      setEditError(saveResult.message ?? 'Unable to save profile.')
+      setEditError(saveResult.message ?? t.unableToSaveProfile)
       return
     }
 
@@ -509,19 +509,19 @@ export default function ProfileSettingsDrawer({
                   icon={Phone}
                   title={t.phoneNumber}
                   subtitle={t.phoneNumberDesc}
-                  value="Not linked"
+                  value={t.notLinked}
                 />
                 <SettingsRow
                   icon={ShieldCheck}
                   title={t.accountVerification}
                   subtitle={t.accountVerificationDesc}
-                  value="Demo"
+                  value={t.demo}
                 />
                 <SettingsRow
                   icon={LockKeyhole}
                   title={t.changePassword}
                   subtitle={t.changePasswordDesc}
-                  value="Soon"
+                  value={t.soon}
                 />
               </div>
 
@@ -529,20 +529,20 @@ export default function ProfileSettingsDrawer({
                 <SettingsRow
                   icon={Truck}
                   title={t.shippingCenter}
-                  subtitle={`${shippingRequestCount} active request${shippingRequestCount === 1 ? '' : 's'}`}
-                  value="Manage"
+                  subtitle={`${shippingRequestCount} ${shippingRequestCount === 1 ? t.activeRequestSingular : t.activeRequestPlural}`}
+                  value={t.manage}
                   onClick={onOpenShippingCenter}
                 />
                 <SettingsRow
                   icon={MapPin}
                   title={t.shippingRegion}
-                  subtitle="Physical card delivery region."
-                  value="Malaysia"
+                  subtitle={t.physicalCardDeliveryRegion}
+                  value={t.malaysia}
                 />
                 <SettingsRow
                   icon={Volume2}
                   title={t.displayMode}
-                  value="Dark"
+                  value={t.darkModeValue}
                 />
               </div>
 
@@ -672,7 +672,7 @@ export default function ProfileSettingsDrawer({
                     </div>
 
                     <p className="mt-3 text-center text-[10px] leading-4 text-slate-500">
-                      Username supports 3–20 characters: letters, numbers, dash and underscore.
+                      {t.usernameRuleDesc}
                     </p>
                   </div>
                 </motion.div>
