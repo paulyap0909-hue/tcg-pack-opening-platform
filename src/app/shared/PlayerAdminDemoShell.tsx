@@ -2014,7 +2014,7 @@ function PlayerAdminDemoShell({
               <div className="overflow-hidden rounded-[1.8rem] border border-white/10 bg-[#07111f]/[0.88] shadow-[0_24px_90px_rgba(0,0,0,0.38)] backdrop-blur-xl">
                 <div className="relative border-b border-white/10 bg-[radial-gradient(circle_at_top_right,rgba(34,211,238,0.22),transparent_34%),radial-gradient(circle_at_20%_0%,rgba(168,85,247,0.18),transparent_34%),linear-gradient(135deg,rgba(15,23,42,0.98),rgba(3,7,18,0.98))] px-4 pb-4 pt-5">
                   <div className="absolute right-4 top-4 rounded-full border border-cyan-300/20 bg-cyan-300/[0.08] px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.2em] text-cyan-200">
-                    Lv. 01
+                    {t.level} 01
                   </div>
 
                   <div className="flex items-center gap-3 pr-20">
@@ -2025,10 +2025,10 @@ function PlayerAdminDemoShell({
                     />
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-lg font-black text-white">{playerProfile.displayName}</p>
-                      <p className="mt-0.5 truncate text-xs font-semibold text-slate-400">@{playerProfile.username} · Demo account</p>
+                      <p className="mt-0.5 truncate text-xs font-semibold text-slate-400">@{playerProfile.username} · {t.demoAccount}</p>
                       <div className="mt-2 flex items-center gap-1.5 text-xs font-black text-cyan-200">
                         <Gem className="h-3.5 w-3.5" />
-                        {walletBalance.toLocaleString()} points
+                        {walletBalance.toLocaleString()} {t.points}
                       </div>
                     </div>
                   </div>
@@ -2038,31 +2038,31 @@ function PlayerAdminDemoShell({
                   <div className="grid grid-cols-4 gap-2 text-center">
                     <button type="button" onClick={() => changeMobilePage('auction')} className="rounded-2xl border border-yellow-300/15 bg-yellow-300/[0.06] px-2 py-3 text-slate-200">
                       <Gavel className="mx-auto h-5 w-5 text-yellow-300" />
-                      <p className="mt-1.5 text-[10px] font-black leading-tight">Bid&Offer</p>
+                      <p className="mt-1.5 text-[10px] font-black leading-tight">{t.bidOffer}</p>
                     </button>
                     <button type="button" onClick={() => setIsVaultOpen(true)} className="rounded-2xl border border-cyan-300/15 bg-cyan-300/[0.06] px-2 py-3 text-slate-200">
                       <PackageOpen className="mx-auto h-5 w-5 text-cyan-200" />
-                      <p className="mt-1.5 text-[10px] font-black leading-tight">My Vault</p>
+                      <p className="mt-1.5 text-[10px] font-black leading-tight">{t.myVault}</p>
                     </button>
                     <button type="button" className="rounded-2xl border border-purple-300/15 bg-purple-300/[0.06] px-2 py-3 text-slate-200">
                       <Trophy className="mx-auto h-5 w-5 text-purple-200" />
-                      <p className="mt-1.5 text-[10px] font-black leading-tight">Favorite</p>
+                      <p className="mt-1.5 text-[10px] font-black leading-tight">{t.favorite}</p>
                     </button>
                     <button type="button" className="rounded-2xl border border-emerald-300/15 bg-emerald-300/[0.06] px-2 py-3 text-slate-200">
                       <UserCircle className="mx-auto h-5 w-5 text-emerald-200" />
-                      <p className="mt-1.5 text-[10px] font-black leading-tight">Following</p>
+                      <p className="mt-1.5 text-[10px] font-black leading-tight">{t.following}</p>
                     </button>
                   </div>
 
                   <div className="mt-4 overflow-hidden rounded-[1.35rem] border border-yellow-300/25 bg-[linear-gradient(135deg,rgba(250,204,21,0.96),rgba(245,158,11,0.94))] p-4 text-black shadow-[0_18px_42px_rgba(250,204,21,0.16)]">
                     <div className="flex items-center justify-between gap-3">
                       <div>
-                        <p className="text-base font-black">Start Trading Today!</p>
+                        <p className="text-base font-black">{t.startTradingToday}</p>
                         <p className="mt-1 max-w-[220px] text-[11px] font-bold leading-4 text-black/70">
-                          Join auctions, collect chase cards and grow your vault.
+                          {t.startTradingSubtitle}
                         </p>
                         <button type="button" onClick={() => changeMobilePage('auction')} className="mt-3 rounded-xl bg-black px-4 py-2 text-xs font-black text-yellow-200">
-                          Go Auction
+                          {t.goAuction}
                         </button>
                       </div>
                       <div className="grid h-20 w-20 shrink-0 place-items-center rounded-3xl border border-black/10 bg-black/10">
@@ -2073,7 +2073,7 @@ function PlayerAdminDemoShell({
 
                   <div className="mt-4 rounded-[1.35rem] border border-white/10 bg-white/[0.045] p-4">
                     <div className="flex items-center justify-between gap-3">
-                      <p className="text-base font-black text-white">My Activity</p>
+                      <p className="text-base font-black text-white">{t.myActivity}</p>
                       <button type="button" onClick={() => setIsTransactionOpen(true)} className="flex items-center gap-1 text-xs font-black text-slate-400">
                         {t.viewAll} <ChevronRight className="h-4 w-4" />
                       </button>
@@ -2082,58 +2082,58 @@ function PlayerAdminDemoShell({
                     <div className="mt-4 grid grid-cols-4 gap-3 text-center">
                       <button type="button" onClick={openTopUpModal} className="rounded-2xl border border-white/10 bg-[#0b1220] px-2 py-3">
                         <Gem className="mx-auto h-5 w-5 text-cyan-200" />
-                        <p className="mt-1.5 text-[10px] font-bold text-slate-300">Top Up</p>
+                        <p className="mt-1.5 text-[10px] font-bold text-slate-300">{t.topUp}</p>
                       </button>
                       <button type="button" onClick={() => setIsTransactionOpen(true)} className="rounded-2xl border border-white/10 bg-[#0b1220] px-2 py-3">
                         <Gift className="mx-auto h-5 w-5 text-purple-200" />
-                        <p className="mt-1.5 text-[10px] font-bold text-slate-300">Paid</p>
+                        <p className="mt-1.5 text-[10px] font-bold text-slate-300">{t.paid}</p>
                       </button>
                       <button type="button" onClick={() => setIsShippingCenterOpen(true)} className="rounded-2xl border border-white/10 bg-[#0b1220] px-2 py-3">
                         <PackageOpen className="mx-auto h-5 w-5 text-yellow-200" />
-                        <p className="mt-1.5 text-[10px] font-bold text-slate-300">To Ship</p>
+                        <p className="mt-1.5 text-[10px] font-bold text-slate-300">{t.toShip}</p>
                       </button>
                       <button type="button" onClick={() => setIsVaultOpen(true)} className="rounded-2xl border border-white/10 bg-[#0b1220] px-2 py-3">
                         <Trophy className="mx-auto h-5 w-5 text-emerald-200" />
-                        <p className="mt-1.5 text-[10px] font-bold text-slate-300">Completed</p>
+                        <p className="mt-1.5 text-[10px] font-bold text-slate-300">{t.completed}</p>
                       </button>
                     </div>
                   </div>
 
                   <div className="mt-4 overflow-hidden rounded-[1.35rem] border border-white/10 bg-white/[0.045]">
                     <button type="button" onClick={openTopUpModal} className="flex w-full items-center justify-between gap-3 border-b border-white/10 px-4 py-3.5 text-left">
-                      <span className="flex items-center gap-3 text-sm font-black text-white"><Gem className="h-5 w-5 text-cyan-200" />Jomluffyz Balance</span>
+                      <span className="flex items-center gap-3 text-sm font-black text-white"><Gem className="h-5 w-5 text-cyan-200" />{t.jomluffyzBalance}</span>
                       <span className="flex items-center gap-1 text-xs font-black text-cyan-200">{walletBalance.toLocaleString()} <ChevronRight className="h-4 w-4 text-slate-500" /></span>
                     </button>
                     <button type="button" onClick={() => setIsDailyLoginOpen(true)} className="flex w-full items-center justify-between gap-3 border-b border-white/10 px-4 py-3.5 text-left">
-                      <span className="flex items-center gap-3 text-sm font-black text-white"><Gift className="h-5 w-5 text-purple-200" />Daily Bonus & Coin</span>
+                      <span className="flex items-center gap-3 text-sm font-black text-white"><Gift className="h-5 w-5 text-purple-200" />{t.dailyBonusCoin}</span>
                       <ChevronRight className="h-4 w-4 text-slate-500" />
                     </button>
                     <button type="button" onClick={() => setIsShippingCenterOpen(true)} className="flex w-full items-center justify-between gap-3 border-b border-white/10 px-4 py-3.5 text-left">
-                      <span className="flex items-center gap-3 text-sm font-black text-white"><PackageOpen className="h-5 w-5 text-yellow-200" />Shipping Requests</span>
+                      <span className="flex items-center gap-3 text-sm font-black text-white"><PackageOpen className="h-5 w-5 text-yellow-200" />{t.shippingRequests}</span>
                       <span className="flex items-center gap-1 text-xs font-black text-slate-400">{vaultCards.filter((card) => card.status === 'Shipping Requested').length} <ChevronRight className="h-4 w-4 text-slate-500" /></span>
                     </button>
                     <button type="button" onClick={toggleSound} className="flex w-full items-center justify-between gap-3 border-b border-white/10 px-4 py-3.5 text-left">
                       <span className="flex items-center gap-3 text-sm font-black text-white">
                         {isSoundEnabled ? <Volume2 className="h-5 w-5 text-cyan-200" /> : <VolumeX className="h-5 w-5 text-slate-400" />}
-                        Sound & Music
+                        {t.soundMusic}
                       </span>
                       <span className={`rounded-full px-3 py-1 text-[11px] font-black ${isSoundEnabled ? 'bg-cyan-300/15 text-cyan-200' : 'bg-white/[0.06] text-slate-400'}`}>
-                        {isSoundEnabled ? 'On' : 'Off'}
+                        {isSoundEnabled ? t.soundOn : t.soundOff}
                       </span>
                     </button>
                     <button type="button" onClick={() => setIsProfileSettingsOpen(true)} className="flex w-full items-center justify-between gap-3 border-b border-white/10 px-4 py-3.5 text-left">
-                      <span className="flex items-center gap-3 text-sm font-black text-white"><UserCircle className="h-5 w-5 text-emerald-200" />Account Settings</span>
+                      <span className="flex items-center gap-3 text-sm font-black text-white"><UserCircle className="h-5 w-5 text-emerald-200" />{t.accountSettings}</span>
                       <ChevronRight className="h-4 w-4 text-slate-500" />
                     </button>
                     <button type="button" className="flex w-full items-center justify-between gap-3 px-4 py-3.5 text-left">
-                      <span className="flex items-center gap-3 text-sm font-black text-white"><Bell className="h-5 w-5 text-slate-300" />Support / Language</span>
+                      <span className="flex items-center gap-3 text-sm font-black text-white"><Bell className="h-5 w-5 text-slate-300" />{t.supportLanguage}</span>
                       <ChevronRight className="h-4 w-4 text-slate-500" />
                     </button>
                   </div>
 
                   <div className="mt-4 rounded-2xl border border-emerald-300/15 bg-emerald-300/[0.055] px-4 py-3">
-                    <p className="text-[10px] font-black uppercase tracking-[0.24em] text-emerald-300">Demo Account</p>
-                    <p className="mt-1 text-xs leading-5 text-slate-300">Compact mobile profile. Real login, payment, shipping and settings can connect in backend phase.</p>
+                    <p className="text-[10px] font-black uppercase tracking-[0.24em] text-emerald-300">{t.demoAccount}</p>
+                    <p className="mt-1 text-xs leading-5 text-slate-300">{t.demoAccountCompact}</p>
                   </div>
                 </div>
               </div>
