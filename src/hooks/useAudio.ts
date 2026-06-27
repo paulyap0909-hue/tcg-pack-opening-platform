@@ -22,10 +22,14 @@ export default function useAudio() {
       }
 
       window.addEventListener('pointerdown', unlockAudio, { once: true })
+      window.addEventListener('touchstart', unlockAudio, { once: true })
+      window.addEventListener('click', unlockAudio, { once: true })
       window.addEventListener('keydown', unlockAudio, { once: true })
 
       return () => {
         window.removeEventListener('pointerdown', unlockAudio)
+        window.removeEventListener('touchstart', unlockAudio)
+        window.removeEventListener('click', unlockAudio)
         window.removeEventListener('keydown', unlockAudio)
       }
     }

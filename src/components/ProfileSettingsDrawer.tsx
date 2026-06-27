@@ -18,6 +18,8 @@ import {
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
+import { audioManager } from '../lib/audioManager'
+
 export type PlayerProfile = {
   displayName: string
   username: string
@@ -263,6 +265,19 @@ export default function ProfileSettingsDrawer({
     }))
   }
 
+  const testButtonClickSound = () => {
+    audioManager.playButtonClick({ throttleMs: 0, volume: 0.9 })
+  }
+
+  const testSuccessSound = () => {
+    audioManager.playSfx('success', { throttleMs: 0, volume: 0.9 })
+  }
+
+  const resetAudioSettings = () => {
+    audioManager.resetAudioSettings()
+    onToggleSound()
+  }
+
   const openEditProfile = () => {
     setDraftDisplayName(playerProfile.displayName)
     setDraftUsername(playerProfile.username)
@@ -435,6 +450,48 @@ export default function ProfileSettingsDrawer({
                   onToggle={() => toggleSoundOption('auctionSounds')}
                   accent="emerald"
                 />
+              </div>
+
+              <div className="mt-4 overflow-hidden rounded-[1.35rem] border border-cyan-300/14 bg-cyan-300/[0.045]">
+                <div className="flex items-center gap-2 border-b border-white/10 px-4 py-3">
+                  <Volume2 className="h-5 w-5 text-cyan-200" />
+                  <p className="text-sm font-black text-white">Audio Test</p>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2 px-4 py-3">
+                  <button
+                    type="button"
+                    data-audio-silent="true"
+                    onClick={testButtonClickSound}
+                    className="rounded-2xl border border-cyan-300/18 bg-cyan-300/[0.07] px-3 py-3 text-xs font-black text-cyan-100"
+                  >
+                    Test Button
+                  </button>
+                  <button
+                    type="button"
+                    data-audio-silent="true"
+                    onClick={testSuccessSound}
+                    className="rounded-2xl border border-emerald-300/18 bg-emerald-300/[0.07] px-3 py-3 text-xs font-black text-emerald-100"
+                  >
+                    Test Success
+                  </button>
+                  <button
+                    type="button"
+                    data-audio-silent="true"
+                    onClick={() => void audioManager.playBgm('lobby')}
+                    className="rounded-2xl border border-purple-300/18 bg-purple-300/[0.07] px-3 py-3 text-xs font-black text-purple-100"
+                  >
+                    Test BGM
+                  </button>
+                  <button
+                    type="button"
+                    data-audio-silent="true"
+                    onClick={resetAudioSettings}
+                    className="rounded-2xl border border-red-300/18 bg-red-300/[0.07] px-3 py-3 text-xs font-black text-red-100"
+                  >
+                    Reset Audio
+                  </button>
+                </div>
               </div>
 
               <div className="mt-4 overflow-hidden rounded-[1.35rem] border border-white/10 bg-white/[0.045]">

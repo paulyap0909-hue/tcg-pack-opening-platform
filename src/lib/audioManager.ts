@@ -1,3 +1,5 @@
+import { Howl, Howler } from 'howler'
+
 import bgmLobbySrc from '../assets/audio/bgm-lobby.mp3'
 import buttonClickSrc from '../assets/audio/button-click.mp3'
 import cardFlipSrc from '../assets/audio/card-flip.mp3'
@@ -22,6 +24,9 @@ const AUDIO_ENABLED_KEY = 'tcg_audio_enabled'
 const BGM_VOLUME_KEY = 'tcg_bgm_volume'
 const SFX_VOLUME_KEY = 'tcg_sfx_volume'
 
+const DEFAULT_BGM_VOLUME = 0.24
+const DEFAULT_SFX_VOLUME = 0.75
+
 const bgmSources: Record<BgmName, string> = {
   lobby: bgmLobbySrc,
 }
@@ -36,39 +41,28 @@ const sfxSources: Record<SfxName, string> = {
   error: errorSrc,
 }
 
-const sfxNames = Object.keys(sfxSources) as SfxName[]
+const isBrowser = () => typeof window !== 'undefined'
 
-const isBrowser = () =>
-  typeof window !== 'undefined' && typeof Audio !== 'undefined'
-
-const getStoredNumber = (key: string, fallback: number) => {
+const safeStoredVolume = (key: string, fallback: number) => {
   if (typeof window === 'undefined') return fallback
 
   const storedValue = Number(window.localStorage.getItem(key))
-  return Number.isFinite(storedValue) ? storedValue : fallback
-}
 
-const getAudioContextConstructor = () => {
-  if (typeof window === 'undefined') return null
+  if (!Number.isFinite(storedValue) || storedValue <= 0 || storedValue > 1) {
+    window.localStorage.setItem(key, String(fallback))
+    return fallback
+  }
 
-  return (
-    window.AudioContext ??
-    (window as Window & typeof globalThis & { webkitAudioContext?: typeof AudioContext })
-      .webkitAudioContext ??
-    null
-  )
+  return storedValue
 }
 
 class TcgAudioManager {
   private enabled = false
-  private activeBgm: HTMLAudioElement | null = null
+  private activeBgm: Howl | null = null
   private activeBgmName: BgmName | null = null
-  private audioContext: AudioContext | null = null
-  private sfxBuffers = new Map<SfxName, AudioBuffer>()
-  private sfxBufferPromises = new Map<SfxName, Promise<AudioBuffer | null>>()
-  private htmlAudioPools = new Map<SfxName, HTMLAudioElement[]>()
+  private bgmHowls = new Map<BgmName, Howl>()
+  private sfxHowls = new Map<SfxName, Howl>()
   private lastSfxPlayedAt = new Map<SfxName, number>()
-  private lastButtonClickPlayedAt = 0
 
   get hasSavedPreference() {
     if (typeof window === 'undefined') return false
@@ -96,8 +90,8 @@ class TcgAudioManager {
     }
 
     if (enabled) {
-      this.primeHtmlAudioPools()
-      void this.warmUpSfx()
+      Howler.mute(false)
+      this.preloadAll()
       return
     }
 
@@ -105,135 +99,132 @@ class TcgAudioManager {
   }
 
   getBgmVolume() {
-    return getStoredNumber(BGM_VOLUME_KEY, 0.24)
+    return safeStoredVolume(BGM_VOLUME_KEY, DEFAULT_BGM_VOLUME)
   }
 
   getSfxVolume() {
-    return getStoredNumber(SFX_VOLUME_KEY, 0.72)
+    return safeStoredVolume(SFX_VOLUME_KEY, DEFAULT_SFX_VOLUME)
   }
 
   setBgmVolume(volume: number) {
-    const normalizedVolume = Math.max(0, Math.min(1, volume))
+    const normalizedVolume = Math.max(0.01, Math.min(1, volume))
 
     if (typeof window !== 'undefined') {
       window.localStorage.setItem(BGM_VOLUME_KEY, String(normalizedVolume))
     }
 
     if (this.activeBgm) {
-      this.activeBgm.volume = normalizedVolume
+      this.activeBgm.volume(normalizedVolume)
     }
   }
 
   setSfxVolume(volume: number) {
     if (typeof window === 'undefined') return
-    window.localStorage.setItem(SFX_VOLUME_KEY, String(Math.max(0, Math.min(1, volume))))
+
+    const normalizedVolume = Math.max(0.01, Math.min(1, volume))
+    window.localStorage.setItem(SFX_VOLUME_KEY, String(normalizedVolume))
+
+    this.sfxHowls.forEach((sound) => {
+      sound.volume(normalizedVolume)
+    })
+  }
+
+  resetAudioSettings() {
+    if (typeof window !== 'undefined') {
+      window.localStorage.removeItem(AUDIO_ENABLED_KEY)
+      window.localStorage.setItem(BGM_VOLUME_KEY, String(DEFAULT_BGM_VOLUME))
+      window.localStorage.setItem(SFX_VOLUME_KEY, String(DEFAULT_SFX_VOLUME))
+    }
+
+    Howler.stop()
+    Howler.mute(false)
+    this.enabled = false
+    this.activeBgm = null
+    this.activeBgmName = null
+    this.lastSfxPlayedAt.clear()
   }
 
   async enableWithSound() {
     this.setEnabled(true)
-    await this.unlockAudioContext()
-    void this.warmUpSfx()
+    this.unlockHowler()
+    this.preloadAll()
     await this.playBgm('lobby')
-    this.playSfx('success', { throttleMs: 0 })
+    this.playSfx('success', { throttleMs: 0, volume: 0.82 })
   }
 
   continueMuted() {
     this.setEnabled(false)
   }
 
-  private getAudioContext() {
-    if (!isBrowser()) return null
-
-    if (this.audioContext) return this.audioContext
-
-    const AudioContextConstructor = getAudioContextConstructor()
-    if (!AudioContextConstructor) return null
-
-    this.audioContext = new AudioContextConstructor()
-    return this.audioContext
-  }
-
-  private async unlockAudioContext() {
-    const context = this.getAudioContext()
-
-    if (!context) return false
+  private unlockHowler() {
+    if (!isBrowser()) return
 
     try {
-      if (context.state === 'suspended') {
-        await context.resume()
+      Howler.mute(false)
+
+      const context = Howler.ctx
+      if (context?.state === 'suspended') {
+        void context.resume().catch(() => undefined)
       }
-
-      const buffer = context.createBuffer(1, 1, 22050)
-      const source = context.createBufferSource()
-      source.buffer = buffer
-      source.connect(context.destination)
-      source.start(0)
-
-      return true
     } catch {
-      return false
+      // Keep UI safe if a browser rejects audio unlock.
     }
   }
 
-  private primeHtmlAudioPools() {
-    if (!isBrowser()) return
+  private getBgmHowl(name: BgmName) {
+    const existingSound = this.bgmHowls.get(name)
+    if (existingSound) return existingSound
 
-    sfxNames.forEach((name) => {
-      if (this.htmlAudioPools.has(name)) return
-
-      const pool = Array.from({ length: name === 'buttonClick' ? 6 : 3 }, () => {
-        const audio = new Audio(sfxSources[name])
-        audio.preload = 'auto'
-        audio.volume = this.getSfxVolume()
-        audio.load()
-        return audio
-      })
-
-      this.htmlAudioPools.set(name, pool)
+    const sound = new Howl({
+      src: [bgmSources[name]],
+      loop: true,
+      html5: true,
+      preload: true,
+      volume: this.getBgmVolume(),
     })
+
+    this.bgmHowls.set(name, sound)
+
+    return sound
   }
 
-  private async loadSfxBuffer(name: SfxName) {
-    if (this.sfxBuffers.has(name)) return this.sfxBuffers.get(name) ?? null
+  private getSfxHowl(name: SfxName) {
+    const existingSound = this.sfxHowls.get(name)
+    if (existingSound) return existingSound
 
-    const existingPromise = this.sfxBufferPromises.get(name)
-    if (existingPromise) return existingPromise
+    const sound = new Howl({
+      src: [sfxSources[name]],
+      html5: false,
+      preload: true,
+      pool: name === 'buttonClick' ? 12 : 6,
+      volume: this.getSfxVolume(),
+    })
 
-    const context = this.getAudioContext()
+    this.sfxHowls.set(name, sound)
 
-    if (!context || typeof fetch === 'undefined') return null
+    return sound
+  }
 
-    const promise = fetch(sfxSources[name])
-      .then((response) => response.arrayBuffer())
-      .then((arrayBuffer) => context.decodeAudioData(arrayBuffer))
-      .then((buffer) => {
-        this.sfxBuffers.set(name, buffer)
-        return buffer
-      })
-      .catch(() => null)
+  preloadAll() {
+    if (!isBrowser()) return
 
-    this.sfxBufferPromises.set(name, promise)
-
-    const buffer = await promise
-    this.sfxBufferPromises.delete(name)
-
-    return buffer
+    this.getBgmHowl('lobby')
+    ;(Object.keys(sfxSources) as SfxName[]).forEach((name) => {
+      this.getSfxHowl(name)
+    })
   }
 
   async warmUpSfx() {
     if (!isBrowser()) return
 
-    this.primeHtmlAudioPools()
-    await this.unlockAudioContext()
-
-    void Promise.all(sfxNames.map((name) => this.loadSfxBuffer(name)))
+    this.unlockHowler()
+    this.preloadAll()
   }
 
   stopBgm() {
     if (!this.activeBgm) return
 
-    this.activeBgm.pause()
-    this.activeBgm.currentTime = 0
+    this.activeBgm.stop()
     this.activeBgm = null
     this.activeBgmName = null
   }
@@ -241,176 +232,46 @@ class TcgAudioManager {
   async playBgm(name: BgmName) {
     if (!isBrowser() || !this.enabled) return false
 
-    if (this.activeBgmName === name && this.activeBgm) {
-      if (this.activeBgm.paused) {
-        try {
-          await this.activeBgm.play()
-          return true
-        } catch {
-          return false
-        }
-      }
+    this.unlockHowler()
 
+    if (this.activeBgmName === name && this.activeBgm?.playing()) {
       return true
     }
 
-    this.stopBgm()
+    if (this.activeBgmName !== name) {
+      this.stopBgm()
+    }
 
-    const bgm = new Audio(bgmSources[name])
-    bgm.loop = true
-    bgm.volume = this.getBgmVolume()
-    bgm.preload = 'auto'
+    const bgm = this.getBgmHowl(name)
+    bgm.volume(this.getBgmVolume())
 
     this.activeBgm = bgm
     this.activeBgmName = name
 
     try {
-      await bgm.play()
-      return true
-    } catch {
-      return false
-    }
-  }
-
-  private playSfxBuffer(name: SfxName, volume: number) {
-    const context = this.getAudioContext()
-    const buffer = this.sfxBuffers.get(name)
-
-    if (!context || !buffer) return false
-
-    try {
-      if (context.state === 'suspended') {
-        void context.resume()
+      if (!bgm.playing()) {
+        bgm.play()
       }
-
-      const source = context.createBufferSource()
-      const gainNode = context.createGain()
-
-      source.buffer = buffer
-      gainNode.gain.value = volume
-
-      source.connect(gainNode)
-      gainNode.connect(context.destination)
-      source.start(0)
 
       return true
     } catch {
       return false
     }
-  }
-
-  private playHtmlSfx(name: SfxName, volume: number) {
-    if (!isBrowser()) return
-
-    this.primeHtmlAudioPools()
-
-    const pool = this.htmlAudioPools.get(name)
-    if (!pool) return
-
-    const audio =
-      pool.find((item) => item.paused || item.ended) ??
-      pool.reduce((oldestAudio, currentAudio) =>
-        currentAudio.currentTime > oldestAudio.currentTime ? currentAudio : oldestAudio,
-      )
-
-    try {
-      audio.pause()
-      audio.currentTime = 0
-      audio.volume = volume
-      void audio.play().catch(() => undefined)
-    } catch {
-      // Browser rejected this play attempt; ignore so UI never breaks.
-    }
-  }
-
-  private playSyntheticButtonClick(volume: number) {
-    const context = this.getAudioContext()
-    if (!context) return false
-
-    const playClick = () => {
-      try {
-        const startTime = context.currentTime
-        const clickOscillator = context.createOscillator()
-        const clickGain = context.createGain()
-        const snapOscillator = context.createOscillator()
-        const snapGain = context.createGain()
-        const masterGain = context.createGain()
-
-        masterGain.gain.setValueAtTime(Math.min(0.18, volume * 0.18), startTime)
-
-        clickOscillator.type = 'triangle'
-        clickOscillator.frequency.setValueAtTime(980, startTime)
-        clickOscillator.frequency.exponentialRampToValueAtTime(360, startTime + 0.045)
-
-        clickGain.gain.setValueAtTime(0.0001, startTime)
-        clickGain.gain.exponentialRampToValueAtTime(1, startTime + 0.004)
-        clickGain.gain.exponentialRampToValueAtTime(0.0001, startTime + 0.058)
-
-        snapOscillator.type = 'square'
-        snapOscillator.frequency.setValueAtTime(1800, startTime)
-        snapOscillator.frequency.exponentialRampToValueAtTime(900, startTime + 0.024)
-
-        snapGain.gain.setValueAtTime(0.0001, startTime)
-        snapGain.gain.exponentialRampToValueAtTime(0.35, startTime + 0.002)
-        snapGain.gain.exponentialRampToValueAtTime(0.0001, startTime + 0.022)
-
-        clickOscillator.connect(clickGain)
-        clickGain.connect(masterGain)
-        snapOscillator.connect(snapGain)
-        snapGain.connect(masterGain)
-        masterGain.connect(context.destination)
-
-        clickOscillator.start(startTime)
-        snapOscillator.start(startTime)
-        clickOscillator.stop(startTime + 0.065)
-        snapOscillator.stop(startTime + 0.03)
-
-        return true
-      } catch {
-        return false
-      }
-    }
-
-    if (context.state === 'suspended') {
-      void context
-        .resume()
-        .then(() => {
-          playClick()
-        })
-        .catch(() => undefined)
-
-      return true
-    }
-
-    return playClick()
   }
 
   playButtonClick(options?: { throttleMs?: number; volume?: number }) {
-    if (!isBrowser() || !this.enabled) return
-
-    const throttleMs = options?.throttleMs ?? 70
-    const now = Date.now()
-
-    if (now - this.lastButtonClickPlayedAt < throttleMs) return
-
-    this.lastButtonClickPlayedAt = now
-
-    const volume = options?.volume ?? this.getSfxVolume()
-
-    // V4: generate the UI tap sound directly with Web Audio.
-    // This avoids short MP3 loading/decoding issues on mobile browsers.
-    this.playSyntheticButtonClick(volume)
+    this.playSfx('buttonClick', {
+      throttleMs: options?.throttleMs ?? 55,
+      volume: options?.volume,
+    })
   }
 
   playSfx(name: SfxName, options?: { throttleMs?: number; volume?: number }) {
-    if (name === 'buttonClick') {
-      this.playButtonClick(options)
-      return
-    }
-
     if (!isBrowser() || !this.enabled) return
 
-    const throttleMs = options?.throttleMs ?? 55
+    this.unlockHowler()
+
+    const throttleMs = options?.throttleMs ?? (name === 'buttonClick' ? 55 : 80)
     const now = Date.now()
     const lastPlayedAt = this.lastSfxPlayedAt.get(name) ?? 0
 
@@ -418,12 +279,14 @@ class TcgAudioManager {
 
     this.lastSfxPlayedAt.set(name, now)
 
-    const volume = options?.volume ?? this.getSfxVolume()
+    const sound = this.getSfxHowl(name)
+    sound.volume(options?.volume ?? this.getSfxVolume())
 
-    if (this.playSfxBuffer(name, volume)) return
-
-    void this.loadSfxBuffer(name)
-    this.playHtmlSfx(name, volume)
+    try {
+      sound.play()
+    } catch {
+      // Ignore rejected sound play attempts so the UI never breaks.
+    }
   }
 }
 
