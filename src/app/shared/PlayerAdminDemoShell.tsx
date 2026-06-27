@@ -36,7 +36,7 @@ import TransactionDrawer, {
 import SellBackConfirmModal from '../../components/SellBackConfirmModal'
 import ShippingConfirmModal from '../../components/ShippingConfirmModal'
 import ShippingCenterDrawer from '../../components/ShippingCenterDrawer'
-import ProfileSettingsDrawer from '../../components/ProfileSettingsDrawer'
+import ProfileSettingsDrawer, { type PlayerProfile } from '../../components/ProfileSettingsDrawer'
 import AdminControlCenterDrawer from '../../components/AdminControlCenterDrawer'
 import QuestLeaderboardPanel, {
   initialQuestStats,
@@ -151,6 +151,12 @@ const STORAGE_KEYS = {
   marketplaceListings: 'tcg-platform-marketplace-listings-v2',
   fairnessRecords: 'tcg-platform-fairness-records-v2',
   dailyLogin: 'tcg-platform-daily-login-v1',
+  playerProfile: 'tcg-player-profile-v1',
+}
+
+const DEFAULT_PLAYER_PROFILE: PlayerProfile = {
+  displayName: 'detailedpower3615',
+  username: 'detailedpower3615',
 }
 
 const categoryFilters: PackCategory[] = [
@@ -502,6 +508,23 @@ const safeJsonParse = <T,>(value: string | null, fallback: T): T => {
   }
 }
 
+const loadPlayerProfile = () => {
+  if (typeof window === 'undefined') return DEFAULT_PLAYER_PROFILE
+
+  const storedProfile = safeJsonParse<PlayerProfile>(
+    window.localStorage.getItem(STORAGE_KEYS.playerProfile),
+    DEFAULT_PLAYER_PROFILE,
+  )
+
+  const displayName = storedProfile.displayName?.trim() || DEFAULT_PLAYER_PROFILE.displayName
+  const username = storedProfile.username?.trim() || DEFAULT_PLAYER_PROFILE.username
+
+  return {
+    displayName,
+    username,
+  }
+}
+
 const loadWalletBalance = () => {
   if (typeof window === 'undefined') return 1000
 
@@ -698,6 +721,7 @@ function PlayerAdminDemoShell({
   const [activePack, setActivePack] = useState<Pack | null>(null)
   const [activeModal, setActiveModal] = useState<ActiveModal>(null)
   const [walletBalance, setWalletBalance] = useState(() => loadWalletBalance())
+  const [playerProfile, setPlayerProfile] = useState<PlayerProfile>(() => loadPlayerProfile())
   const [isTopUpOpen, setIsTopUpOpen] = useState(false)
   const [isVaultOpen, setIsVaultOpen] = useState(false)
   const [isTransactionOpen, setIsTransactionOpen] = useState(false)
@@ -750,6 +774,13 @@ function PlayerAdminDemoShell({
     toggleSound,
     playSfx,
   } = useAudio()
+
+  useEffect(() => {
+    window.localStorage.setItem(
+      STORAGE_KEYS.playerProfile,
+      JSON.stringify(playerProfile),
+    )
+  }, [playerProfile])
 
   useEffect(() => {
     window.localStorage.setItem(
@@ -1077,6 +1108,35 @@ function PlayerAdminDemoShell({
 
     setActivePack(latestPack)
     setActiveModal('detail')
+  }
+
+  const handleSavePlayerProfile = (profile: PlayerProfile) => {
+    const displayName = profile.displayName.trim()
+    const username = profile.username.trim().replace(/^@+/, '').toLowerCase()
+
+    if (displayName.length < 2 || displayName.length > 20) {
+      playSfx('error')
+      return {
+        ok: false,
+        message: 'Display name must be 2–20 characters.',
+      }
+    }
+
+    if (!/^[a-z0-9_-]{3,20}$/.test(username)) {
+      playSfx('error')
+      return {
+        ok: false,
+        message: 'Username must be 3–20 characters and use letters, numbers, dash or underscore only.',
+      }
+    }
+
+    setPlayerProfile({
+      displayName,
+      username,
+    })
+    playSfx('success')
+
+    return { ok: true }
   }
 
   const handleTopUp = (points: number) => {
@@ -1461,6 +1521,7 @@ function PlayerAdminDemoShell({
     setActivePack(null)
     setActiveModal(null)
     setWalletBalance(1000)
+    setPlayerProfile(DEFAULT_PLAYER_PROFILE)
     setIsTopUpOpen(false)
     setIsVaultOpen(false)
     setIsTransactionOpen(false)
@@ -1580,8 +1641,8 @@ function PlayerAdminDemoShell({
                 Profile
               </span>
               <img
-                src="https://api.dicebear.com/9.x/adventurer/svg?seed=detailedpower3615&radius=50&backgroundColor=8b5cf6"
-                alt="Player account"
+                src={`https://api.dicebear.com/9.x/adventurer/svg?seed=${encodeURIComponent(playerProfile.username || playerProfile.displayName)}&radius=50&backgroundColor=8b5cf6`}
+                alt={playerProfile.displayName}
                 className="h-9 w-9 rounded-xl border border-white/10 object-cover"
               />
             </button>
@@ -1792,13 +1853,13 @@ function PlayerAdminDemoShell({
 
                   <div className="flex items-center gap-3 pr-20">
                     <img
-                      src="https://api.dicebear.com/9.x/adventurer/svg?seed=detailedpower3615&radius=50&backgroundColor=8b5cf6"
-                      alt="detailedpower3615"
+                      src={`https://api.dicebear.com/9.x/adventurer/svg?seed=${encodeURIComponent(playerProfile.username || playerProfile.displayName)}&radius=50&backgroundColor=8b5cf6`}
+                      alt={playerProfile.displayName}
                       className="h-[54px] w-[54px] shrink-0 rounded-2xl border border-purple-300/25 bg-purple-300/10 shadow-[0_0_28px_rgba(168,85,247,0.24)]"
                     />
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-lg font-black text-white">detailedpower3615</p>
-                      <p className="mt-0.5 text-xs font-semibold text-slate-400">View profile · Demo account</p>
+                      <p className="truncate text-lg font-black text-white">{playerProfile.displayName}</p>
+                      <p className="mt-0.5 truncate text-xs font-semibold text-slate-400">@{playerProfile.username} · Demo account</p>
                       <div className="mt-2 flex items-center gap-1.5 text-xs font-black text-cyan-200">
                         <Gem className="h-3.5 w-3.5" />
                         {walletBalance.toLocaleString()} points
@@ -2162,7 +2223,7 @@ function PlayerAdminDemoShell({
       <PlayerWalletPanel
         isOpen={isPlayerWalletOpen}
         onClose={() => setIsPlayerWalletOpen(false)}
-        username="detailedpower3615"
+        username={playerProfile.displayName}
         walletBalance={walletBalance}
         vaultCount={vaultCards.length}
         raffleTickets={raffleTickets}
@@ -2225,9 +2286,11 @@ function PlayerAdminDemoShell({
 
       <ProfileSettingsDrawer
         isOpen={isProfileSettingsOpen}
+        playerProfile={playerProfile}
         isSoundEnabled={isSoundEnabled}
         walletBalance={walletBalance}
         shippingRequestCount={vaultCards.filter((card) => card.status === 'Shipping Requested').length}
+        onSaveProfile={handleSavePlayerProfile}
         onClose={() => setIsProfileSettingsOpen(false)}
         onToggleSound={toggleSound}
         onOpenShippingCenter={() => {
