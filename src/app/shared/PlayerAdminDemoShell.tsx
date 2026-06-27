@@ -71,6 +71,12 @@ import {
 } from '../../data/dailyLoginRewards'
 
 import heroPremiumShinyPack from '../../assets/decks/hero-premium-shiny-pack.png'
+import onePiecePack01 from '../../assets/decks/onepiece-pack-01.png'
+import onePiecePack02 from '../../assets/decks/onepiece-pack-02.png'
+import onePiecePack03 from '../../assets/decks/onepiece-pack-03.png'
+import onePiecePack04 from '../../assets/decks/onepiece-pack-04.png'
+import onePiecePack05 from '../../assets/decks/onepiece-pack-05.png'
+import onePiecePack06 from '../../assets/decks/onepiece-pack-06.png'
 import pikachuPackWorld from '../../assets/ui/pikachu-pack-world.jpg'
 import luffyPackWorld from '../../assets/ui/luffy-pack-world.webp'
 
@@ -137,7 +143,7 @@ type QuestStatIncrement = Partial<
 >
 
 const STORAGE_KEYS = {
-  packs: 'tcg-platform-packs-v4',
+  packs: 'tcg-platform-packs-v5',
   walletBalance: 'tcg-platform-wallet-v2',
   vaultCards: 'tcg-platform-vault-cards-v3',
   transactions: 'tcg-platform-transactions-v2',
@@ -289,7 +295,7 @@ const initialPacks: Pack[] = [
     totalQuantity: 300,
     glow: 'from-red-300 to-amber-600',
     badge: 'Luffy Chase',
-    cover: genericPackCoverAssets.pirateDeckCover,
+    cover: onePiecePack01,
   },
   {
     name: 'One Piece Grand Line Vault',
@@ -300,7 +306,51 @@ const initialPacks: Pack[] = [
     totalQuantity: 180,
     glow: 'from-orange-300 to-red-700',
     badge: 'Treasure Drop',
-    cover: genericPackCoverAssets.secretDeckCover,
+    cover: onePiecePack02,
+  },
+  {
+    name: 'One Piece Zoro Sword Drop',
+    category: 'One Piece Inspired',
+    price: '180 Points',
+    remaining: '126 / 240 left',
+    remainingQuantity: 126,
+    totalQuantity: 240,
+    glow: 'from-emerald-300 to-cyan-700',
+    badge: 'Sword Drop',
+    cover: onePiecePack03,
+  },
+  {
+    name: 'One Piece Nami Gold Map',
+    category: 'One Piece Inspired',
+    price: '140 Points',
+    remaining: '210 / 320 left',
+    remainingQuantity: 210,
+    totalQuantity: 320,
+    glow: 'from-yellow-300 to-orange-700',
+    badge: 'Gold Map',
+    cover: onePiecePack04,
+  },
+  {
+    name: 'One Piece Sanji Flame Kick',
+    category: 'One Piece Inspired',
+    price: '190 Points',
+    remaining: '98 / 220 left',
+    remainingQuantity: 98,
+    totalQuantity: 220,
+    glow: 'from-orange-300 to-rose-700',
+    badge: 'Flame Kick',
+    cover: onePiecePack05,
+  },
+  {
+    name: 'One Piece Pirate Emperor Pack',
+    category: 'One Piece Inspired',
+    price: '260 Points',
+    remaining: '54 / 160 left',
+    remainingQuantity: 54,
+    totalQuantity: 160,
+    glow: 'from-purple-300 to-red-800',
+    badge: 'Emperor Pack',
+    cover: onePiecePack06,
   },
 ]
 
@@ -1774,7 +1824,7 @@ function PlayerAdminDemoShell({
                       setSelectedCategory('All')
                       void audioManager.playBgm(option.id === 'pokemon' ? 'pokemon' : 'onePiece')
                     }}
-                    className={`group relative min-h-[190px] overflow-hidden rounded-[1.35rem] border p-0 text-left transition active:scale-[0.98] ${
+                    className={`group relative min-h-[200px] overflow-hidden rounded-[1.35rem] border p-0 text-left transition active:scale-[0.98] ${
                       isSelected ? option.activeClass : option.inactiveClass
                     }`}
                   >
@@ -1784,24 +1834,27 @@ function PlayerAdminDemoShell({
                     <img
                       src={option.image}
                       alt={option.imageAlt}
-                      className={`pointer-events-none absolute bottom-0 right-[-18px] h-[128px] w-[128px] object-contain drop-shadow-[0_0_28px_rgba(255,255,255,0.2)] transition duration-300 ${
+                      className={`pointer-events-none absolute bottom-2 right-[-14px] h-[116px] w-[116px] object-contain drop-shadow-[0_0_28px_rgba(255,255,255,0.2)] transition duration-300 ${
                         isSelected ? 'scale-110 opacity-100' : 'scale-100 opacity-70 grayscale-[0.25]'
                       }`}
                       draggable={false}
                     />
 
-                    <div className="relative z-10 flex h-full min-h-[190px] flex-col justify-between p-4">
+                    <div className="relative z-10 flex h-full min-h-[200px] flex-col justify-between p-4">
                       <div>
-                        <p className="max-w-[112px] text-[10px] font-black uppercase leading-5 tracking-[0.22em] text-current/65">
-                          {option.eyebrow}
-                        </p>
-                        <h3 className="mt-2 text-2xl font-black tracking-tight text-white">
+                        <div className="flex h-[4.65rem] flex-col justify-start gap-1 text-[10px] font-black uppercase leading-none tracking-[0.22em] text-current/65">
+                          {option.eyebrow.split(' ').map((word) => (
+                            <span key={`${option.id}-${word}`}>{word}</span>
+                          ))}
+                        </div>
+
+                        <h3 className="mt-1 min-h-[2.15rem] text-2xl font-black leading-none tracking-tight text-white">
                           {option.label}
                         </h3>
                       </div>
 
                       <div className="pr-16">
-                        <p className="text-xs font-black text-current/72">
+                        <p className="text-xs font-black leading-4 text-current/72">
                           {packCount} active packs
                         </p>
                         <div className={`mt-2 h-1.5 rounded-full bg-gradient-to-r ${option.iconClass} ${
