@@ -51,6 +51,7 @@ import HeroPackSection from '../../components/HeroPackSection'
 import DailyLoginRewardModal from '../../components/DailyLoginRewardModal'
 import LiveAuctionPanel from '../../components/LiveAuctionPanel'
 import MobileAuctionPanel from '../../components/MobileAuctionPanel'
+import MobileHomeProgressPanel from '../../components/MobileHomeProgressPanel'
 import PlayerWalletPanel from '../../components/PlayerWalletPanel'
 
 import type { Pack } from '../../data/cardPool'
@@ -67,6 +68,8 @@ import {
 import heroPremiumShinyPack from '../../assets/decks/hero-premium-shiny-pack.png'
 
 type ActiveModal = 'detail' | 'opening' | 'multi-opening' | null
+
+type MobilePage = 'home' | 'packs' | 'auction' | 'rewards' | 'account'
 
 type PackAdminStatus = 'Active' | 'Paused' | 'Hidden'
 type PackCoverKey = 'electric' | 'pirate' | 'secret' | 'custom'
@@ -122,8 +125,6 @@ type PackSortOption =
   | 'Price: Low to High'
   | 'Price: High to Low'
   | 'A-Z'
-
-type MobilePage = 'home' | 'packs' | 'auction' | 'rewards' | 'account'
 
 type QuestStatIncrement = Partial<
   Pick<
@@ -696,11 +697,11 @@ function PlayerAdminDemoShell({
   const [isTransactionOpen, setIsTransactionOpen] = useState(false)
   const [isPlayerWalletOpen, setIsPlayerWalletOpen] = useState(false)
   const [isAdminShippingOpen, setIsAdminShippingOpen] = useState(initialAdminOpen)
-  const [mobilePage, setMobilePage] = useState<MobilePage>('home')
   const [selectedCategory, setSelectedCategory] =
     useState<PackCategory>('All')
   const [packSearchQuery, setPackSearchQuery] = useState('')
   const [packSortBy, setPackSortBy] = useState<PackSortOption>('Latest')
+  const [mobilePage, setMobilePage] = useState<MobilePage>('home')
   const [vaultCards, setVaultCards] = useState<VaultCard[]>(() =>
     loadVaultCards(),
   )
@@ -1499,14 +1500,15 @@ function PlayerAdminDemoShell({
     return sortedPacks
   }, [playerVisiblePacks, selectedCategory, packSearchQuery, packSortBy])
 
+  const changeMobilePage = (page: MobilePage) => {
+    setMobilePage(page)
 
-  const getMobileNavClass = (page: MobilePage) => {
-    const isActive = mobilePage === page
-
-    return `flex flex-col items-center gap-1 rounded-2xl px-2 py-2 text-[11px] font-black transition ${
-      isActive ? 'text-cyan-200' : 'text-slate-400'
-    }`
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
   }
+
+
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-[#030712] text-white">
@@ -1555,6 +1557,7 @@ function PlayerAdminDemoShell({
               <input
                 type="text"
                 value={packSearchQuery}
+                onFocus={() => changeMobilePage('packs')}
                 onChange={(event) => setPackSearchQuery(event.target.value)}
                 placeholder="Search packs, cards"
                 className="h-11 w-full rounded-full border border-white/10 bg-white/[0.06] pl-10 pr-4 text-sm font-semibold text-white outline-none placeholder:text-slate-400 focus:border-cyan-300/40"
@@ -1573,7 +1576,7 @@ function PlayerAdminDemoShell({
 
             <button
               type="button"
-              onClick={() => setMobilePage('account')}
+              onClick={() => changeMobilePage('account')}
               className="flex h-11 w-11 items-center justify-center rounded-full border border-purple-300/20 bg-purple-300/10"
             >
               <img
@@ -1584,11 +1587,9 @@ function PlayerAdminDemoShell({
             </button>
           </div>
         </header>
-
-
         <div className="lg:hidden">
           {mobilePage === 'home' && (
-            <div className="space-y-6">
+            <>
               <HeroPackSection
                 packImage={heroPremiumShinyPack}
                 packName="Premium Shiny Featured Pack"
@@ -1597,187 +1598,210 @@ function PlayerAdminDemoShell({
                 totalSupply={totalSupply}
                 raffleTickets={raffleTickets}
                 vaultCount={vaultCards.length}
-                onStartOpening={() => setMobilePage('packs')}
-                onHowItWorks={() => setMobilePage('rewards')}
+                onStartOpening={() => changeMobilePage('packs')}
+                onHowItWorks={() => changeMobilePage('rewards')}
                 onTopUp={openTopUpModal}
-                onOpenVault={() => setMobilePage('account')}
+                onOpenVault={() => setIsVaultOpen(true)}
               />
 
-              <section className="mx-auto w-full max-w-7xl px-4 pb-7">
-                <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.04] p-4">
-                  <p className="text-[11px] font-black uppercase tracking-[0.28em] text-cyan-300">
-                    Quick Access
-                  </p>
-                  <div className="mt-4 grid grid-cols-3 gap-3">
-                    <button
-                      type="button"
-                      onClick={() => setMobilePage('packs')}
-                      className="rounded-2xl border border-cyan-300/20 bg-cyan-300/10 p-3 text-left"
-                    >
-                      <PackageOpen className="h-5 w-5 text-cyan-300" />
-                      <p className="mt-3 text-sm font-black text-white">Packs</p>
-                      <p className="mt-1 text-[11px] text-slate-400">Open drops</p>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => setMobilePage('auction')}
-                      className="rounded-2xl border border-yellow-300/20 bg-yellow-300/10 p-3 text-left"
-                    >
-                      <Gavel className="h-5 w-5 text-yellow-300" />
-                      <p className="mt-3 text-sm font-black text-white">Auction</p>
-                      <p className="mt-1 text-[11px] text-slate-400">Live bids</p>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => setMobilePage('rewards')}
-                      className="rounded-2xl border border-purple-300/20 bg-purple-300/10 p-3 text-left"
-                    >
-                      <Gift className="h-5 w-5 text-purple-300" />
-                      <p className="mt-3 text-sm font-black text-white">Rewards</p>
-                      <p className="mt-1 text-[11px] text-slate-400">Claim now</p>
-                    </button>
-                  </div>
+              <section className="mx-auto w-full max-w-7xl px-4 pb-8">
+                <div className="grid grid-cols-3 gap-3">
+                  <button type="button" onClick={() => changeMobilePage('packs')} className="rounded-2xl border border-cyan-300/20 bg-cyan-300/10 p-3 text-left">
+                    <PackageOpen className="h-6 w-6 text-cyan-300" />
+                    <p className="mt-2 text-xs font-black text-white">Browse Packs</p>
+                    <p className="mt-1 text-xs text-slate-400">Open 1 / 10</p>
+                  </button>
+                  <button type="button" onClick={() => changeMobilePage('auction')} className="rounded-2xl border border-yellow-300/20 bg-yellow-300/10 p-3 text-left">
+                    <Gavel className="h-6 w-6 text-yellow-300" />
+                    <p className="mt-2 text-xs font-black text-white">Auction</p>
+                    <p className="mt-1 text-xs text-slate-400">Bid live</p>
+                  </button>
+                  <button type="button" onClick={() => changeMobilePage('rewards')} className="rounded-2xl border border-purple-300/20 bg-purple-300/10 p-3 text-left">
+                    <Gift className="h-6 w-6 text-purple-300" />
+                    <p className="mt-2 text-xs font-black text-white">Rewards</p>
+                    <p className="mt-1 text-xs text-slate-400">Quest / login</p>
+                  </button>
                 </div>
               </section>
-            </div>
+
+              <MobileHomeProgressPanel
+                questStats={questStats}
+                walletBalance={walletBalance}
+                raffleTickets={raffleTickets}
+                dailyLoginState={dailyLoginState}
+                onClaimQuest={handleClaimQuest}
+                onOpenDailyLogin={() => setIsDailyLoginOpen(true)}
+                onOpenPacks={() => changeMobilePage('packs')}
+                onOpenAuction={() => changeMobilePage('auction')}
+              />
+            </>
           )}
 
           {mobilePage === 'packs' && (
-            <section id="packs" className="mx-auto w-full max-w-7xl px-4 py-5">
-              <div className="mb-4">
-                <p className="text-[11px] font-black uppercase tracking-[0.28em] text-cyan-300">
-                  Pack Catalog
-                </p>
-                <h2 className="mt-2 text-3xl font-black text-white">
-                  Browse Packs
-                </h2>
-                <p className="mt-2 text-sm leading-6 text-slate-400">
-                  Choose a pack, open details, then pull cards into your vault.
-                </p>
+            <>
+        <section id="packs" className="mx-auto w-full max-w-7xl scroll-mt-8 px-4 py-7 sm:px-5 lg:px-8">
+          <div className="mb-5 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+            <div>
+              <p className="hud-label text-sm">Pack Catalog</p>
+              <h2 className="mt-2 text-3xl font-black sm:text-4xl">Browse Active Packs</h2>
+              <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-400">
+                Swipe sideways on mobile to browse packs faster. Tap View to open details.
+              </p>
+            </div>
+
+            <div className="flex w-full flex-col gap-3 lg:max-w-xl lg:flex-row lg:justify-end">
+              <div className="relative flex-1">
+                <Search className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-500" />
+                <input
+                  type="text"
+                  value={packSearchQuery}
+                  onChange={(event) => setPackSearchQuery(event.target.value)}
+                  placeholder="Search"
+                  className="w-full rounded-2xl border border-white/8 bg-white/[0.04] py-3.5 pl-12 pr-4 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300/35 focus:bg-white/[0.06]"
+                />
               </div>
 
-              <div className="mb-4 flex gap-2 overflow-x-auto pb-1 [-webkit-overflow-scrolling:touch]">
-                {categoryFilters.map((category) => {
-                  const isSelected = selectedCategory === category
-
-                  return (
-                    <button
-                      key={category}
-                      type="button"
-                      onClick={() => setSelectedCategory(category)}
-                      className={`flex shrink-0 items-center gap-2 rounded-2xl border px-3 py-2.5 text-[11px] font-black uppercase tracking-wider transition ${
-                        isSelected
-                          ? 'border-cyan-300 bg-cyan-300 text-black'
-                          : 'border-white/8 bg-white/[0.04] text-slate-300'
-                      }`}
-                    >
-                      <Filter className="h-4 w-4" />
-                      {category}
-                    </button>
-                  )
-                })}
+              <div className="relative min-w-[180px]">
+                <select
+                  value={packSortBy}
+                  onChange={(event) => setPackSortBy(event.target.value as PackSortOption)}
+                  className="w-full appearance-none rounded-2xl border border-white/8 bg-white/[0.04] px-4 py-3.5 pr-10 text-sm font-semibold text-white outline-none transition focus:border-cyan-300/35 focus:bg-white/[0.06]"
+                >
+                  <option value="Latest">Latest</option>
+                  <option value="Price: Low to High">Price: Low to High</option>
+                  <option value="Price: High to Low">Price: High to Low</option>
+                  <option value="A-Z">A-Z</option>
+                </select>
+                <ChevronRight className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 text-slate-500" />
               </div>
+            </div>
+          </div>
 
-              {filteredPacks.length === 0 ? (
-                <div className="rounded-[1.5rem] border border-white/8 bg-white/[0.03] px-6 py-12 text-center">
-                  <p className="text-xl font-black text-white">No packs found</p>
-                  <p className="mt-2 text-sm text-slate-400">
-                    Try another search keyword or switch to a different category.
-                  </p>
-                </div>
-              ) : (
-                <div className="grid grid-cols-2 gap-3">
-                  {filteredPacks.map((pack, index) => {
-                    const isSoldOut = pack.remainingQuantity <= 0
+          <div className="mb-5 flex gap-2 overflow-x-auto pb-1 [-webkit-overflow-scrolling:touch] sm:flex-wrap sm:overflow-visible sm:pb-0 sm:gap-3">
+            {categoryFilters.map((category) => {
+              const isSelected = selectedCategory === category
 
-                    return (
-                      <motion.article
-                        key={pack.name}
-                        initial={{ opacity: 0, y: 18 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: index * 0.03 }}
-                        onClick={() => {
-                          if (!isSoldOut) openPackDetail(pack)
-                        }}
-                        className={`group relative overflow-hidden rounded-[1.25rem] border border-white/6 bg-[#0a1322]/95 p-2.5 shadow-[0_12px_40px_rgba(0,0,0,0.28)] ${
-                          isSoldOut ? 'cursor-not-allowed opacity-60 grayscale' : 'cursor-pointer'
-                        }`}
-                      >
-                        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.07),transparent_36%),linear-gradient(180deg,rgba(255,255,255,0.02),transparent)]" />
+              return (
+                <button
+                  key={category}
+                  type="button"
+                  onClick={() => setSelectedCategory(category)}
+                  className={`flex shrink-0 items-center gap-2 rounded-2xl border px-3 py-2.5 text-[11px] font-black uppercase tracking-wider transition hover:scale-[1.02] sm:px-4 sm:py-3 sm:text-xs ${
+                    isSelected
+                      ? 'border-cyan-300 bg-cyan-300 text-black'
+                      : 'border-white/8 bg-white/[0.04] text-slate-300 hover:border-cyan-300/25 hover:bg-white/[0.06] hover:text-white'
+                  }`}
+                >
+                  <Filter className="h-4 w-4" />
+                  {category}
+                </button>
+              )
+            })}
+          </div>
 
-                        <div className="relative flex min-h-[245px] flex-col">
-                          <div className="text-center">
-                            <h3 className="line-clamp-2 min-h-[2.3rem] text-xs font-black leading-tight text-white">
-                              {pack.name}
-                            </h3>
-                            <p className="mt-1 text-xs text-slate-500">{pack.category}</p>
+          {filteredPacks.length === 0 ? (
+            <div className="rounded-[2rem] border border-white/8 bg-white/[0.03] px-6 py-16 text-center">
+              <p className="text-xl font-black text-white">No packs found</p>
+              <p className="mt-2 text-sm text-slate-400">
+                Try another search keyword or switch to a different category.
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 sm:gap-4 xl:grid-cols-4">
+              {filteredPacks.map((pack, index) => {
+                const isSoldOut = pack.remainingQuantity <= 0
+
+                return (
+                  <motion.article
+                    key={pack.name}
+                    initial={{ opacity: 0, y: 24 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.04 }}
+                    onClick={() => {
+                      if (!isSoldOut) openPackDetail(pack)
+                    }}
+                    className={`group relative overflow-hidden rounded-[1.25rem] border border-white/6 bg-[#0a1322]/95 p-2.5 shadow-[0_12px_40px_rgba(0,0,0,0.28)] transition duration-300 hover:-translate-y-1 hover:border-cyan-300/20 hover:shadow-[0_18px_55px_rgba(8,145,178,0.18)] sm:rounded-[1.55rem] sm:p-4 ${
+                      isSoldOut ? 'cursor-not-allowed opacity-60 grayscale' : 'cursor-pointer'
+                    }`}
+                  >
+                    <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.07),transparent_36%),linear-gradient(180deg,rgba(255,255,255,0.02),transparent)]" />
+
+                    <div className="relative flex min-h-[245px] flex-col sm:min-h-[400px]">
+                      <div className="text-center">
+                        <h3 className="line-clamp-2 min-h-[2.3rem] text-xs font-black leading-tight text-white sm:min-h-[3.4rem] sm:text-[1.05rem]">
+                          {pack.name}
+                        </h3>
+                        <p className="mt-1 text-xs text-slate-500 sm:text-sm">{pack.category}</p>
+                      </div>
+
+                      <div className="flex flex-1 items-center justify-center px-2 py-4 sm:px-4 sm:py-6">
+                        <img
+                          src={pack.cover}
+                          alt={pack.name}
+                          loading="lazy"
+                          className="max-h-[128px] w-auto object-contain drop-shadow-[0_18px_35px_rgba(0,0,0,0.45)] transition duration-300 group-hover:scale-[1.03] sm:max-h-[215px]"
+                        />
+                      </div>
+
+                      <div className="mt-auto flex items-center justify-between gap-4 pt-2">
+                        <div className="flex items-center gap-1.5 text-sm font-black text-white sm:gap-2 sm:text-lg">
+                          <div className="flex h-6 w-6 items-center justify-center rounded-full bg-amber-300/15 text-amber-300">
+                            <Gem className="h-4 w-4 fill-current" />
                           </div>
-
-                          <div className="flex flex-1 items-center justify-center px-2 py-4">
-                            <img
-                              src={pack.cover}
-                              alt={pack.name}
-                              loading="lazy"
-                              className="max-h-[128px] w-auto object-contain drop-shadow-[0_18px_35px_rgba(0,0,0,0.45)]"
-                            />
-                          </div>
-
-                          <div className="mt-auto flex items-center justify-between gap-3 pt-2">
-                            <div className="flex items-center gap-1.5 text-sm font-black text-white">
-                              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-amber-300/15 text-amber-300">
-                                <Gem className="h-4 w-4 fill-current" />
-                              </div>
-                              {getPackCost(pack).toFixed(2)}
-                            </div>
-
-                            <button
-                              type="button"
-                              disabled={isSoldOut}
-                              onClick={(event) => {
-                                event.stopPropagation()
-                                if (!isSoldOut) openPackDetail(pack)
-                              }}
-                              className={`inline-flex items-center gap-1 text-sm font-bold ${
-                                isSoldOut ? 'text-slate-500' : 'text-slate-300'
-                              }`}
-                            >
-                              {isSoldOut ? 'Sold Out' : 'View'}
-                              {!isSoldOut && <ChevronRight className="h-4 w-4" />}
-                            </button>
-                          </div>
+                          {getPackCost(pack).toFixed(2)}
                         </div>
-                      </motion.article>
-                    )
-                  })}
-                </div>
-              )}
-            </section>
+
+                        <button
+                          type="button"
+                          disabled={isSoldOut}
+                          onClick={(event) => {
+                            event.stopPropagation()
+                            if (!isSoldOut) openPackDetail(pack)
+                          }}
+                          className={`inline-flex items-center gap-1 text-sm font-bold transition sm:text-base ${
+                            isSoldOut ? 'text-slate-500' : 'text-slate-300 hover:text-white'
+                          }`}
+                        >
+                          {isSoldOut ? 'Sold Out' : 'View'}
+                          {!isSoldOut && <ChevronRight className="h-4 w-4" />}
+                        </button>
+                      </div>
+                    </div>
+                  </motion.article>
+                )
+              })}
+            </div>
+          )}
+        </section>
+
+
+            </>
           )}
 
           {mobilePage === 'auction' && (
-            <MobileAuctionPanel
-              walletBalance={walletBalance}
-              onBid={handleAuctionBid}
-              onNeedTopUp={openTopUpModal}
-            />
+            <MobileAuctionPanel walletBalance={walletBalance} onBid={handleAuctionBid} onNeedTopUp={openTopUpModal} />
           )}
 
           {mobilePage === 'rewards' && (
-            <div>
-              <section id="how-it-works">
-                <QuestLeaderboardPanel
-                  questStats={questStats}
-                  vaultCards={vaultCards}
-                  transactions={transactions}
-                  raffleTickets={raffleTickets}
-                  walletBalance={walletBalance}
-                  dailyLoginState={dailyLoginState}
-                  onClaimQuest={handleClaimQuest}
-                  onOpenDailyLogin={() => setIsDailyLoginOpen(true)}
-                />
-              </section>
+            <section id="how-it-works" className="mx-auto w-full max-w-7xl px-4 py-7">
+              <div className="mb-4 rounded-[1.5rem] border border-purple-300/18 bg-purple-300/[0.06] p-4">
+                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-purple-300">
+                  Rewards
+                </p>
+                <h2 className="mt-1 text-2xl font-black text-white">
+                  Raffle & Daily Bonus
+                </h2>
+                <p className="mt-2 text-sm leading-6 text-slate-400">
+                  Player level and daily quests are now placed on Home for faster mobile access.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setIsDailyLoginOpen(true)}
+                  className="mt-4 w-full rounded-2xl bg-gradient-to-r from-orange-300 to-yellow-300 px-4 py-3 text-sm font-black text-black"
+                >
+                  Open Daily Login Rewards
+                </button>
+              </div>
 
               <RaffleCenterPanel
                 ticketBalance={raffleTickets}
@@ -1785,110 +1809,54 @@ function PlayerAdminDemoShell({
                 winners={raffleWinners}
                 onEnterRaffle={handleEnterRaffle}
               />
-            </div>
+            </section>
           )}
 
+
           {mobilePage === 'account' && (
-            <section className="mx-auto w-full max-w-7xl px-4 py-5">
-              <div className="rounded-[1.8rem] border border-white/10 bg-gradient-to-b from-white/[0.08] to-white/[0.03] p-5 shadow-[0_22px_80px_rgba(0,0,0,0.35)]">
+            <section id="account" className="mx-auto w-full max-w-7xl px-4 py-7">
+              <div className="rounded-[1.6rem] border border-white/10 bg-white/[0.04] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.28)]">
                 <div className="flex items-center gap-4">
-                  <img
-                    src="https://api.dicebear.com/9.x/adventurer/svg?seed=detailedpower3615&radius=50&backgroundColor=8b5cf6"
-                    alt="Player account"
-                    className="h-16 w-16 rounded-2xl border border-white/10 object-cover"
-                  />
-                  <div>
-                    <p className="text-xl font-black text-white">detailedpower3615</p>
-                    <p className="mt-1 text-sm text-slate-400">Demo player account</p>
+                  <img src="https://api.dicebear.com/9.x/adventurer/svg?seed=detailedpower3615&radius=50&backgroundColor=8b5cf6" alt="detailedpower3615" className="h-16 w-16 rounded-2xl border border-purple-300/20 bg-purple-300/10" />
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-xl font-black text-white">detailedpower3615</p>
+                    <p className="text-sm text-slate-400">View profile · Demo account</p>
                   </div>
                 </div>
-
-                <div className="mt-5 rounded-[1.4rem] border border-cyan-300/15 bg-cyan-300/[0.06] p-4">
-                  <div className="flex items-center justify-between">
+                <div className="mt-5 rounded-2xl border border-cyan-300/15 bg-cyan-300/[0.06] p-4">
+                  <div className="flex items-center justify-between gap-4">
                     <div>
-                      <p className="text-xs font-black uppercase tracking-[0.24em] text-slate-400">
-                        Points Balance
-                      </p>
-                      <p className="mt-2 text-4xl font-black text-cyan-100">
-                        {walletBalance.toLocaleString()}
-                      </p>
+                      <p className="text-xs font-black uppercase tracking-[0.24em] text-slate-500">Points Balance</p>
+                      <p className="mt-1 text-3xl font-black text-cyan-200">{walletBalance.toLocaleString()}</p>
                     </div>
-
-                    <button
-                      type="button"
-                      onClick={openTopUpModal}
-                      className="rounded-full bg-cyan-300 px-4 py-2 text-sm font-black text-black"
-                    >
-                      Add Points
-                    </button>
+                    <button type="button" onClick={openTopUpModal} className="rounded-xl bg-cyan-300 px-4 py-3 text-sm font-black text-black">Add Points</button>
                   </div>
-
-                  <button
-                    type="button"
-                    onClick={() => setIsDailyLoginOpen(true)}
-                    className="mt-4 flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-blue-500 to-purple-500 px-5 py-3 text-sm font-black text-white"
-                  >
+                  <button type="button" onClick={() => setIsDailyLoginOpen(true)} className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-500 to-purple-500 px-4 py-3 text-sm font-black text-white">
                     <Gift className="h-5 w-5" />
                     Roll Daily Points
                   </button>
                 </div>
-
                 <div className="mt-4 grid grid-cols-3 gap-3">
-                  <button
-                    type="button"
-                    onClick={() => setIsVaultOpen(true)}
-                    className="rounded-2xl border border-cyan-300/15 bg-cyan-300/[0.06] p-4 text-left"
-                  >
-                    <p className="text-[10px] font-black uppercase tracking-[0.24em] text-cyan-300">Vault</p>
+                  <button type="button" onClick={() => setIsVaultOpen(true)} className="rounded-2xl border border-cyan-300/15 bg-cyan-300/[0.05] p-4 text-left">
+                    <p className="text-xs font-black uppercase tracking-[0.2em] text-cyan-300">Vault</p>
                     <p className="mt-2 text-2xl font-black text-white">{vaultCards.length}</p>
                   </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setMobilePage('rewards')}
-                    className="rounded-2xl border border-yellow-300/15 bg-yellow-300/[0.06] p-4 text-left"
-                  >
-                    <p className="text-[10px] font-black uppercase tracking-[0.24em] text-yellow-300">Tickets</p>
+                  <div className="rounded-2xl border border-yellow-300/15 bg-yellow-300/[0.05] p-4 text-left">
+                    <p className="text-xs font-black uppercase tracking-[0.2em] text-yellow-300">Tickets</p>
                     <p className="mt-2 text-2xl font-black text-white">{raffleTickets}</p>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setIsTransactionOpen(true)}
-                    className="rounded-2xl border border-purple-300/15 bg-purple-300/[0.06] p-4 text-left"
-                  >
-                    <p className="text-[10px] font-black uppercase tracking-[0.24em] text-purple-300">History</p>
+                  </div>
+                  <button type="button" onClick={() => setIsTransactionOpen(true)} className="rounded-2xl border border-purple-300/15 bg-purple-300/[0.05] p-4 text-left">
+                    <p className="text-xs font-black uppercase tracking-[0.2em] text-purple-300">History</p>
                     <p className="mt-2 text-2xl font-black text-white">{transactions.length}</p>
                   </button>
                 </div>
-
-                <div className="mt-4 space-y-3">
-                  <button
-                    type="button"
-                    onClick={() => setIsAdminShippingOpen(true)}
-                    className="flex w-full items-center justify-between rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-4 text-left"
-                  >
-                    <span className="font-black text-white">Shipments</span>
-                    <span className="rounded-full bg-white/10 px-2 py-1 text-xs font-black text-slate-300">
-                      {vaultCards.filter((card) => card.status === 'Shipping Requested').length}
-                    </span>
-                  </button>
-
-                  <button
-                    type="button"
-                    className="flex w-full items-center justify-between rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-4 text-left"
-                  >
-                    <span className="font-black text-white">Support</span>
-                    <ChevronRight className="h-4 w-4 text-slate-500" />
-                  </button>
-
-                  <button
-                    type="button"
-                    className="flex w-full items-center justify-between rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-4 text-left"
-                  >
-                    <span className="font-black text-white">Settings</span>
-                    <ChevronRight className="h-4 w-4 text-slate-500" />
-                  </button>
+                <div className="mt-4 grid gap-3">
+                  <button type="button" onClick={() => setIsAdminShippingOpen(true)} className="rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-4 text-center text-sm font-black text-white">Shipments · {vaultCards.filter((card) => card.status === 'Shipping Requested').length}</button>
+                  <button type="button" className="rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-4 text-center text-sm font-black text-white">Support / Settings</button>
+                </div>
+                <div className="mt-4 rounded-2xl border border-emerald-300/15 bg-emerald-300/[0.06] p-4">
+                  <p className="text-xs font-black uppercase tracking-[0.28em] text-emerald-300">Demo Account</p>
+                  <p className="mt-2 text-sm leading-6 text-slate-300">This account page is separated from the main demo flow. Real login, payment, withdrawals and profile settings can connect in the backend phase.</p>
                 </div>
               </div>
             </section>
@@ -1896,6 +1864,8 @@ function PlayerAdminDemoShell({
         </div>
 
         <div className="hidden lg:block">
+
+
         <HeroPackSection
           packImage={heroPremiumShinyPack}
           packName="Premium Shiny Featured Pack"
@@ -2068,13 +2038,7 @@ function PlayerAdminDemoShell({
         />
         </section>
 
-        <div className="lg:hidden">
-          <MobileAuctionPanel
-            walletBalance={walletBalance}
-            onBid={handleAuctionBid}
-            onNeedTopUp={openTopUpModal}
-          />
-        </div>
+
 
         <div id="auction" className="hidden lg:block">
           <LiveAuctionPanel
@@ -2095,64 +2059,17 @@ function PlayerAdminDemoShell({
         {/* Real Card Catalog Preview is hidden for boss/demo presentation. */}
 
         </div>
-
       </main>
 
       <nav className="fixed bottom-0 left-0 right-0 z-[99990] border-t border-white/10 bg-[#05070d]/94 px-2 pb-[env(safe-area-inset-bottom)] pt-2 backdrop-blur-xl lg:hidden">
         <div className="mx-auto grid max-w-md grid-cols-5">
-          <button
-            type="button"
-            onClick={() => setMobilePage('home')}
-            className={getMobileNavClass('home')}
-          >
-            <Home className="h-5 w-5" />
-            Home
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setMobilePage('packs')}
-            className={getMobileNavClass('packs')}
-          >
-            <PackageOpen className="h-5 w-5" />
-            Packs
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setMobilePage('auction')}
-            className={`flex flex-col items-center gap-1 rounded-2xl px-2 py-2 text-[11px] font-black transition ${
-              mobilePage === 'auction' ? 'text-yellow-300' : 'text-slate-400'
-            }`}
-          >
-            <Gavel className="h-5 w-5" />
-            Auction
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setMobilePage('rewards')}
-            className={`flex flex-col items-center gap-1 rounded-2xl px-2 py-2 text-[11px] font-black transition ${
-              mobilePage === 'rewards' ? 'text-purple-300' : 'text-slate-400'
-            }`}
-          >
-            <Gift className="h-5 w-5" />
-            Rewards
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setMobilePage('account')}
-            className={`flex flex-col items-center gap-1 rounded-2xl px-2 py-2 text-[11px] font-black transition ${
-              mobilePage === 'account' ? 'text-emerald-300' : 'text-slate-400'
-            }`}
-          >
-            <UserCircle className="h-5 w-5" />
-            Account
-          </button>
+          <button type="button" onClick={() => changeMobilePage('home')} className={`flex flex-col items-center gap-1 rounded-2xl px-2 py-2 text-[11px] font-black ${mobilePage === 'home' ? 'text-cyan-200' : 'text-slate-400'}`}><Home className="h-5 w-5" />Home</button>
+          <button type="button" onClick={() => changeMobilePage('packs')} className={`flex flex-col items-center gap-1 rounded-2xl px-2 py-2 text-[11px] font-black ${mobilePage === 'packs' ? 'text-cyan-200' : 'text-slate-400'}`}><PackageOpen className="h-5 w-5" />Packs</button>
+          <button type="button" onClick={() => changeMobilePage('auction')} className={`flex flex-col items-center gap-1 rounded-2xl px-2 py-2 text-[11px] font-black ${mobilePage === 'auction' ? 'text-yellow-300' : 'text-slate-400'}`}><Gavel className="h-5 w-5" />Auction</button>
+          <button type="button" onClick={() => changeMobilePage('rewards')} className={`flex flex-col items-center gap-1 rounded-2xl px-2 py-2 text-[11px] font-black ${mobilePage === 'rewards' ? 'text-purple-300' : 'text-slate-400'}`}><Gift className="h-5 w-5" />Rewards</button>
+          <button type="button" onClick={() => changeMobilePage('account')} className={`flex flex-col items-center gap-1 rounded-2xl px-2 py-2 text-[11px] font-black ${mobilePage === 'account' ? 'text-emerald-300' : 'text-slate-400'}`}><UserCircle className="h-5 w-5" />Account</button>
         </div>
       </nav>
-
       <PackDetailModal
         pack={activeModal === 'detail' ? activePack : null}
         onClose={closeModal}
