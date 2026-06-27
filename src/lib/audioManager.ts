@@ -323,6 +323,68 @@ class TcgAudioManager {
     }
   }
 
+  private playSyntheticButtonClick(volume: number) {
+    const context = this.getAudioContext()
+    if (!context) return false
+
+    const playClick = () => {
+      try {
+        const startTime = context.currentTime
+        const clickOscillator = context.createOscillator()
+        const clickGain = context.createGain()
+        const snapOscillator = context.createOscillator()
+        const snapGain = context.createGain()
+        const masterGain = context.createGain()
+
+        masterGain.gain.setValueAtTime(Math.min(0.18, volume * 0.18), startTime)
+
+        clickOscillator.type = 'triangle'
+        clickOscillator.frequency.setValueAtTime(980, startTime)
+        clickOscillator.frequency.exponentialRampToValueAtTime(360, startTime + 0.045)
+
+        clickGain.gain.setValueAtTime(0.0001, startTime)
+        clickGain.gain.exponentialRampToValueAtTime(1, startTime + 0.004)
+        clickGain.gain.exponentialRampToValueAtTime(0.0001, startTime + 0.058)
+
+        snapOscillator.type = 'square'
+        snapOscillator.frequency.setValueAtTime(1800, startTime)
+        snapOscillator.frequency.exponentialRampToValueAtTime(900, startTime + 0.024)
+
+        snapGain.gain.setValueAtTime(0.0001, startTime)
+        snapGain.gain.exponentialRampToValueAtTime(0.35, startTime + 0.002)
+        snapGain.gain.exponentialRampToValueAtTime(0.0001, startTime + 0.022)
+
+        clickOscillator.connect(clickGain)
+        clickGain.connect(masterGain)
+        snapOscillator.connect(snapGain)
+        snapGain.connect(masterGain)
+        masterGain.connect(context.destination)
+
+        clickOscillator.start(startTime)
+        snapOscillator.start(startTime)
+        clickOscillator.stop(startTime + 0.065)
+        snapOscillator.stop(startTime + 0.03)
+
+        return true
+      } catch {
+        return false
+      }
+    }
+
+    if (context.state === 'suspended') {
+      void context
+        .resume()
+        .then(() => {
+          playClick()
+        })
+        .catch(() => undefined)
+
+      return true
+    }
+
+    return playClick()
+  }
+
   playButtonClick(options?: { throttleMs?: number; volume?: number }) {
     if (!isBrowser() || !this.enabled) return
 
@@ -335,13 +397,17 @@ class TcgAudioManager {
 
     const volume = options?.volume ?? this.getSfxVolume()
 
-    // Keep button click on the HTMLAudio pool instead of Web Audio.
-    // This is more reliable on mobile browsers where BGM works but
-    // decoded Web Audio SFX may stay suspended or fail silently.
-    this.playHtmlSfx('buttonClick', volume)
+    // V4: generate the UI tap sound directly with Web Audio.
+    // This avoids short MP3 loading/decoding issues on mobile browsers.
+    this.playSyntheticButtonClick(volume)
   }
 
   playSfx(name: SfxName, options?: { throttleMs?: number; volume?: number }) {
+    if (name === 'buttonClick') {
+      this.playButtonClick(options)
+      return
+    }
+
     if (!isBrowser() || !this.enabled) return
 
     const throttleMs = options?.throttleMs ?? 55
