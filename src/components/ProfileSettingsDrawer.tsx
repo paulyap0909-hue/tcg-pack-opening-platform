@@ -1,6 +1,7 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import {
   Bell,
+  Check,
   ChevronRight,
   Gem,
   Globe2,
@@ -19,6 +20,7 @@ import {
 import { useEffect, useState } from 'react'
 
 import { audioManager } from '../lib/audioManager'
+import { languageOptions, translations, type AppLanguage } from '../lib/i18n'
 
 export type PlayerProfile = {
   displayName: string
@@ -33,6 +35,9 @@ type ProfileSaveResult = {
 type ProfileSettingsDrawerProps = {
   isOpen: boolean
   onClose: () => void
+  language: AppLanguage
+  languageLabel: string
+  onChangeLanguage: (language: AppLanguage) => void
   playerProfile: PlayerProfile
   isSoundEnabled: boolean
   onToggleSound: () => void
@@ -193,6 +198,9 @@ function SettingsRow({
 export default function ProfileSettingsDrawer({
   isOpen,
   onClose,
+  language,
+  languageLabel,
+  onChangeLanguage,
   playerProfile,
   isSoundEnabled,
   onToggleSound,
@@ -205,15 +213,22 @@ export default function ProfileSettingsDrawer({
   const [notifications, setNotifications] = useState(notificationDefaults)
   const [soundOptions, setSoundOptions] = useState(soundDefaults)
   const [isEditOpen, setIsEditOpen] = useState(false)
+  const [isLanguageOpen, setIsLanguageOpen] = useState(false)
   const [draftDisplayName, setDraftDisplayName] = useState(playerProfile.displayName)
   const [draftUsername, setDraftUsername] = useState(playerProfile.username)
   const [editError, setEditError] = useState('')
+  const t = translations[language]
 
   useEffect(() => {
     if (!isOpen) return
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
+        if (isLanguageOpen) {
+          setIsLanguageOpen(false)
+          return
+        }
+
         if (isEditOpen) {
           setIsEditOpen(false)
           return
@@ -230,7 +245,7 @@ export default function ProfileSettingsDrawer({
       document.body.style.overflow = ''
       window.removeEventListener('keydown', handleKeyDown)
     }
-  }, [isEditOpen, isOpen, onClose])
+  }, [isEditOpen, isLanguageOpen, isOpen, onClose])
 
   useEffect(() => {
     if (!isEditOpen) return
@@ -265,25 +280,16 @@ export default function ProfileSettingsDrawer({
     }))
   }
 
-
-  const testSuccessSound = () => {
-    audioManager.playSfx('success', { throttleMs: 0, volume: 0.9 })
-  }
-
-  const testBidSound = () => {
-    audioManager.playSfx('bidClick', { throttleMs: 0, volume: 0.85 })
-  }
-
-  const resetAudioSettings = () => {
-    audioManager.resetAudioSettings()
-    onToggleSound()
-  }
-
   const openEditProfile = () => {
     setDraftDisplayName(playerProfile.displayName)
     setDraftUsername(playerProfile.username)
     setEditError('')
     setIsEditOpen(true)
+  }
+
+  const handleChooseLanguage = (nextLanguage: AppLanguage) => {
+    onChangeLanguage(nextLanguage)
+    setIsLanguageOpen(false)
   }
 
   const handleSaveProfile = () => {
@@ -332,10 +338,10 @@ export default function ProfileSettingsDrawer({
 
                 <div className="text-center">
                   <p className="text-[10px] font-black uppercase tracking-[0.3em] text-cyan-200">
-                    Player Profile
+                    {t.playerProfile}
                   </p>
                   <h2 className="text-xl font-black tracking-tight text-white">
-                    Account Settings
+                    {t.accountSettings}
                   </h2>
                 </div>
 
@@ -370,44 +376,44 @@ export default function ProfileSettingsDrawer({
                   onClick={openEditProfile}
                   className="mt-4 w-full rounded-2xl border border-white/10 bg-white/[0.07] px-4 py-3 text-sm font-black text-white"
                 >
-                  Edit Profile
+                  {t.editProfile}
                 </button>
               </div>
 
               <div className="mt-4 overflow-hidden rounded-[1.35rem] border border-white/10 bg-white/[0.045]">
                 <div className="flex items-center gap-2 border-b border-white/10 px-4 py-3">
                   <Bell className="h-5 w-5 text-yellow-200" />
-                  <p className="text-sm font-black text-white">Notifications</p>
+                  <p className="text-sm font-black text-white">{t.notifications}</p>
                 </div>
 
                 <ToggleRow
-                  label="Pack Opening Result"
-                  description="Rare pull and vault save alerts."
+                  label={t.packOpeningResult}
+                  description={t.packOpeningResultDesc}
                   enabled={notifications.packResult}
                   onToggle={() => toggleNotification('packResult')}
                   accent="yellow"
                 />
                 <ToggleRow
-                  label="Auction Bid Updates"
-                  description="Outbid, winning and ending soon alerts."
+                  label={t.auctionBidUpdates}
+                  description={t.auctionBidUpdatesDesc}
                   enabled={notifications.auctionBid}
                   onToggle={() => toggleNotification('auctionBid')}
                   accent="yellow"
                 />
                 <ToggleRow
-                  label="Raffle Rewards"
+                  label={t.raffleRewards}
                   enabled={notifications.raffleReward}
                   onToggle={() => toggleNotification('raffleReward')}
                   accent="purple"
                 />
                 <ToggleRow
-                  label="Shipping Updates"
+                  label={t.shippingUpdates}
                   enabled={notifications.shippingUpdate}
                   onToggle={() => toggleNotification('shippingUpdate')}
                   accent="cyan"
                 />
                 <ToggleRow
-                  label="Promotions & Events"
+                  label={t.promotionsEvents}
                   enabled={notifications.eventPromo}
                   onToggle={() => toggleNotification('eventPromo')}
                   accent="emerald"
@@ -417,36 +423,36 @@ export default function ProfileSettingsDrawer({
               <div className="mt-4 overflow-hidden rounded-[1.35rem] border border-white/10 bg-white/[0.045]">
                 <div className="flex items-center gap-2 border-b border-white/10 px-4 py-3">
                   <Music2 className="h-5 w-5 text-cyan-200" />
-                  <p className="text-sm font-black text-white">Sound & Music</p>
+                  <p className="text-sm font-black text-white">{t.soundMusic}</p>
                 </div>
 
                 <ToggleRow
-                  label="Master Sound"
-                  description="Controls music and all sound effects."
+                  label={t.masterSound}
+                  description={t.masterSoundDesc}
                   enabled={isSoundEnabled}
                   onToggle={handleMainSoundToggle}
                   accent="cyan"
                 />
                 <ToggleRow
-                  label="Background Music"
+                  label={t.backgroundMusic}
                   enabled={isSoundEnabled && soundOptions.backgroundMusic}
                   onToggle={() => toggleSoundOption('backgroundMusic')}
                   accent="cyan"
                 />
                 <ToggleRow
-                  label="Sound Effects"
+                  label={t.soundEffects}
                   enabled={isSoundEnabled && soundOptions.soundEffects}
                   onToggle={() => toggleSoundOption('soundEffects')}
                   accent="purple"
                 />
                 <ToggleRow
-                  label="Pack Opening Sounds"
+                  label={t.packOpeningSounds}
                   enabled={isSoundEnabled && soundOptions.packOpeningSounds}
                   onToggle={() => toggleSoundOption('packOpeningSounds')}
                   accent="yellow"
                 />
                 <ToggleRow
-                  label="Auction Sounds"
+                  label={t.auctionSounds}
                   enabled={isSoundEnabled && soundOptions.auctionSounds}
                   onToggle={() => toggleSoundOption('auctionSounds')}
                   accent="emerald"
@@ -456,25 +462,25 @@ export default function ProfileSettingsDrawer({
               <div className="mt-4 overflow-hidden rounded-[1.35rem] border border-cyan-300/14 bg-cyan-300/[0.045]">
                 <div className="flex items-center gap-2 border-b border-white/10 px-4 py-3">
                   <Volume2 className="h-5 w-5 text-cyan-200" />
-                  <p className="text-sm font-black text-white">Audio Test</p>
+                  <p className="text-sm font-black text-white">{t.audioTest}</p>
                 </div>
 
                 <div className="grid grid-cols-2 gap-2 px-4 py-3">
                   <button
                     type="button"
                     data-audio-silent="true"
-                    onClick={testBidSound}
+                    onClick={() => audioManager.playSfx('bidClick', { throttleMs: 0, volume: 0.85 })}
                     className="rounded-2xl border border-yellow-300/18 bg-yellow-300/[0.07] px-3 py-3 text-xs font-black text-yellow-100"
                   >
-                    Test Bid
+                    {t.testBid}
                   </button>
                   <button
                     type="button"
                     data-audio-silent="true"
-                    onClick={testSuccessSound}
+                    onClick={() => audioManager.playSfx('success', { throttleMs: 0, volume: 0.9 })}
                     className="rounded-2xl border border-emerald-300/18 bg-emerald-300/[0.07] px-3 py-3 text-xs font-black text-emerald-100"
                   >
-                    Test Success
+                    {t.testSuccess}
                   </button>
                   <button
                     type="button"
@@ -482,7 +488,7 @@ export default function ProfileSettingsDrawer({
                     onClick={() => void audioManager.playBgm('lobby')}
                     className="rounded-2xl border border-purple-300/18 bg-purple-300/[0.07] px-3 py-3 text-xs font-black text-purple-100"
                   >
-                    Test Lobby
+                    {t.testBgm}
                   </button>
                   <button
                     type="button"
@@ -490,7 +496,7 @@ export default function ProfileSettingsDrawer({
                     onClick={() => void audioManager.playBgm('pokemon')}
                     className="rounded-2xl border border-yellow-300/18 bg-yellow-300/[0.07] px-3 py-3 text-xs font-black text-yellow-100"
                   >
-                    Test Pokémon
+                    Pokémon
                   </button>
                   <button
                     type="button"
@@ -498,15 +504,18 @@ export default function ProfileSettingsDrawer({
                     onClick={() => void audioManager.playBgm('onePiece')}
                     className="rounded-2xl border border-red-300/18 bg-red-300/[0.07] px-3 py-3 text-xs font-black text-red-100"
                   >
-                    Test One Piece
+                    One Piece
                   </button>
                   <button
                     type="button"
                     data-audio-silent="true"
-                    onClick={resetAudioSettings}
+                    onClick={() => {
+                      audioManager.resetAudioSettings()
+                      onToggleSound()
+                    }}
                     className="rounded-2xl border border-red-300/18 bg-red-300/[0.07] px-3 py-3 text-xs font-black text-red-100"
                   >
-                    Reset Audio
+                    {t.resetAudio}
                   </button>
                 </div>
               </div>
@@ -514,20 +523,20 @@ export default function ProfileSettingsDrawer({
               <div className="mt-4 overflow-hidden rounded-[1.35rem] border border-white/10 bg-white/[0.045]">
                 <SettingsRow
                   icon={Phone}
-                  title="Phone Number"
-                  subtitle="Verification will be connected in production."
+                  title={t.phoneNumber}
+                  subtitle={t.phoneNumberDesc}
                   value="Not linked"
                 />
                 <SettingsRow
                   icon={ShieldCheck}
-                  title="Account Verification"
-                  subtitle="Demo account for boss preview."
+                  title={t.accountVerification}
+                  subtitle={t.accountVerificationDesc}
                   value="Demo"
                 />
                 <SettingsRow
                   icon={LockKeyhole}
-                  title="Change Password"
-                  subtitle="Coming soon with real login."
+                  title={t.changePassword}
+                  subtitle={t.changePasswordDesc}
                   value="Soon"
                 />
               </div>
@@ -535,25 +544,26 @@ export default function ProfileSettingsDrawer({
               <div className="mt-4 overflow-hidden rounded-[1.35rem] border border-white/10 bg-white/[0.045]">
                 <SettingsRow
                   icon={Truck}
-                  title="Shipping Center"
+                  title={t.shippingCenter}
                   subtitle={`${shippingRequestCount} active request${shippingRequestCount === 1 ? '' : 's'}`}
                   value="Manage"
                   onClick={onOpenShippingCenter}
                 />
                 <SettingsRow
                   icon={MapPin}
-                  title="Shipping Region"
+                  title={t.shippingRegion}
                   subtitle="Physical card delivery region."
                   value="Malaysia"
                 />
                 <SettingsRow
                   icon={Globe2}
-                  title="Language"
-                  value="English"
+                  title={t.language}
+                  value={languageLabel}
+                  onClick={() => setIsLanguageOpen(true)}
                 />
                 <SettingsRow
                   icon={Volume2}
-                  title="Display Mode"
+                  title={t.displayMode}
                   value="Dark"
                 />
               </div>
@@ -561,20 +571,20 @@ export default function ProfileSettingsDrawer({
               <div className="mt-4 overflow-hidden rounded-[1.35rem] border border-white/10 bg-white/[0.045]">
                 <SettingsRow
                   icon={UserCircle}
-                  title="Version"
+                  title={t.version}
                   value="V 1.0.0"
                 />
                 <SettingsRow
                   icon={RotateCcw}
-                  title="Reset Demo Data"
-                  subtitle="Clears local wallet, vault, packs and history."
+                  title={t.resetDemoData}
+                  subtitle={t.resetDemoDataDesc}
                   danger
                   onClick={onResetDemoData}
                 />
                 <SettingsRow
                   icon={LogOut}
-                  title="Logout Demo"
-                  subtitle="Demo only. Real auth can be added later."
+                  title={t.logoutDemo}
+                  subtitle={t.logoutDemoDesc}
                 />
               </div>
             </div>
@@ -599,10 +609,10 @@ export default function ProfileSettingsDrawer({
                     <div className="flex items-center justify-between gap-3">
                       <div>
                         <p className="text-[10px] font-black uppercase tracking-[0.26em] text-cyan-200">
-                          Profile
+                          {t.profile}
                         </p>
                         <h3 className="mt-1 text-xl font-black text-white">
-                          Edit Profile
+                          {t.editProfile}
                         </h3>
                       </div>
 
@@ -638,25 +648,25 @@ export default function ProfileSettingsDrawer({
                     </div>
 
                     <label className="mt-4 block text-xs font-black uppercase tracking-[0.2em] text-slate-500">
-                      Display Name
+                      {t.displayName}
                     </label>
                     <input
                       value={draftDisplayName}
                       onChange={(event) => setDraftDisplayName(event.target.value)}
                       maxLength={20}
                       className="mt-2 w-full rounded-2xl border border-white/10 bg-white/[0.07] px-4 py-3 text-sm font-bold text-white outline-none placeholder:text-slate-600 focus:border-cyan-300/40"
-                      placeholder="Display name"
+                      placeholder={t.displayName}
                     />
 
                     <label className="mt-4 block text-xs font-black uppercase tracking-[0.2em] text-slate-500">
-                      Username
+                      {t.username}
                     </label>
                     <input
                       value={draftUsername}
                       onChange={(event) => setDraftUsername(event.target.value.replace(/\s+/g, '').toLowerCase())}
                       maxLength={20}
                       className="mt-2 w-full rounded-2xl border border-white/10 bg-white/[0.07] px-4 py-3 text-sm font-bold text-white outline-none placeholder:text-slate-600 focus:border-cyan-300/40"
-                      placeholder="username"
+                      placeholder={t.username}
                     />
 
                     {editError && (
@@ -671,7 +681,7 @@ export default function ProfileSettingsDrawer({
                         onClick={() => setIsEditOpen(false)}
                         className="rounded-2xl border border-white/10 bg-white/[0.055] px-4 py-3 text-sm font-black text-slate-200"
                       >
-                        Cancel
+                        {t.cancel}
                       </button>
                       <button
                         type="button"
@@ -679,13 +689,83 @@ export default function ProfileSettingsDrawer({
                         onClick={handleSaveProfile}
                         className="rounded-2xl bg-gradient-to-r from-cyan-300 to-blue-500 px-4 py-3 text-sm font-black text-black shadow-[0_14px_32px_rgba(34,211,238,0.24)]"
                       >
-                        Save Changes
+                        {t.saveChanges}
                       </button>
                     </div>
 
                     <p className="mt-3 text-center text-[10px] leading-4 text-slate-500">
                       Username supports 3–20 characters: letters, numbers, dash and underscore.
                     </p>
+                  </div>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          <AnimatePresence>
+            {isLanguageOpen && (
+              <motion.div
+                className="absolute inset-0 z-40 flex items-end justify-center bg-black/55 px-4 pb-4 backdrop-blur-sm"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+              >
+                <motion.div
+                  className="w-full max-w-md overflow-hidden rounded-[1.6rem] border border-cyan-300/18 bg-[#07111f] text-white shadow-[0_-20px_80px_rgba(34,211,238,0.18)]"
+                  initial={{ y: 80, scale: 0.98 }}
+                  animate={{ y: 0, scale: 1 }}
+                  exit={{ y: 80, scale: 0.98 }}
+                  transition={{ type: 'spring', damping: 26, stiffness: 260 }}
+                >
+                  <div className="flex items-center justify-between border-b border-white/10 px-4 py-4">
+                    <div>
+                      <p className="text-[10px] font-black uppercase tracking-[0.26em] text-cyan-200">
+                        {t.language}
+                      </p>
+                      <h3 className="mt-1 text-xl font-black text-white">
+                        {t.chooseLanguage}
+                      </h3>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setIsLanguageOpen(false)}
+                      className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/[0.07]"
+                      aria-label="Close language picker"
+                    >
+                      <X className="h-5 w-5" />
+                    </button>
+                  </div>
+
+                  <div className="p-4">
+                    <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04]">
+                      {languageOptions.map((option) => {
+                        const isSelected = language === option.code
+
+                        return (
+                          <button
+                            key={option.code}
+                            type="button"
+                            onClick={() => handleChooseLanguage(option.code)}
+                            className="flex w-full items-center justify-between border-b border-white/10 px-4 py-4 text-left last:border-b-0"
+                          >
+                            <div>
+                              <p className="text-sm font-black text-white">
+                                {option.nativeLabel}
+                              </p>
+                              <p className="mt-1 text-xs font-semibold text-slate-500">
+                                {option.label}
+                              </p>
+                            </div>
+
+                            {isSelected && (
+                              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-cyan-300 text-black">
+                                <Check className="h-4 w-4" />
+                              </span>
+                            )}
+                          </button>
+                        )
+                      })}
+                    </div>
                   </div>
                 </motion.div>
               </motion.div>

@@ -16,8 +16,10 @@ import {
 
 import type { Pack } from '../data/cardPool'
 import onePieceMasterPackCover from '../assets/decks/onepiece-pack-07.png'
+import { translations, type AppLanguage } from '../lib/i18n'
 
 type MobileLukaHomePageProps = {
+  language: AppLanguage
   packs: Pack[]
   walletBalance: number
   raffleTickets: number
@@ -132,19 +134,19 @@ const liveTicker = [
 const packDisplay = [
   {
     tier: 'GREAT',
-    value: 'Up to 2,495 pts',
+    value: '2,495 pts',
     accent: 'from-slate-700/80 to-slate-950',
     border: 'border-white/16',
   },
   {
     tier: 'ULTRA',
-    value: 'Up to 6,176 pts',
+    value: '6,176 pts',
     accent: 'from-cyan-500/55 to-slate-950',
     border: 'border-cyan-300/26',
   },
   {
     tier: 'MASTER',
-    value: 'Up to 22,157 pts',
+    value: '22,157 pts',
     accent: 'from-orange-300/70 via-orange-600/45 to-slate-950',
     border: 'border-orange-300/40',
   },
@@ -255,6 +257,7 @@ function LeaderboardRow({ player }: { player: LeaderboardPlayer }) {
 }
 
 export default function MobileLukaHomePage({
+  language,
   packs,
   walletBalance,
   raffleTickets,
@@ -266,6 +269,7 @@ export default function MobileLukaHomePage({
   onSignIn,
 }: MobileLukaHomePageProps) {
   const [isLeaderboardOpen, setIsLeaderboardOpen] = useState(false)
+  const t = translations[language]
   const featuredPacks = packs.slice(0, 3)
   const topThree = leaderboardPlayers.slice(0, 3)
 
@@ -427,14 +431,14 @@ export default function MobileLukaHomePage({
 
       <div className="mt-5 flex items-center justify-between">
         <h2 className="text-center text-2xl font-black uppercase tracking-[0.08em] text-white">
-          Packs
+          {t.navPacks}
         </h2>
         <button
           type="button"
           onClick={onOpenPacks}
           className="inline-flex items-center gap-1 text-xs font-black uppercase tracking-[0.16em] text-cyan-200"
         >
-          View all
+          {t.viewAll}
           <ChevronRight className="h-4 w-4" />
         </button>
       </div>
@@ -467,7 +471,7 @@ export default function MobileLukaHomePage({
                       </span>
                     </div>
                     <p className="mt-1 text-[11px] font-semibold text-white/65">
-                      {display.value}
+                      {t.upTo} {display.value}
                     </p>
                   </div>
 
@@ -492,7 +496,7 @@ export default function MobileLukaHomePage({
                   </div>
 
                   <span className="rounded-full border border-white/35 bg-black/30 px-4 py-1.5 text-xs font-black uppercase text-white">
-                    Pull
+                    {t.pull}
                   </span>
                 </div>
               </div>

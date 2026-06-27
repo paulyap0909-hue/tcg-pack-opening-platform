@@ -58,6 +58,13 @@ import PlayerWalletPanel from '../../components/PlayerWalletPanel'
 import AudioGateModal from '../../components/AudioGateModal'
 import useAudio from '../../hooks/useAudio'
 import { audioManager } from '../../lib/audioManager'
+import {
+  getLanguageLabel,
+  loadStoredLanguage,
+  saveStoredLanguage,
+  translations,
+  type AppLanguage,
+} from '../../lib/i18n'
 
 import type { Pack } from '../../data/cardPool'
 import { packCoverAssets, genericPackCoverAssets } from '../../data/cardPool'
@@ -833,6 +840,7 @@ function PlayerAdminDemoShell({
   const [activeModal, setActiveModal] = useState<ActiveModal>(null)
   const [walletBalance, setWalletBalance] = useState(() => loadWalletBalance())
   const [playerProfile, setPlayerProfile] = useState<PlayerProfile>(() => loadPlayerProfile())
+  const [language, setLanguage] = useState<AppLanguage>(() => loadStoredLanguage())
   const [isTopUpOpen, setIsTopUpOpen] = useState(false)
   const [isVaultOpen, setIsVaultOpen] = useState(false)
   const [isTransactionOpen, setIsTransactionOpen] = useState(false)
@@ -884,6 +892,11 @@ function PlayerAdminDemoShell({
     toggleSound,
     playSfx,
   } = useAudio()
+  const t = translations[language]
+
+  useEffect(() => {
+    saveStoredLanguage(language)
+  }, [language])
 
   useEffect(() => {
     window.localStorage.setItem(
@@ -1767,6 +1780,7 @@ function PlayerAdminDemoShell({
         <div className="lg:hidden">
           {mobilePage === 'home' && (
             <MobileLukaHomePage
+              language={language}
               packs={playerVisiblePacks}
               walletBalance={walletBalance}
               raffleTickets={raffleTickets}
@@ -1784,10 +1798,10 @@ function PlayerAdminDemoShell({
         <section id="packs" className="mx-auto w-full max-w-7xl scroll-mt-8 px-4 py-7 sm:px-5 lg:px-8">
           <div className="mb-5 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div>
-              <p className="hud-label text-sm">Pack Catalog</p>
-              <h2 className="mt-2 text-3xl font-black sm:text-4xl">Browse Active Packs</h2>
+              <p className="hud-label text-sm">{t.packCatalog}</p>
+              <h2 className="mt-2 text-3xl font-black sm:text-4xl">{t.browseActivePacks}</h2>
               <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-400">
-                Swipe sideways on mobile to browse packs faster. Tap View to open details.
+                {t.packCatalogHint}
               </p>
             </div>
 
@@ -1798,7 +1812,7 @@ function PlayerAdminDemoShell({
             <div className="mb-3 flex items-center justify-between gap-3 px-1">
               <div>
                 <p className="text-[10px] font-black uppercase tracking-[0.28em] text-cyan-200/75">
-                  Choose Your Pack World
+                  {t.chooseYourPackWorld}
                 </p>
                 <p className="mt-1 text-sm font-bold text-slate-300">
                   {activePackUniverseMeta.description}
@@ -1859,7 +1873,7 @@ function PlayerAdminDemoShell({
 
                       <div className="pr-[5.6rem]">
                         <p className="text-xs font-black leading-4 text-current/72">
-                          {packCount} active packs
+                          {packCount} {t.activePacks}
                         </p>
                         <div className={`mt-2 h-1.5 rounded-full bg-gradient-to-r ${option.iconClass} ${
                           isSelected ? 'opacity-100' : 'opacity-35'
@@ -1874,9 +1888,9 @@ function PlayerAdminDemoShell({
 
           {filteredPacks.length === 0 ? (
             <div className="rounded-[2rem] border border-white/8 bg-white/[0.03] px-6 py-16 text-center">
-              <p className="text-xl font-black text-white">No packs found</p>
+              <p className="text-xl font-black text-white">{t.noPacksFound}</p>
               <p className="mt-2 text-sm text-slate-400">
-                Try another search keyword or switch to a different category.
+                {t.tryAnotherPack}
               </p>
             </div>
           ) : (
@@ -1935,7 +1949,7 @@ function PlayerAdminDemoShell({
                             isSoldOut ? 'text-slate-500' : 'text-slate-300 hover:text-white'
                           }`}
                         >
-                          {isSoldOut ? 'Sold Out' : 'View'}
+                          {isSoldOut ? 'Sold Out' : t.pull}
                           {!isSoldOut && <ChevronRight className="h-4 w-4" />}
                         </button>
                       </div>
@@ -1952,7 +1966,12 @@ function PlayerAdminDemoShell({
           )}
 
           {mobilePage === 'auction' && (
-            <MobileAuctionPanel walletBalance={walletBalance} onBid={handleAuctionBid} onNeedTopUp={openTopUpModal} />
+            <MobileAuctionPanel
+              language={language}
+              walletBalance={walletBalance}
+              onBid={handleAuctionBid}
+              onNeedTopUp={openTopUpModal}
+            />
           )}
 
           {mobilePage === 'rewards' && (
@@ -2056,7 +2075,7 @@ function PlayerAdminDemoShell({
                     <div className="flex items-center justify-between gap-3">
                       <p className="text-base font-black text-white">My Activity</p>
                       <button type="button" onClick={() => setIsTransactionOpen(true)} className="flex items-center gap-1 text-xs font-black text-slate-400">
-                        View All <ChevronRight className="h-4 w-4" />
+                        {t.viewAll} <ChevronRight className="h-4 w-4" />
                       </button>
                     </div>
 
@@ -2153,10 +2172,10 @@ function PlayerAdminDemoShell({
         <section id="packs" className="mx-auto w-full max-w-7xl scroll-mt-8 px-4 py-7 sm:px-5 lg:px-8">
           <div className="mb-5 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div>
-              <p className="hud-label text-sm">Pack Catalog</p>
-              <h2 className="mt-2 text-3xl font-black sm:text-4xl">Browse Active Packs</h2>
+              <p className="hud-label text-sm">{t.packCatalog}</p>
+              <h2 className="mt-2 text-3xl font-black sm:text-4xl">{t.browseActivePacks}</h2>
               <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-400">
-                Swipe sideways on mobile to browse packs faster. Tap View to open details.
+                {t.packCatalogHint}
               </p>
             </div>
 
@@ -2167,7 +2186,7 @@ function PlayerAdminDemoShell({
             <div className="mb-3 flex items-center justify-between gap-3 px-1">
               <div>
                 <p className="text-[10px] font-black uppercase tracking-[0.28em] text-cyan-200/75">
-                  Choose Your Pack World
+                  {t.chooseYourPackWorld}
                 </p>
                 <p className="mt-1 text-sm font-bold text-slate-300">
                   {activePackUniverseMeta.description}
@@ -2207,7 +2226,7 @@ function PlayerAdminDemoShell({
                           {option.label}
                         </h3>
                         <p className="mt-1 text-[11px] font-bold text-current/65">
-                          {packCount} active packs
+                          {packCount} {t.activePacks}
                         </p>
                       </div>
 
@@ -2223,9 +2242,9 @@ function PlayerAdminDemoShell({
 
           {filteredPacks.length === 0 ? (
             <div className="rounded-[2rem] border border-white/8 bg-white/[0.03] px-6 py-16 text-center">
-              <p className="text-xl font-black text-white">No packs found</p>
+              <p className="text-xl font-black text-white">{t.noPacksFound}</p>
               <p className="mt-2 text-sm text-slate-400">
-                Try another search keyword or switch to a different category.
+                {t.tryAnotherPack}
               </p>
             </div>
           ) : (
@@ -2284,7 +2303,7 @@ function PlayerAdminDemoShell({
                             isSoldOut ? 'text-slate-500' : 'text-slate-300 hover:text-white'
                           }`}
                         >
-                          {isSoldOut ? 'Sold Out' : 'View'}
+                          {isSoldOut ? 'Sold Out' : t.pull}
                           {!isSoldOut && <ChevronRight className="h-4 w-4" />}
                         </button>
                       </div>
@@ -2334,11 +2353,11 @@ function PlayerAdminDemoShell({
 
       <nav className="fixed bottom-0 left-0 right-0 z-[99990] border-t border-white/10 bg-[#05070d]/94 px-2 pb-[env(safe-area-inset-bottom)] pt-2 backdrop-blur-xl lg:hidden">
         <div className="mx-auto grid max-w-md grid-cols-5">
-          <button type="button" onClick={() => changeMobilePage('home')} className={`flex flex-col items-center gap-1 rounded-2xl px-2 py-2 text-[11px] font-black ${mobilePage === 'home' ? 'text-cyan-200' : 'text-slate-400'}`}><Home className="h-5 w-5" />Home</button>
-          <button type="button" onClick={() => changeMobilePage('packs')} className={`flex flex-col items-center gap-1 rounded-2xl px-2 py-2 text-[11px] font-black ${mobilePage === 'packs' ? 'text-cyan-200' : 'text-slate-400'}`}><PackageOpen className="h-5 w-5" />Packs</button>
-          <button type="button" onClick={() => changeMobilePage('auction')} className={`flex flex-col items-center gap-1 rounded-2xl px-2 py-2 text-[11px] font-black ${mobilePage === 'auction' ? 'text-yellow-300' : 'text-slate-400'}`}><Gavel className="h-5 w-5" />Auction</button>
-          <button type="button" onClick={() => changeMobilePage('rewards')} className={`flex flex-col items-center gap-1 rounded-2xl px-2 py-2 text-[11px] font-black ${mobilePage === 'rewards' ? 'text-purple-300' : 'text-slate-400'}`}><Gift className="h-5 w-5" />Rewards</button>
-          <button type="button" onClick={() => changeMobilePage('account')} className={`flex flex-col items-center gap-1 rounded-2xl px-2 py-2 text-[11px] font-black ${mobilePage === 'account' ? 'text-emerald-300' : 'text-slate-400'}`}><UserCircle className="h-5 w-5" />Account</button>
+          <button type="button" onClick={() => changeMobilePage('home')} className={`flex flex-col items-center gap-1 rounded-2xl px-2 py-2 text-[11px] font-black ${mobilePage === 'home' ? 'text-cyan-200' : 'text-slate-400'}`}><Home className="h-5 w-5" />{t.navHome}</button>
+          <button type="button" onClick={() => changeMobilePage('packs')} className={`flex flex-col items-center gap-1 rounded-2xl px-2 py-2 text-[11px] font-black ${mobilePage === 'packs' ? 'text-cyan-200' : 'text-slate-400'}`}><PackageOpen className="h-5 w-5" />{t.navPacks}</button>
+          <button type="button" onClick={() => changeMobilePage('auction')} className={`flex flex-col items-center gap-1 rounded-2xl px-2 py-2 text-[11px] font-black ${mobilePage === 'auction' ? 'text-yellow-300' : 'text-slate-400'}`}><Gavel className="h-5 w-5" />{t.navAuction}</button>
+          <button type="button" onClick={() => changeMobilePage('rewards')} className={`flex flex-col items-center gap-1 rounded-2xl px-2 py-2 text-[11px] font-black ${mobilePage === 'rewards' ? 'text-purple-300' : 'text-slate-400'}`}><Gift className="h-5 w-5" />{t.navRewards}</button>
+          <button type="button" onClick={() => changeMobilePage('account')} className={`flex flex-col items-center gap-1 rounded-2xl px-2 py-2 text-[11px] font-black ${mobilePage === 'account' ? 'text-emerald-300' : 'text-slate-400'}`}><UserCircle className="h-5 w-5" />{t.navAccount}</button>
         </div>
       </nav>
 
@@ -2444,6 +2463,9 @@ function PlayerAdminDemoShell({
 
       <ProfileSettingsDrawer
         isOpen={isProfileSettingsOpen}
+        language={language}
+        languageLabel={getLanguageLabel(language)}
+        onChangeLanguage={setLanguage}
         playerProfile={playerProfile}
         isSoundEnabled={isSoundEnabled}
         walletBalance={walletBalance}

@@ -16,8 +16,10 @@ import {
 
 import { pokemonRealCardPool } from '../data/cardPool'
 import { audioManager } from '../lib/audioManager'
+import { translations, type AppLanguage } from '../lib/i18n'
 
 type MobileAuctionPanelProps = {
+  language: AppLanguage
   walletBalance: number
   onBid: (cost: number, auctionName: string, nextBid: number) => boolean
   onNeedTopUp: () => void
@@ -169,7 +171,7 @@ const parseAuctionSeconds = (endsIn: string) => {
 const padTime = (value: number) => value.toString().padStart(2, '0')
 
 const formatAuctionCountdown = (secondsLeft: number) => {
-  if (secondsLeft <= 0) return 'Auction Ended'
+  if (secondsLeft <= 0) return '{t.auctionEnded}'
 
   const hours = Math.floor(secondsLeft / 3600)
   const minutes = Math.floor((secondsLeft % 3600) / 60)
@@ -217,10 +219,12 @@ const getCountdownProgressClass = (secondsLeft: number) => {
 }
 
 export default function MobileAuctionPanel({
+  language,
   walletBalance,
   onBid,
   onNeedTopUp,
 }: MobileAuctionPanelProps) {
+  const t = translations[language]
   const [selectedTab, setSelectedTab] = useState<'General' | 'Premier'>('General')
   const [selectedItem, setSelectedItem] = useState<MobileAuctionItem | null>(null)
   const [bidStep, setBidStep] = useState(50)
@@ -489,7 +493,7 @@ export default function MobileAuctionPanel({
                     selectedCountdownStatus === 'Ended' ? 'text-slate-500' : 'text-cyan-200/70'
                   }`}
                 >
-                  {selectedCountdownStatus === 'Ended' ? 'Auction Closed' : 'Live Auction'}
+                  {selectedCountdownStatus === 'Ended' ? t.auctionClosed : t.liveAuction}
                 </span>
                 <div
                   className={`mt-0.5 flex items-center gap-1.5 text-sm font-black ${getCountdownTextClass(
@@ -535,13 +539,13 @@ export default function MobileAuctionPanel({
                   <div className="flex items-start justify-between gap-4">
                     <div>
                       <p className="text-[10px] font-black uppercase tracking-[0.22em] text-cyan-200/70">
-                        Current Bid
+                        {t.currentBid}
                       </p>
                       <p className="mt-1 text-3xl font-black text-yellow-300">
                         {formatMoney(selectedItem.currentBid)}
                       </p>
                       <p className="mt-1 text-xs font-semibold text-slate-400">
-                        +MYR {selectedItem.shippingFee.toFixed(2)} Shipping Fee
+                        +MYR {selectedItem.shippingFee.toFixed(2)} {t.shippingFee}
                       </p>
                     </div>
 
@@ -552,7 +556,7 @@ export default function MobileAuctionPanel({
 
                   <div className="mt-4 rounded-2xl border border-white/10 bg-black/20 p-3">
                     <div className="flex items-center justify-between gap-3">
-                      <p className="text-xs font-bold text-slate-400">Ends in</p>
+                      <p className="text-xs font-bold text-slate-400">{t.endsIn}</p>
                       <p className={`text-sm font-black ${getCountdownTextClass(selectedTimeLeftSeconds)}`}>
                         {formatAuctionCountdown(selectedTimeLeftSeconds)}
                       </p>
@@ -577,55 +581,53 @@ export default function MobileAuctionPanel({
                   <div className="min-w-0 flex-1">
                     <p className="font-black text-white">{selectedItem.seller}</p>
                     <p className="text-sm text-slate-400">
-                      {selectedItem.country} | {selectedItem.followers} followers
+                      {selectedItem.country} | {selectedItem.followers} {t.followers}
                     </p>
                     <p className="mt-1 text-xs text-yellow-100/75">
-                      {selectedItem.sold} sold | ⭐ {selectedItem.review} Positive Review
+                      {selectedItem.sold} {t.sold} | ⭐ {selectedItem.review} {t.positiveReview}
                     </p>
                   </div>
                   <button
                     type="button"
                     className="rounded-full bg-yellow-400 px-4 py-2 text-sm font-black text-black shadow-[0_10px_24px_rgba(250,204,21,0.20)]"
                   >
-                    Follow
+                    {t.follow}
                   </button>
                 </div>
 
                 <div className="mt-4 overflow-hidden rounded-[1.25rem] border border-white/10 bg-white/[0.045]">
                   <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
-                    <p className="text-sm font-bold text-slate-300">Shipping Method</p>
-                    <p className="text-sm font-black text-white">Express</p>
+                    <p className="text-sm font-bold text-slate-300">{t.shippingMethod}</p>
+                    <p className="text-sm font-black text-white">{t.express}</p>
                   </div>
                   <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
-                    <p className="text-sm font-bold text-slate-300">Condition</p>
-                    <p className="text-sm font-black text-white">PSA 10 / Sealed</p>
+                    <p className="text-sm font-bold text-slate-300">{t.condition}</p>
+                    <p className="text-sm font-black text-white">{t.conditionValue}</p>
                   </div>
                   <div className="flex items-center justify-between px-4 py-3">
-                    <p className="text-sm font-bold text-slate-300">Authenticity</p>
-                    <p className="text-sm font-black text-cyan-100">Checked</p>
+                    <p className="text-sm font-bold text-slate-300">{t.authenticity}</p>
+                    <p className="text-sm font-black text-cyan-100">{t.checked}</p>
                   </div>
                 </div>
 
                 <div className="mt-4 rounded-[1.25rem] border border-white/10 bg-white/[0.045] p-4">
-                  <p className="text-sm font-black text-white">Description:</p>
+                  <p className="text-sm font-black text-white">{t.description}</p>
                   <p className="mt-3 text-sm leading-6 text-slate-400">
-                    Premium auction listing for {selectedItem.title}. The card is sealed,
-                    verified and ready for vault collection or express shipping after the
-                    auction is completed.
+                    {t.auctionDescriptionPrefix} {selectedItem.title}. {t.auctionDescriptionSuffix}
                   </p>
                 </div>
 
                 <div className="mt-4 rounded-[1.25rem] border border-yellow-300/15 bg-yellow-300/[0.06] p-4">
-                  <p className="text-sm font-black text-yellow-100">Auction Note</p>
+                  <p className="text-sm font-black text-yellow-100">{t.auctionNote}</p>
                   <p className="mt-2 text-xs leading-5 text-yellow-100/70">
-                    1. Winner must complete payment within 3 days.<br />
-                    2. Auction items are final once the bid is confirmed.
+                    {t.auctionNoteLine1}<br />
+                    {t.auctionNoteLine2}
                   </p>
                 </div>
 
                 <div className="mt-4 rounded-[1.25rem] border border-white/10 bg-white/[0.045] p-4 shadow-inner shadow-black/20">
                   <p className="text-xs font-black uppercase tracking-[0.2em] text-cyan-200/70">
-                    Quick Bid
+                    {t.quickBid}
                   </p>
                   <div className="mt-3 grid grid-cols-3 gap-2">
                     {[10, 50, 100].map((step) => (
@@ -654,7 +656,7 @@ export default function MobileAuctionPanel({
               <div className="mb-2 flex items-center justify-between gap-3">
                 <div className="min-w-0">
                   <p className="text-[10px] font-black uppercase tracking-[0.2em] text-cyan-200/70">
-                    Current Bid
+                    {t.currentBid}
                   </p>
                   <p className="text-base font-black text-yellow-300">
                     {formatMoney(selectedItem.currentBid)}
@@ -663,7 +665,7 @@ export default function MobileAuctionPanel({
 
                 <div className="flex shrink-0 items-center gap-2 text-right">
                   <div>
-                    <p className="text-[10px] font-bold text-slate-500">Next</p>
+                    <p className="text-[10px] font-bold text-slate-500">{t.next}</p>
                     <p className="text-sm font-black text-white">+{bidStep}</p>
                   </div>
                   <div className="rounded-full border border-white/10 bg-white/[0.08] px-3 py-1 text-xs font-black text-white">
@@ -678,7 +680,7 @@ export default function MobileAuctionPanel({
                   className="flex h-12 w-14 shrink-0 flex-col items-center justify-center rounded-2xl border border-white/10 bg-white/[0.06] text-[10px] font-black text-slate-300"
                 >
                   <HelpCircle className="h-4 w-4" />
-                  Help
+                  {t.help}
                 </button>
 
                 <button
@@ -693,10 +695,10 @@ export default function MobileAuctionPanel({
                 >
                   <Gavel className="h-4 w-4" />
                   {selectedCountdownStatus === 'Ended'
-                    ? 'Auction Ended'
+                    ? '{t.auctionEnded}'
                     : walletBalance >= bidStep
-                      ? 'Bid Now'
-                      : 'Top Up to Bid'}
+                      ? '{t.bidNow}'
+                      : '{t.topUpToBid}'}
                 </button>
               </div>
             </div>
