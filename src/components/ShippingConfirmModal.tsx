@@ -1,14 +1,8 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import {
-  AlertTriangle,
-  ShieldCheck,
-  Truck,
-  X,
-} from 'lucide-react'
-import { useEffect, useState } from 'react'
-import type { FormEvent } from 'react'
-import { translations, type AppLanguage } from '../lib/i18n'
+import { AlertTriangle, PackageOpen, ShieldCheck, Truck, X } from 'lucide-react'
+import { type FormEvent, useEffect, useState } from 'react'
 
+import { translations, type AppLanguage } from '../lib/i18n'
 import { getLocalizedCardGrade, getLocalizedCardRarity, type ShippingInfo, type VaultCard } from './VaultDrawer'
 
 type ShippingConfirmModalProps = {
@@ -84,213 +78,213 @@ export default function ShippingConfirmModal({
     })
   }
 
+  const inputClass =
+    'h-12 w-full rounded-2xl border border-cyan-300/20 bg-black/40 px-3.5 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300/60'
+  const labelClass =
+    'mb-1.5 block text-[10px] font-black uppercase tracking-[0.2em] text-cyan-300'
+
   return (
     <AnimatePresence>
       <motion.div
-        className="fixed inset-0 z-[999999] flex items-center justify-center overflow-y-auto bg-black/85 px-4 py-6 backdrop-blur-xl"
+        className="fixed inset-0 z-[999999] flex items-end justify-center bg-black/85 px-3 pb-3 pt-6 backdrop-blur-xl sm:items-center sm:p-4"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
       >
         <motion.form
           onSubmit={handleSubmit}
-          className="hud-panel hud-corners relative w-full max-w-5xl rounded-[2rem] p-6"
-          initial={{ scale: 0.92, y: 24 }}
-          animate={{ scale: 1, y: 0 }}
-          exit={{ scale: 0.92, y: 24 }}
+          className="hud-panel hud-corners flex max-h-[92svh] w-full max-w-md flex-col overflow-hidden rounded-[1.45rem]"
+          initial={{ y: 80, scale: 0.98 }}
+          animate={{ y: 0, scale: 1 }}
+          exit={{ y: 80, scale: 0.98 }}
+          transition={{ type: 'spring', damping: 26, stiffness: 260 }}
         >
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label={t.cancel}
-            className="absolute right-5 top-5 z-10 flex h-11 w-11 items-center justify-center rounded-full border border-cyan-300/40 bg-slate-950/95 text-cyan-100 shadow-[0_0_35px_rgba(34,211,238,0.35)] transition hover:scale-105 hover:bg-cyan-300/10"
-          >
-            <X className="h-5 w-5" />
-          </button>
+          <div className="flex shrink-0 items-start justify-between gap-3 border-b border-cyan-300/10 px-4 py-4">
+            <div className="min-w-0">
+              <div className="mb-1.5 flex items-center gap-2">
+                <Truck className="h-4 w-4 text-cyan-300" />
+                <p className="text-[10px] font-black uppercase tracking-[0.22em] text-cyan-300">
+                  {t.shippingAddressForm}
+                </p>
+              </div>
 
-          <div className="border-b border-cyan-300/10 pb-5 pr-14">
-            <div className="mb-3 flex items-center gap-2">
-              <Truck className="h-5 w-5 text-cyan-300" />
-              <p className="text-xs font-black uppercase tracking-[0.3em] text-cyan-300">
-                {t.shippingAddressForm}
-              </p>
+              <h2 className="text-xl font-black leading-tight text-white">
+                {t.requestPhysicalShipping}
+              </h2>
             </div>
 
-            <h2 className="text-3xl font-black text-white">
-              {t.requestPhysicalShipping}
-            </h2>
-
-            <p className="mt-3 text-sm leading-6 text-slate-400">
-              {t.shippingFormDesc}
-            </p>
+            <button
+              type="button"
+              onClick={onClose}
+              aria-label={t.cancel}
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-cyan-300/25 bg-slate-950/95 text-cyan-100"
+            >
+              <X className="h-5 w-5" />
+            </button>
           </div>
 
-          <div className="mt-6 grid gap-6 lg:grid-cols-[220px_1fr]">
-            <div>
-              <div className="hud-rarity-glow flex min-h-[280px] items-center justify-center overflow-hidden rounded-3xl border border-cyan-300/15 bg-black/60 p-3">
+          <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4">
+            <div className="grid grid-cols-[92px_1fr] gap-3 rounded-2xl border border-cyan-300/12 bg-cyan-300/[0.035] p-3">
+              <div className="hud-rarity-glow flex h-[126px] items-center justify-center overflow-hidden rounded-2xl border border-cyan-300/15 bg-black/55 p-2">
                 <img
                   src={card.image}
                   alt={card.name}
-                  className="max-h-[260px] w-auto object-contain"
+                  className="max-h-[118px] w-auto object-contain"
                 />
               </div>
 
-              <div className="mt-4 rounded-2xl border border-cyan-300/10 bg-cyan-300/[0.04] p-4">
-                <p className="text-sm font-black text-white">{card.name}</p>
-                <p className="mt-1 text-xs uppercase tracking-[0.2em] text-cyan-300">
-                  {getLocalizedCardRarity(card.rarity, t)} · {getLocalizedCardGrade(card.grade, t)}
-                </p>
-                <p className="mt-3 text-xs text-slate-400">
-                  {t.source}: {card.sourcePack}
-                </p>
+              <div className="min-w-0 self-center">
+                <div className="mb-2 flex flex-wrap gap-1.5">
+                  <span className="rounded-full border border-amber-300/20 bg-amber-300/10 px-2 py-0.5 text-[8px] font-bold uppercase tracking-widest text-amber-200">
+                    {getLocalizedCardRarity(card.rarity, t)}
+                  </span>
+                  <span className="rounded-full border border-cyan-300/20 bg-cyan-300/10 px-2 py-0.5 text-[8px] font-bold uppercase tracking-widest text-cyan-200">
+                    {getLocalizedCardGrade(card.grade, t)}
+                  </span>
+                </div>
+
+                <h3 className="truncate text-lg font-black text-white">{card.name}</h3>
+
+                <div className="mt-2 flex items-start gap-1.5 text-xs leading-4 text-slate-400">
+                  <PackageOpen className="mt-0.5 h-3.5 w-3.5 shrink-0 text-cyan-300" />
+                  <span className="line-clamp-2">{card.sourcePack}</span>
+                </div>
               </div>
             </div>
 
-            <div>
-              <div className="grid gap-4 sm:grid-cols-2">
-                <label className="block">
-                  <span className="mb-2 block text-xs font-black uppercase tracking-[0.22em] text-cyan-300">
-                    {t.fullName}
-                  </span>
-                  <input
-                    required
-                    value={shippingInfo.fullName}
-                    onChange={(event) =>
-                      updateField('fullName', event.target.value)
-                    }
-                    className="w-full rounded-2xl border border-cyan-300/20 bg-black/40 px-4 py-3 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300/60"
-                    placeholder={t.recipientName}
-                  />
-                </label>
+            <p className="mt-3 rounded-2xl border border-amber-300/15 bg-amber-300/[0.055] px-3 py-2 text-xs leading-5 text-amber-100/85">
+              {t.shippingFormDesc}
+            </p>
 
+            <div className="mt-4 grid gap-3">
+              <label className="block">
+                <span className={labelClass}>{t.fullName}</span>
+                <input
+                  required
+                  value={shippingInfo.fullName}
+                  onChange={(event) => updateField('fullName', event.target.value)}
+                  className={inputClass}
+                  placeholder={t.recipientName}
+                />
+              </label>
+
+              <div className="grid grid-cols-2 gap-3">
                 <label className="block">
-                  <span className="mb-2 block text-xs font-black uppercase tracking-[0.22em] text-cyan-300">
-                    {t.phone}
-                  </span>
+                  <span className={labelClass}>{t.phone}</span>
                   <input
                     required
                     value={shippingInfo.phone}
                     onChange={(event) => updateField('phone', event.target.value)}
-                    className="w-full rounded-2xl border border-cyan-300/20 bg-black/40 px-4 py-3 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300/60"
+                    className={inputClass}
                     placeholder={t.phoneNumberPlaceholder}
                   />
                 </label>
 
-                <label className="block sm:col-span-2">
-                  <span className="mb-2 block text-xs font-black uppercase tracking-[0.22em] text-cyan-300">
-                    {t.email}
-                  </span>
+                <label className="block">
+                  <span className={labelClass}>{t.email}</span>
                   <input
                     required
                     type="email"
                     value={shippingInfo.email}
                     onChange={(event) => updateField('email', event.target.value)}
-                    className="w-full rounded-2xl border border-cyan-300/20 bg-black/40 px-4 py-3 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300/60"
+                    className={inputClass}
                     placeholder={t.emailAddress}
                   />
                 </label>
+              </div>
 
-                <label className="block sm:col-span-2">
-                  <span className="mb-2 block text-xs font-black uppercase tracking-[0.22em] text-cyan-300">
-                    {t.shippingAddress}
-                  </span>
-                  <textarea
-                    required
-                    value={shippingInfo.address}
-                    onChange={(event) =>
-                      updateField('address', event.target.value)
-                    }
-                    rows={3}
-                    className="w-full resize-none rounded-2xl border border-cyan-300/20 bg-black/40 px-4 py-3 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300/60"
-                    placeholder={t.fullShippingAddress}
-                  />
-                </label>
+              <label className="block">
+                <span className={labelClass}>{t.shippingAddress}</span>
+                <textarea
+                  required
+                  value={shippingInfo.address}
+                  onChange={(event) => updateField('address', event.target.value)}
+                  rows={3}
+                  className="min-h-[86px] w-full resize-none rounded-2xl border border-cyan-300/20 bg-black/40 px-3.5 py-3 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300/60"
+                  placeholder={t.fullShippingAddress}
+                />
+              </label>
 
+              <div className="grid grid-cols-2 gap-3">
                 <label className="block">
-                  <span className="mb-2 block text-xs font-black uppercase tracking-[0.22em] text-cyan-300">
-                    {t.postcode}
-                  </span>
+                  <span className={labelClass}>{t.postcode}</span>
                   <input
                     required
                     value={shippingInfo.postcode}
-                    onChange={(event) =>
-                      updateField('postcode', event.target.value)
-                    }
-                    className="w-full rounded-2xl border border-cyan-300/20 bg-black/40 px-4 py-3 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300/60"
+                    onChange={(event) => updateField('postcode', event.target.value)}
+                    className={inputClass}
                     placeholder={t.postcode}
                   />
                 </label>
 
                 <label className="block">
-                  <span className="mb-2 block text-xs font-black uppercase tracking-[0.22em] text-cyan-300">
-                    {t.city}
-                  </span>
+                  <span className={labelClass}>{t.city}</span>
                   <input
                     required
                     value={shippingInfo.city}
                     onChange={(event) => updateField('city', event.target.value)}
-                    className="w-full rounded-2xl border border-cyan-300/20 bg-black/40 px-4 py-3 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300/60"
+                    className={inputClass}
                     placeholder={t.city}
                   />
                 </label>
+              </div>
 
+              <div className="grid grid-cols-2 gap-3">
                 <label className="block">
-                  <span className="mb-2 block text-xs font-black uppercase tracking-[0.22em] text-cyan-300">
-                    {t.state}
-                  </span>
+                  <span className={labelClass}>{t.state}</span>
                   <input
                     required
                     value={shippingInfo.state}
                     onChange={(event) => updateField('state', event.target.value)}
-                    className="w-full rounded-2xl border border-cyan-300/20 bg-black/40 px-4 py-3 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300/60"
+                    className={inputClass}
                     placeholder={t.state}
                   />
                 </label>
 
                 <label className="block">
-                  <span className="mb-2 block text-xs font-black uppercase tracking-[0.22em] text-cyan-300">
-                    {t.remark}
-                  </span>
+                  <span className={labelClass}>{t.remark}</span>
                   <input
                     value={shippingInfo.remark ?? ''}
                     onChange={(event) => updateField('remark', event.target.value)}
-                    className="w-full rounded-2xl border border-cyan-300/20 bg-black/40 px-4 py-3 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300/60"
+                    className={inputClass}
                     placeholder={t.optionalNote}
                   />
                 </label>
               </div>
+            </div>
 
-              <div className="mt-5 rounded-2xl border border-amber-300/15 bg-amber-300/[0.06] p-4">
-                <div className="mb-2 flex items-center gap-2">
-                  <AlertTriangle className="h-4 w-4 text-amber-300" />
-                  <p className="text-xs uppercase tracking-[0.25em] text-amber-300">
-                    {t.important}
-                  </p>
-                </div>
-
-                <p className="text-sm leading-6 text-slate-300">
-                  {t.shippingImportant}
+            <div className="mt-3 rounded-2xl border border-amber-300/15 bg-amber-300/[0.06] p-3">
+              <div className="mb-1.5 flex items-center gap-2">
+                <AlertTriangle className="h-4 w-4 text-amber-300" />
+                <p className="text-[10px] font-black uppercase tracking-[0.22em] text-amber-300">
+                  {t.important}
                 </p>
               </div>
+
+              <p className="text-xs leading-5 text-slate-300">
+                {t.shippingImportant}
+              </p>
             </div>
           </div>
 
-          <div className="mt-7 grid gap-3 sm:grid-cols-2">
-            <button
-              type="button"
-              onClick={onClose}
-              className="rounded-2xl border border-cyan-300/30 bg-cyan-300/10 px-6 py-4 font-black text-cyan-200 transition hover:scale-[1.02] hover:bg-cyan-300/20"
-            >
-              {t.cancel}
-            </button>
+          <div className="shrink-0 border-t border-white/10 bg-[#07111f]/95 p-3">
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={onClose}
+                className="rounded-2xl border border-cyan-300/25 bg-cyan-300/10 px-4 py-3 text-sm font-black text-cyan-200"
+              >
+                {t.cancel}
+              </button>
 
-            <button
-              type="submit"
-              className="flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-cyan-300 to-purple-400 px-6 py-4 font-black text-black shadow-[0_0_40px_rgba(34,211,238,0.28)] transition hover:scale-[1.02]"
-            >
-              <ShieldCheck className="h-5 w-5" />
-              {t.confirmShippingRequest}
-            </button>
+              <button
+                type="submit"
+                className="flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-cyan-300 to-purple-400 px-4 py-3 text-sm font-black text-black shadow-[0_0_30px_rgba(34,211,238,0.24)]"
+              >
+                <ShieldCheck className="h-4 w-4" />
+                {t.confirmShippingRequest}
+              </button>
+            </div>
           </div>
         </motion.form>
       </motion.div>
