@@ -12,6 +12,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import type { Pack, RevealCard } from '../data/cardPool'
 import { createWeightedResults, getBestPull, getOpenedTime } from '../data/cardPool'
 import type { VaultCard } from './VaultDrawer'
+import { audioManager } from '../lib/audioManager'
 
 type MultiOpenModalProps = {
   pack: Pack | null
@@ -64,9 +65,21 @@ export default function MultiOpenModal({
 
     if (savedBatchRef.current === batchId) return
 
+    audioManager.playSfx('packOpen')
+
+    window.setTimeout(() => {
+      audioManager.playSfx('cardFlip')
+
+      if (bestPull?.rank && bestPull.rank >= 5) {
+        audioManager.playSfx('secretHit')
+      } else if (bestPull?.rank && bestPull.rank >= 2) {
+        audioManager.playSfx('rareHit')
+      }
+    }, 420)
+
     onAddAllToVault(createVaultCards(results, pack))
     savedBatchRef.current = batchId
-  }, [pack, quantity, results, onAddAllToVault])
+  }, [bestPull, pack, quantity, results, onAddAllToVault])
 
   useEffect(() => {
     if (!pack) return

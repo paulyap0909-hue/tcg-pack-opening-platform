@@ -12,6 +12,7 @@ import { useEffect, useRef, useState } from 'react'
 import type { Pack, RevealCard } from '../data/cardPool'
 import { getOpenedTime, getWeightedRandomCard } from '../data/cardPool'
 import type { VaultCard } from './VaultDrawer'
+import { audioManager } from '../lib/audioManager'
 
 type PackOpeningModalProps = {
   pack: Pack | null
@@ -80,9 +81,18 @@ export default function PackOpeningModal({
 
   const revealCard = () => {
     saveCurrentResultToVault()
+    audioManager.playSfx('packOpen')
     setStage('opening')
 
     window.setTimeout(() => {
+      audioManager.playSfx('cardFlip')
+
+      if (result.rank >= 5) {
+        audioManager.playSfx('secretHit')
+      } else if (result.rank >= 2) {
+        audioManager.playSfx('rareHit')
+      }
+
       setStage('revealed')
     }, 650)
   }

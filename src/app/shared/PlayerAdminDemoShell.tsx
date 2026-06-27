@@ -12,6 +12,8 @@ import {
   Search,
   Trophy,
   UserCircle,
+  Volume2,
+  VolumeX,
 } from 'lucide-react'
 
 import '../../styles/sci-fi-hud.css'
@@ -53,6 +55,8 @@ import LiveAuctionPanel from '../../components/LiveAuctionPanel'
 import MobileAuctionPanel from '../../components/MobileAuctionPanel'
 import MobileLukaHomePage from '../../components/MobileLukaHomePage'
 import PlayerWalletPanel from '../../components/PlayerWalletPanel'
+import AudioGateModal from '../../components/AudioGateModal'
+import useAudio from '../../hooks/useAudio'
 
 import type { Pack } from '../../data/cardPool'
 import { pokemonPackCoverUrls } from '../../data/cardPool'
@@ -734,6 +738,14 @@ function PlayerAdminDemoShell({
   const [sellBackTarget, setSellBackTarget] = useState<VaultCard | null>(null)
   const [shippingTarget, setShippingTarget] = useState<VaultCard | null>(null)
   const [listForSaleTarget, setListForSaleTarget] = useState<VaultCard | null>(null)
+  const {
+    isAudioGateOpen,
+    isSoundEnabled,
+    enterWithSound,
+    continueMuted,
+    toggleSound,
+    playSfx,
+  } = useAudio()
 
   useEffect(() => {
     window.localStorage.setItem(
@@ -855,6 +867,7 @@ function PlayerAdminDemoShell({
   }
 
   const openTopUpModal = () => {
+    playSfx('buttonClick')
     setActiveModal(null)
     setActivePack(null)
 
@@ -908,8 +921,12 @@ function PlayerAdminDemoShell({
   }
 
   const handleEnterRaffle = (prize: RafflePrize, tickets: number) => {
-    if (raffleTickets < tickets) return
+    if (raffleTickets < tickets) {
+      playSfx('error')
+      return
+    }
 
+    playSfx('success')
     setRaffleTickets((currentTickets) => Math.max(currentTickets - tickets, 0))
 
     const newEntry: RaffleEntry = {
@@ -935,6 +952,7 @@ function PlayerAdminDemoShell({
   const handleClaimQuest = (questId: string, reward: QuestReward) => {
     if (questStats.claimedQuestIds.includes(questId)) return
 
+    playSfx('success')
     const nextBalance = walletBalance + reward.points
 
     setQuestStats((currentStats) => {
@@ -968,6 +986,7 @@ function PlayerAdminDemoShell({
       return
     }
 
+    playSfx('success')
     const reward = getDailyRewardForStreak(dailyLoginState.streakDay)
     const nextBalance = walletBalance + reward.points
 
@@ -1048,13 +1067,18 @@ function PlayerAdminDemoShell({
   const openPackDetail = (pack: Pack) => {
     const latestPack = getLatestPack(pack.name) ?? pack
 
-    if (latestPack.remainingQuantity <= 0) return
+    if (latestPack.remainingQuantity <= 0) {
+      playSfx('error')
+      return
+    }
 
+    playSfx('buttonClick')
     setActivePack(latestPack)
     setActiveModal('detail')
   }
 
   const handleTopUp = (points: number) => {
+    playSfx('success')
     const nextBalance = walletBalance + points
 
     setWalletBalance(nextBalance)
@@ -1077,10 +1101,12 @@ function PlayerAdminDemoShell({
     nextBid: number,
   ) => {
     if (walletBalance < cost) {
+      playSfx('error')
       openTopUpModal()
       return false
     }
 
+    playSfx('bidClick')
     const nextBalance = walletBalance - cost
 
     setWalletBalance(nextBalance)
@@ -1102,6 +1128,7 @@ function PlayerAdminDemoShell({
     if (!latestPack) return
 
     if (!hasEnoughStock(latestPack, 1)) {
+      playSfx('error')
       setActivePack(latestPack)
       return
     }
@@ -1109,10 +1136,12 @@ function PlayerAdminDemoShell({
     const packCost = getPackCost(latestPack)
 
     if (walletBalance < packCost) {
+      playSfx('error')
       openTopUpModal()
       return
     }
 
+    playSfx('packOpen')
     const nextBalance = walletBalance - packCost
 
     setWalletBalance(nextBalance)
@@ -1140,6 +1169,7 @@ function PlayerAdminDemoShell({
     if (!latestPack) return
 
     if (!hasEnoughStock(latestPack, quantity)) {
+      playSfx('error')
       setActivePack(latestPack)
       return
     }
@@ -1148,10 +1178,12 @@ function PlayerAdminDemoShell({
     const totalCost = packCost * quantity
 
     if (walletBalance < totalCost) {
+      playSfx('error')
       openTopUpModal()
       return
     }
 
+    playSfx('packOpen')
     const nextBalance = walletBalance - totalCost
 
     setWalletBalance(nextBalance)
@@ -1317,6 +1349,7 @@ function PlayerAdminDemoShell({
   const confirmSellBackCard = () => {
     if (!sellBackTarget) return
 
+    playSfx('success')
     const card = sellBackTarget
     const sellBackPoints = getSellBackPoints(card)
     const nextBalance = walletBalance + sellBackPoints
@@ -1347,6 +1380,7 @@ function PlayerAdminDemoShell({
   const confirmShippingRequest = (shippingInfo: ShippingInfo) => {
     if (!shippingTarget) return
 
+    playSfx('success')
     const card = shippingTarget
 
     setVaultCards((currentCards) =>
@@ -1501,6 +1535,10 @@ function PlayerAdminDemoShell({
   }, [playerVisiblePacks, selectedCategory, packSearchQuery, packSortBy])
 
   const changeMobilePage = (page: MobilePage) => {
+    if (page !== mobilePage) {
+      playSfx('navSwitch')
+    }
+
     setMobilePage(page)
 
     if (typeof window !== 'undefined') {
@@ -1726,7 +1764,10 @@ function PlayerAdminDemoShell({
 
                   <button
                     type="button"
-                    onClick={() => setIsDailyLoginOpen(true)}
+                    onClick={() => {
+                      playSfx('buttonClick')
+                      setIsDailyLoginOpen(true)
+                    }}
                     className="shrink-0 rounded-2xl bg-gradient-to-r from-orange-300 to-yellow-300 px-3 py-2 text-xs font-black text-black"
                   >
                     Daily Login
@@ -1846,6 +1887,15 @@ function PlayerAdminDemoShell({
                     <button type="button" onClick={() => setIsAdminShippingOpen(true)} className="flex w-full items-center justify-between gap-3 border-b border-white/10 px-4 py-3.5 text-left">
                       <span className="flex items-center gap-3 text-sm font-black text-white"><PackageOpen className="h-5 w-5 text-yellow-200" />Shipping Requests</span>
                       <span className="flex items-center gap-1 text-xs font-black text-slate-400">{vaultCards.filter((card) => card.status === 'Shipping Requested').length} <ChevronRight className="h-4 w-4 text-slate-500" /></span>
+                    </button>
+                    <button type="button" onClick={toggleSound} className="flex w-full items-center justify-between gap-3 border-b border-white/10 px-4 py-3.5 text-left">
+                      <span className="flex items-center gap-3 text-sm font-black text-white">
+                        {isSoundEnabled ? <Volume2 className="h-5 w-5 text-cyan-200" /> : <VolumeX className="h-5 w-5 text-slate-400" />}
+                        Sound & Music
+                      </span>
+                      <span className={`rounded-full px-3 py-1 text-[11px] font-black ${isSoundEnabled ? 'bg-cyan-300/15 text-cyan-200' : 'bg-white/[0.06] text-slate-400'}`}>
+                        {isSoundEnabled ? 'On' : 'Off'}
+                      </span>
                     </button>
                     <button type="button" className="flex w-full items-center justify-between gap-3 border-b border-white/10 px-4 py-3.5 text-left">
                       <span className="flex items-center gap-3 text-sm font-black text-white"><UserCircle className="h-5 w-5 text-emerald-200" />Account Settings</span>
@@ -2075,6 +2125,13 @@ function PlayerAdminDemoShell({
           <button type="button" onClick={() => changeMobilePage('account')} className={`flex flex-col items-center gap-1 rounded-2xl px-2 py-2 text-[11px] font-black ${mobilePage === 'account' ? 'text-emerald-300' : 'text-slate-400'}`}><UserCircle className="h-5 w-5" />Account</button>
         </div>
       </nav>
+
+      <AudioGateModal
+        isOpen={isAudioGateOpen}
+        onEnterWithSound={enterWithSound}
+        onContinueMuted={continueMuted}
+      />
+
       <PackDetailModal
         pack={activeModal === 'detail' ? activePack : null}
         onClose={closeModal}

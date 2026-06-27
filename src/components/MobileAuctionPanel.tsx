@@ -14,6 +14,7 @@ import {
 } from 'lucide-react'
 
 import { pokemonRealCardPool } from '../data/cardPool'
+import { audioManager } from '../lib/audioManager'
 
 type MobileAuctionPanelProps = {
   walletBalance: number
@@ -257,10 +258,12 @@ export default function MobileAuctionPanel({
     if (!selectedItem) return
 
     if (getTimeLeftSeconds(selectedItem) <= 0) {
+      audioManager.playSfx('error')
       return
     }
 
     if (walletBalance < bidStep) {
+      audioManager.playSfx('error')
       onNeedTopUp()
       return
     }
