@@ -77,8 +77,8 @@ import onePiecePack03 from '../../assets/decks/onepiece-pack-03.png'
 import onePiecePack04 from '../../assets/decks/onepiece-pack-04.png'
 import onePiecePack05 from '../../assets/decks/onepiece-pack-05.png'
 import onePiecePack06 from '../../assets/decks/onepiece-pack-06.png'
-import pikachuPackWorld from '../../assets/ui/pikachu-pack-world.jpg'
-import luffyPackWorld from '../../assets/ui/luffy-pack-world.webp'
+import pikachuPackWorld from '../../assets/ui/pikachu-pack-world.png'
+import luffyPackWorld from '../../assets/ui/luffy-pack-world.png'
 
 type ActiveModal = 'detail' | 'opening' | 'multi-opening' | null
 
@@ -1834,7 +1834,11 @@ function PlayerAdminDemoShell({
                     <img
                       src={option.image}
                       alt={option.imageAlt}
-                      className={`pointer-events-none absolute bottom-2 right-[-14px] h-[116px] w-[116px] object-contain drop-shadow-[0_0_28px_rgba(255,255,255,0.2)] transition duration-300 ${
+                      className={`pointer-events-none absolute object-contain drop-shadow-[0_0_28px_rgba(255,255,255,0.2)] transition duration-300 ${
+                        option.id === 'pokemon'
+                          ? 'bottom-[-8px] right-[-10px] h-[142px] w-[110px]'
+                          : 'bottom-2 right-[-12px] h-[120px] w-[140px]'
+                      } ${
                         isSelected ? 'scale-110 opacity-100' : 'scale-100 opacity-70 grayscale-[0.25]'
                       }`}
                       draggable={false}
@@ -1853,7 +1857,7 @@ function PlayerAdminDemoShell({
                         </h3>
                       </div>
 
-                      <div className="pr-16">
+                      <div className="pr-[5.6rem]">
                         <p className="text-xs font-black leading-4 text-current/72">
                           {packCount} active packs
                         </p>
