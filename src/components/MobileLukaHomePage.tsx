@@ -2,7 +2,6 @@ import { useState } from 'react'
 import {
   ChevronRight,
   Clock3,
-  Crown,
   Flame,
   Gift,
   HelpCircle,
@@ -147,27 +146,6 @@ const packDisplay = [
     value: 'Up to 22,157 pts',
     accent: 'from-orange-300/70 via-orange-600/45 to-slate-950',
     border: 'border-orange-300/40',
-  },
-]
-
-const leaderboardEvents = [
-  {
-    title: 'Weekly Spending',
-    value: 'Worth RM13K',
-    active: true,
-    icon: Trophy,
-  },
-  {
-    title: 'Weekly Burn',
-    value: 'Worth RM10K',
-    active: false,
-    icon: Flame,
-  },
-  {
-    title: 'Master Pack',
-    value: 'Worth RM55K',
-    active: false,
-    icon: Crown,
   },
 ]
 
@@ -552,92 +530,114 @@ export default function MobileLukaHomePage({
               </button>
             </div>
 
-            <div className="-mx-4 mt-5 flex gap-2 overflow-x-auto px-4 pb-1 [-webkit-overflow-scrolling:touch]">
-              {leaderboardEvents.map((event) => {
-                const Icon = event.icon
+            <div className="relative mt-5 overflow-hidden rounded-[1.65rem] border border-cyan-300/18 bg-[#07111f]/90 p-4 shadow-[0_24px_80px_rgba(0,0,0,0.35)]">
+              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_12%,rgba(34,211,238,0.22),transparent_30%),radial-gradient(circle_at_86%_16%,rgba(249,115,22,0.22),transparent_30%),radial-gradient(circle_at_52%_100%,rgba(168,85,247,0.2),transparent_38%)]" />
+              <div className="pointer-events-none absolute -right-10 -top-12 h-36 w-36 rounded-full bg-orange-300/18 blur-3xl" />
+              <div className="pointer-events-none absolute -left-12 bottom-0 h-36 w-36 rounded-full bg-cyan-300/14 blur-3xl" />
 
-                return (
-                  <button
-                    key={event.title}
-                    type="button"
-                    className={`relative min-w-[132px] overflow-hidden rounded-2xl border p-3 text-left ${
-                      event.active
-                        ? 'border-cyan-200/45 bg-gradient-to-br from-cyan-300/22 via-violet-300/12 to-orange-300/18 shadow-[0_0_32px_rgba(34,211,238,0.22)]'
-                        : 'border-white/10 bg-white/[0.055]'
-                    }`}
-                  >
-                    <div className="absolute -right-4 -top-5 h-16 w-16 rounded-full bg-orange-300/12 blur-xl" />
-                    <Icon className={event.active ? 'h-5 w-5 text-cyan-100' : 'h-5 w-5 text-slate-400'} />
-                    <p className="mt-2 text-[11px] font-black text-white">
-                      {event.title}
+              <div className="relative z-10">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <div className="inline-flex items-center gap-2 rounded-full border border-orange-300/20 bg-orange-300/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.24em] text-orange-200">
+                      <Flame className="h-3.5 w-3.5 fill-orange-300 text-orange-300" />
+                      Live Event
+                    </div>
+                    <h4 className="mt-3 text-xl font-black tracking-tight text-white">
+                      Top Spenders Event
+                    </h4>
+                    <p className="mt-1 max-w-[260px] text-xs leading-5 text-slate-400">
+                      Climb the weekly spending leaderboard and unlock premium reward points.
                     </p>
-                    <p className="mt-0.5 text-[9px] font-bold uppercase tracking-[0.12em] text-white/50">
-                      {event.value}
-                    </p>
-                  </button>
-                )
-              })}
-            </div>
+                  </div>
 
-            <div className="relative mt-5 overflow-hidden rounded-[1.45rem] border border-orange-300/25 bg-[#120b0a] p-4 shadow-[0_22px_70px_rgba(249,115,22,0.18)]">
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_20%,rgba(249,115,22,0.36),transparent_28%),radial-gradient(circle_at_38%_92%,rgba(34,211,238,0.22),transparent_32%),linear-gradient(135deg,rgba(30,41,59,0.25),rgba(124,45,18,0.42),rgba(3,7,18,0.88))]" />
-              <div className="absolute -bottom-10 right-8 text-[7rem] leading-none opacity-15">🔥</div>
-              <div className="relative z-10 grid grid-cols-[1fr_132px] gap-3">
-                <div>
-                  <p className="text-[10px] font-black uppercase tracking-[0.22em] text-orange-200">
-                    Top Spenders
-                  </p>
-                  <div className="mt-12">
-                    <p className="text-[10px] font-bold text-orange-100/65">Ends in</p>
-                    <p className="mt-1 font-mono text-xl font-black tracking-[0.08em] text-white">
-                      01d:00h:31m
+                  <div className="rounded-2xl border border-cyan-300/16 bg-cyan-300/[0.07] px-3 py-2 text-right">
+                    <p className="text-[9px] font-black uppercase tracking-[0.22em] text-cyan-200/70">
+                      Ends In
+                    </p>
+                    <p className="mt-1 font-mono text-sm font-black text-cyan-100">
+                      01D 00H 31M
                     </p>
                   </div>
                 </div>
 
-                <div className="rounded-2xl border border-white/10 bg-black/35 p-3 backdrop-blur">
-                  {rewardRows.map((row) => (
-                    <div
-                      key={`reward-${row.rank}`}
-                      className="flex items-center justify-between gap-2 border-b border-white/8 py-1.5 last:border-b-0"
-                    >
-                      <span className="text-[10px] font-black uppercase tracking-[0.12em] text-white/74">
-                        {row.rank}
-                      </span>
-                      <span className="text-[10px] font-black text-orange-100">
-                        {row.reward}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
+                <div className="mt-4 grid grid-cols-3 gap-2">
+                  <div className="rounded-2xl border border-orange-300/16 bg-orange-300/[0.08] px-3 py-3">
+                    <p className="text-[9px] font-black uppercase tracking-[0.18em] text-orange-200/70">
+                      Prize Pool
+                    </p>
+                    <p className="mt-1 text-lg font-black text-white">
+                      41,000
+                    </p>
+                  </div>
 
-              <div className="relative z-10 mt-4 inline-flex items-center gap-2 rounded-2xl border border-cyan-200/20 bg-cyan-300/10 px-3 py-2">
-                <Trophy className="h-4 w-4 text-cyan-100" />
-                <div>
-                  <p className="text-[9px] font-black uppercase tracking-[0.22em] text-cyan-100/65">
-                    Total Worth
-                  </p>
-                  <p className="text-lg font-black text-white">41,000 pts</p>
+                  <div className="rounded-2xl border border-purple-300/16 bg-purple-300/[0.08] px-3 py-3">
+                    <p className="text-[9px] font-black uppercase tracking-[0.18em] text-purple-200/70">
+                      Top Reward
+                    </p>
+                    <p className="mt-1 text-lg font-black text-white">
+                      15,000
+                    </p>
+                  </div>
+
+                  <div className="rounded-2xl border border-cyan-300/16 bg-cyan-300/[0.08] px-3 py-3">
+                    <p className="text-[9px] font-black uppercase tracking-[0.18em] text-cyan-200/70">
+                      Rewards
+                    </p>
+                    <p className="mt-1 text-lg font-black text-white">
+                      Top 5
+                    </p>
+                  </div>
+                </div>
+
+                <div className="mt-3 rounded-2xl border border-white/10 bg-black/25 p-2.5">
+                  <div className="grid grid-cols-5 gap-1.5">
+                    {rewardRows.map((row) => (
+                      <div
+                        key={`reward-${row.rank}`}
+                        className="rounded-xl border border-white/10 bg-white/[0.045] px-1.5 py-2 text-center"
+                      >
+                        <p className="text-[8px] font-black uppercase tracking-[0.12em] text-slate-500">
+                          {row.rank.replace('Top ', '#')}
+                        </p>
+                        <p className="mt-1 text-[10px] font-black text-orange-100">
+                          {row.reward.replace(' pts', '')}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
 
-            <div className="mt-5 flex items-center justify-between">
-              <div className="inline-flex rounded-full border border-white/10 bg-white/[0.055] p-1">
-                <button className="rounded-full bg-cyan-300 px-5 py-2 text-xs font-black text-black shadow-[0_0_24px_rgba(34,211,238,0.3)]">
+            <div className="mt-4 flex items-center justify-between gap-3">
+              <div className="inline-flex flex-1 rounded-full border border-white/10 bg-white/[0.055] p-1">
+                <button className="flex-1 rounded-full bg-cyan-300 px-4 py-2 text-xs font-black text-black shadow-[0_0_24px_rgba(34,211,238,0.3)]">
                   Current Event
                 </button>
-                <button className="rounded-full px-5 py-2 text-xs font-black text-slate-400">
+                <button className="flex-1 rounded-full px-4 py-2 text-xs font-black text-slate-400">
                   Past Event
                 </button>
               </div>
               <button
                 type="button"
-                className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/[0.055] text-slate-300"
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/[0.055] text-slate-300"
               >
                 <RefreshCw className="h-4 w-4" />
               </button>
+            </div>
+
+            <div className="mt-5 flex items-center justify-between">
+              <div>
+                <p className="text-[10px] font-black uppercase tracking-[0.26em] text-cyan-200">
+                  Current Ranking
+                </p>
+                <h4 className="mt-1 text-lg font-black text-white">
+                  Top 3 Players
+                </h4>
+              </div>
+              <div className="rounded-full border border-white/10 bg-white/[0.055] px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">
+                Live Demo
+              </div>
             </div>
 
             <div className="mt-7 grid grid-cols-3 items-end gap-2">
