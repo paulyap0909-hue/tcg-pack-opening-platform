@@ -3,7 +3,6 @@ import { motion } from 'framer-motion'
 import {
   Bell,
   ChevronRight,
-  Filter,
   Gavel,
   Gem,
   Gift,
@@ -59,6 +58,7 @@ import MobileLukaHomePage from '../../components/MobileLukaHomePage'
 import PlayerWalletPanel from '../../components/PlayerWalletPanel'
 import AudioGateModal from '../../components/AudioGateModal'
 import useAudio from '../../hooks/useAudio'
+import { audioManager } from '../../lib/audioManager'
 
 import type { Pack } from '../../data/cardPool'
 import { packCoverAssets, genericPackCoverAssets } from '../../data/cardPool'
@@ -76,6 +76,7 @@ import heroPremiumShinyPack from '../../assets/decks/hero-premium-shiny-pack.png
 type ActiveModal = 'detail' | 'opening' | 'multi-opening' | null
 
 type MobilePage = 'home' | 'packs' | 'auction' | 'rewards' | 'account'
+type PackUniverse = 'pokemon' | 'onePiece'
 
 type PackAdminStatus = 'Active' | 'Paused' | 'Hidden'
 type PackCoverKey = 'electric' | 'pirate' | 'secret' | 'custom'
@@ -140,7 +141,7 @@ type QuestStatIncrement = Partial<
 >
 
 const STORAGE_KEYS = {
-  packs: 'tcg-platform-packs-v3',
+  packs: 'tcg-platform-packs-v4',
   walletBalance: 'tcg-platform-wallet-v2',
   vaultCards: 'tcg-platform-vault-cards-v3',
   transactions: 'tcg-platform-transactions-v2',
@@ -159,12 +160,33 @@ const DEFAULT_PLAYER_PROFILE: PlayerProfile = {
   username: 'detailedpower3615',
 }
 
-const categoryFilters: PackCategory[] = [
-  'All',
-  'Pokémon Inspired',
-  'One Piece Inspired',
-  'Premium Mystery Pack',
-  'Nearly Sold Out',
+const packUniverseOptions: Array<{
+  id: PackUniverse
+  label: string
+  eyebrow: string
+  description: string
+  activeClass: string
+  inactiveClass: string
+  iconClass: string
+}> = [
+  {
+    id: 'pokemon',
+    label: 'Pokémon',
+    eyebrow: 'Electric chase world',
+    description: 'Charizard, Pikachu, Crown Zenith and premium Pokémon-style drops.',
+    activeClass: 'border-yellow-300/70 bg-yellow-300/16 text-yellow-100 shadow-[0_0_38px_rgba(250,204,21,0.18)]',
+    inactiveClass: 'border-white/10 bg-white/[0.045] text-slate-300',
+    iconClass: 'from-yellow-300 to-cyan-300',
+  },
+  {
+    id: 'onePiece',
+    label: 'One Piece',
+    eyebrow: 'Pirate treasure world',
+    description: 'Luffy-inspired treasure drops, anime chase packs and ocean adventure pulls.',
+    activeClass: 'border-red-300/70 bg-red-300/14 text-red-100 shadow-[0_0_38px_rgba(248,113,113,0.18)]',
+    inactiveClass: 'border-white/10 bg-white/[0.045] text-slate-300',
+    iconClass: 'from-red-300 to-amber-300',
+  },
 ]
 
 const initialPacks: Pack[] = [
@@ -255,6 +277,28 @@ const initialPacks: Pack[] = [
     glow: 'from-lime-300 to-emerald-700',
     badge: 'Vaulted',
     cover: packCoverAssets.venusaurHoloVaultedDrop,
+  },
+  {
+    name: 'One Piece Luffy Treasure Chase',
+    category: 'One Piece Inspired',
+    price: '160 Points',
+    remaining: '168 / 300 left',
+    remainingQuantity: 168,
+    totalQuantity: 300,
+    glow: 'from-red-300 to-amber-600',
+    badge: 'Luffy Chase',
+    cover: genericPackCoverAssets.pirateDeckCover,
+  },
+  {
+    name: 'One Piece Grand Line Vault',
+    category: 'One Piece Inspired',
+    price: '220 Points',
+    remaining: '88 / 180 left',
+    remainingQuantity: 88,
+    totalQuantity: 180,
+    glow: 'from-orange-300 to-red-700',
+    badge: 'Treasure Drop',
+    cover: genericPackCoverAssets.secretDeckCover,
   },
 ]
 
@@ -363,6 +407,21 @@ const getPackCover = (
 
 const isPackAvailableToPlayer = (pack: ManagedPack) => {
   return (pack.adminStatus ?? 'Active') === 'Active'
+}
+
+const getPackUniverse = (pack: Pack): PackUniverse => {
+  const normalizedPackText = `${pack.name} ${pack.category} ${pack.badge}`.toLowerCase()
+
+  if (
+    normalizedPackText.includes('one piece') ||
+    normalizedPackText.includes('luffy') ||
+    normalizedPackText.includes('pirate') ||
+    normalizedPackText.includes('grand line')
+  ) {
+    return 'onePiece'
+  }
+
+  return 'pokemon'
 }
 
 
@@ -734,6 +793,7 @@ function PlayerAdminDemoShell({
   const [packSearchQuery, setPackSearchQuery] = useState('')
   const [packSortBy, setPackSortBy] = useState<PackSortOption>('Latest')
   const [mobilePage, setMobilePage] = useState<MobilePage>('home')
+  const [selectedPackUniverse, setSelectedPackUniverse] = useState<PackUniverse>('pokemon')
   const [vaultCards, setVaultCards] = useState<VaultCard[]>(() =>
     loadVaultCards(),
   )
@@ -1561,13 +1621,28 @@ function PlayerAdminDemoShell({
     0,
   )
 
+  const packUniverseCounts = useMemo(() => {
+    return playerVisiblePacks.reduce(
+      (counts, pack) => {
+        const packUniverse = getPackUniverse(pack)
+        return {
+          ...counts,
+          [packUniverse]: counts[packUniverse] + 1,
+        }
+      },
+      { pokemon: 0, onePiece: 0 } as Record<PackUniverse, number>,
+    )
+  }, [playerVisiblePacks])
 
-
+  const activePackUniverseMeta =
+    packUniverseOptions.find((option) => option.id === selectedPackUniverse) ??
+    packUniverseOptions[0]
 
   const filteredPacks = useMemo(() => {
     const normalizedSearch = packSearchQuery.trim().toLowerCase()
 
     const basePacks = playerVisiblePacks.filter((pack) => {
+      const matchesUniverse = getPackUniverse(pack) === selectedPackUniverse
       const matchesCategory =
         selectedCategory === 'All'
           ? true
@@ -1581,7 +1656,7 @@ function PlayerAdminDemoShell({
         pack.category.toLowerCase().includes(normalizedSearch) ||
         pack.badge.toLowerCase().includes(normalizedSearch)
 
-      return matchesCategory && matchesSearch
+      return matchesUniverse && matchesCategory && matchesSearch
     })
 
     const sortedPacks = [...basePacks]
@@ -1595,7 +1670,7 @@ function PlayerAdminDemoShell({
     }
 
     return sortedPacks
-  }, [playerVisiblePacks, selectedCategory, packSearchQuery, packSortBy])
+  }, [packSearchQuery, packSortBy, playerVisiblePacks, selectedCategory, selectedPackUniverse])
 
   const changeMobilePage = (page: MobilePage) => {
     setMobilePage(page)
@@ -1604,6 +1679,17 @@ function PlayerAdminDemoShell({
       window.scrollTo({ top: 0, behavior: 'smooth' })
     }
   }
+
+  useEffect(() => {
+    if (!isSoundEnabled) return
+
+    if (mobilePage === 'packs') {
+      void audioManager.playBgm(selectedPackUniverse === 'pokemon' ? 'pokemon' : 'onePiece')
+      return
+    }
+
+    void audioManager.playBgm('lobby')
+  }, [isSoundEnabled, mobilePage, selectedPackUniverse])
 
 
 
@@ -1703,26 +1789,62 @@ function PlayerAdminDemoShell({
             </div>
           </div>
 
-          <div className="mb-5 flex gap-2 overflow-x-auto pb-1 [-webkit-overflow-scrolling:touch] sm:flex-wrap sm:overflow-visible sm:pb-0 sm:gap-3">
-            {categoryFilters.map((category) => {
-              const isSelected = selectedCategory === category
+          <div className="mb-5 overflow-hidden rounded-[1.65rem] border border-white/10 bg-white/[0.035] p-3 shadow-[0_20px_70px_rgba(0,0,0,0.25)]">
+            <div className="mb-3 flex items-center justify-between gap-3 px-1">
+              <div>
+                <p className="text-[10px] font-black uppercase tracking-[0.28em] text-cyan-200/75">
+                  Choose Your Pack World
+                </p>
+                <p className="mt-1 text-sm font-bold text-slate-300">
+                  {activePackUniverseMeta.description}
+                </p>
+              </div>
 
-              return (
-                <button
-                  key={category}
-                  type="button"
-                  onClick={() => setSelectedCategory(category)}
-                  className={`flex shrink-0 items-center gap-2 rounded-2xl border px-3 py-2.5 text-[11px] font-black uppercase tracking-wider transition hover:scale-[1.02] sm:px-4 sm:py-3 sm:text-xs ${
-                    isSelected
-                      ? 'border-cyan-300 bg-cyan-300 text-black'
-                      : 'border-white/8 bg-white/[0.04] text-slate-300 hover:border-cyan-300/25 hover:bg-white/[0.06] hover:text-white'
-                  }`}
-                >
-                  <Filter className="h-4 w-4" />
-                  {category}
-                </button>
-              )
-            })}
+              <div className="hidden rounded-full border border-white/10 bg-black/25 px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-slate-400 sm:block">
+                BGM Switch
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2">
+              {packUniverseOptions.map((option) => {
+                const isSelected = selectedPackUniverse === option.id
+                const packCount = packUniverseCounts[option.id]
+
+                return (
+                  <button
+                    key={option.id}
+                    type="button"
+                    onClick={() => {
+                      setSelectedPackUniverse(option.id)
+                      setSelectedCategory('All')
+                      void audioManager.playBgm(option.id === 'pokemon' ? 'pokemon' : 'onePiece')
+                    }}
+                    className={`relative overflow-hidden rounded-[1.35rem] border p-3 text-left transition active:scale-[0.98] ${
+                      isSelected ? option.activeClass : option.inactiveClass
+                    }`}
+                  >
+                    <div className={`pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full bg-gradient-to-br ${option.iconClass} opacity-20 blur-xl`} />
+                    <div className="relative flex items-start justify-between gap-2">
+                      <div className="min-w-0">
+                        <p className="text-[10px] font-black uppercase tracking-[0.18em] text-current/60">
+                          {option.eyebrow}
+                        </p>
+                        <h3 className="mt-1 text-lg font-black tracking-tight text-white">
+                          {option.label}
+                        </h3>
+                        <p className="mt-1 text-[11px] font-bold text-current/65">
+                          {packCount} active packs
+                        </p>
+                      </div>
+
+                      <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br ${option.iconClass} text-black shadow-[0_0_24px_rgba(255,255,255,0.12)]`}>
+                        <PackageOpen className="h-5 w-5" />
+                      </div>
+                    </div>
+                  </button>
+                )
+              })}
+            </div>
           </div>
 
           {filteredPacks.length === 0 ? (
@@ -2041,26 +2163,62 @@ function PlayerAdminDemoShell({
             </div>
           </div>
 
-          <div className="mb-5 flex gap-2 overflow-x-auto pb-1 [-webkit-overflow-scrolling:touch] sm:flex-wrap sm:overflow-visible sm:pb-0 sm:gap-3">
-            {categoryFilters.map((category) => {
-              const isSelected = selectedCategory === category
+          <div className="mb-5 overflow-hidden rounded-[1.65rem] border border-white/10 bg-white/[0.035] p-3 shadow-[0_20px_70px_rgba(0,0,0,0.25)]">
+            <div className="mb-3 flex items-center justify-between gap-3 px-1">
+              <div>
+                <p className="text-[10px] font-black uppercase tracking-[0.28em] text-cyan-200/75">
+                  Choose Your Pack World
+                </p>
+                <p className="mt-1 text-sm font-bold text-slate-300">
+                  {activePackUniverseMeta.description}
+                </p>
+              </div>
 
-              return (
-                <button
-                  key={category}
-                  type="button"
-                  onClick={() => setSelectedCategory(category)}
-                  className={`flex shrink-0 items-center gap-2 rounded-2xl border px-3 py-2.5 text-[11px] font-black uppercase tracking-wider transition hover:scale-[1.02] sm:px-4 sm:py-3 sm:text-xs ${
-                    isSelected
-                      ? 'border-cyan-300 bg-cyan-300 text-black'
-                      : 'border-white/8 bg-white/[0.04] text-slate-300 hover:border-cyan-300/25 hover:bg-white/[0.06] hover:text-white'
-                  }`}
-                >
-                  <Filter className="h-4 w-4" />
-                  {category}
-                </button>
-              )
-            })}
+              <div className="hidden rounded-full border border-white/10 bg-black/25 px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-slate-400 sm:block">
+                BGM Switch
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2">
+              {packUniverseOptions.map((option) => {
+                const isSelected = selectedPackUniverse === option.id
+                const packCount = packUniverseCounts[option.id]
+
+                return (
+                  <button
+                    key={option.id}
+                    type="button"
+                    onClick={() => {
+                      setSelectedPackUniverse(option.id)
+                      setSelectedCategory('All')
+                      void audioManager.playBgm(option.id === 'pokemon' ? 'pokemon' : 'onePiece')
+                    }}
+                    className={`relative overflow-hidden rounded-[1.35rem] border p-3 text-left transition active:scale-[0.98] ${
+                      isSelected ? option.activeClass : option.inactiveClass
+                    }`}
+                  >
+                    <div className={`pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full bg-gradient-to-br ${option.iconClass} opacity-20 blur-xl`} />
+                    <div className="relative flex items-start justify-between gap-2">
+                      <div className="min-w-0">
+                        <p className="text-[10px] font-black uppercase tracking-[0.18em] text-current/60">
+                          {option.eyebrow}
+                        </p>
+                        <h3 className="mt-1 text-lg font-black tracking-tight text-white">
+                          {option.label}
+                        </h3>
+                        <p className="mt-1 text-[11px] font-bold text-current/65">
+                          {packCount} active packs
+                        </p>
+                      </div>
+
+                      <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br ${option.iconClass} text-black shadow-[0_0_24px_rgba(255,255,255,0.12)]`}>
+                        <PackageOpen className="h-5 w-5" />
+                      </div>
+                    </div>
+                  </button>
+                )
+              })}
+            </div>
           </div>
 
           {filteredPacks.length === 0 ? (

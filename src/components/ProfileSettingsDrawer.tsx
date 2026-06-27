@@ -482,7 +482,23 @@ export default function ProfileSettingsDrawer({
                     onClick={() => void audioManager.playBgm('lobby')}
                     className="rounded-2xl border border-purple-300/18 bg-purple-300/[0.07] px-3 py-3 text-xs font-black text-purple-100"
                   >
-                    Test BGM
+                    Test Lobby
+                  </button>
+                  <button
+                    type="button"
+                    data-audio-silent="true"
+                    onClick={() => void audioManager.playBgm('pokemon')}
+                    className="rounded-2xl border border-yellow-300/18 bg-yellow-300/[0.07] px-3 py-3 text-xs font-black text-yellow-100"
+                  >
+                    Test Pokémon
+                  </button>
+                  <button
+                    type="button"
+                    data-audio-silent="true"
+                    onClick={() => void audioManager.playBgm('onePiece')}
+                    className="rounded-2xl border border-red-300/18 bg-red-300/[0.07] px-3 py-3 text-xs font-black text-red-100"
+                  >
+                    Test One Piece
                   </button>
                   <button
                     type="button"

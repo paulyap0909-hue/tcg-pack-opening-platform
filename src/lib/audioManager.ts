@@ -1,6 +1,8 @@
 import { Howl, Howler } from 'howler'
 
 import bgmLobbySrc from '../assets/audio/bgm-lobby.mp3'
+import pokemonBgmSrc from '../assets/audio/pokemon-bgm.mp3'
+import onePieceBgmSrc from '../assets/audio/onepiece-bgm.mp3'
 import bidClickSrc from '../assets/audio/bid-click.wav'
 import cardFlipSrc from '../assets/audio/card-flip.wav'
 import errorSrc from '../assets/audio/error.wav'
@@ -9,7 +11,7 @@ import rareHitSrc from '../assets/audio/rare-hit.mp3'
 import secretHitSrc from '../assets/audio/secret-hit.mp3'
 import successSrc from '../assets/audio/success.wav'
 
-export type BgmName = 'lobby'
+export type BgmName = 'lobby' | 'pokemon' | 'onePiece'
 
 export type SfxName =
   | 'bidClick'
@@ -29,6 +31,8 @@ const DEFAULT_SFX_VOLUME = 0.85
 
 const bgmSources: Record<BgmName, string> = {
   lobby: bgmLobbySrc,
+  pokemon: pokemonBgmSrc,
+  onePiece: onePieceBgmSrc,
 }
 
 const sfxSources: Record<SfxName, string> = {
@@ -277,18 +281,19 @@ class TcgAudioManager {
     }
   }
 
-  ensureBgmLoop(name: BgmName = 'lobby') {
+  ensureBgmLoop(name?: BgmName) {
     if (!isBrowser() || !this.enabled) return
 
-    const bgm = this.getBgmHowl(name)
+    const targetName = name ?? this.activeBgmName ?? 'lobby'
+    const bgm = this.getBgmHowl(targetName)
     bgm.loop(true)
     bgm.volume(this.getBgmVolume())
 
     this.activeBgm = bgm
-    this.activeBgmName = name
+    this.activeBgmName = targetName
 
     if (!bgm.playing()) {
-      void this.playBgm(name)
+      void this.playBgm(targetName)
     }
   }
 

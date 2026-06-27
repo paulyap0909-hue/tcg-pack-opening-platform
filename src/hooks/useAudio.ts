@@ -41,7 +41,7 @@ export default function useAudio() {
 
   useEffect(() => {
     const keepBgmLooping = () => {
-      audioManager.ensureBgmLoop('lobby')
+      audioManager.ensureBgmLoop()
     }
 
     document.addEventListener('visibilitychange', keepBgmLooping)
