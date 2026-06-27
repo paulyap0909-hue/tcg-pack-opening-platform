@@ -2,17 +2,10 @@ import { useEffect, useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
 import {
   ChevronRight,
-  Crown,
   Filter,
   Gem,
-  PackageOpen,
-  ReceiptText,
   Search,
-  Settings,
-  ShieldCheck,
   Trophy,
-  Wallet,
-  Zap,
 } from 'lucide-react'
 
 import '../../styles/sci-fi-hud.css'
@@ -28,7 +21,6 @@ import VaultDrawer, {
   type VaultCard,
   getSellBackPoints,
 } from '../../components/VaultDrawer'
-import LivePullFeed from '../../components/LivePullFeed'
 import TransactionDrawer, {
   type TransactionRecord,
   type TransactionType,
@@ -46,13 +38,8 @@ import RaffleCenterPanel, {
   type RafflePrize,
   type RaffleWinner,
 } from '../../components/RaffleCenterPanel'
-import CreatorDropsPanel from '../../components/CreatorDropsPanel'
-import FairnessCenterPanel, {
-  type FairnessRecord,
-} from '../../components/FairnessCenterPanel'
-import MarketplacePanel, {
-  type MarketplaceListing,
-} from '../../components/MarketplacePanel'
+import type { FairnessRecord } from '../../components/FairnessCenterPanel'
+import type { MarketplaceListing } from '../../components/MarketplacePanel'
 import ListForSaleModal from '../../components/ListForSaleModal'
 import HeroPackSection from '../../components/HeroPackSection'
 import DailyLoginRewardModal from '../../components/DailyLoginRewardModal'
@@ -121,7 +108,6 @@ type PackCategory =
   | 'Pokémon Inspired'
   | 'One Piece Inspired'
   | 'Premium Mystery Pack'
-  | 'Creator Drops'
   | 'Nearly Sold Out'
 
 type PackSortOption =
@@ -156,7 +142,6 @@ const categoryFilters: PackCategory[] = [
   'Pokémon Inspired',
   'One Piece Inspired',
   'Premium Mystery Pack',
-  'Creator Drops',
   'Nearly Sold Out',
 ]
 
@@ -1314,42 +1299,6 @@ function PlayerAdminDemoShell({
     handleCancelMarketplaceListing(listing)
   }
 
-  const handleBuyMarketplaceListing = (listing: MarketplaceListing) => {
-    if (listing.source === 'player') return
-
-    if (walletBalance < listing.price) {
-      openTopUpModal()
-      return
-    }
-
-    const nextBalance = walletBalance - listing.price
-    const purchasedAt = getFullDateTime()
-
-    const purchasedCard: VaultCard = {
-      ...listing.card,
-      id: `${Date.now()}-marketplace-card-${Math.random().toString(16).slice(2)}`,
-      openedAt: `Marketplace · ${purchasedAt}`,
-      status: 'Stored',
-      listingPrice: undefined,
-      listedAt: undefined,
-      listedSeller: undefined,
-    }
-
-    setWalletBalance(nextBalance)
-    setVaultCards((currentCards) => [purchasedCard, ...currentCards])
-    setMarketplaceListings((currentListings) =>
-      currentListings.filter((item) => item.id !== listing.id),
-    )
-
-    addTransaction(
-      'marketplace',
-      `Marketplace Buy · ${listing.card.name}`,
-      `Purchased ${listing.card.rarity} card from ${listing.seller} for ${listing.price.toLocaleString()} points.`,
-      listing.price,
-      nextBalance,
-    )
-  }
-
   const handleSellBackCard = (card: VaultCard) => {
     setSellBackTarget(card)
   }
@@ -1490,7 +1439,9 @@ function PlayerAdminDemoShell({
     setListForSaleTarget(null)
   }
 
-  const playerVisiblePacks = packs.filter(isPackAvailableToPlayer)
+  const playerVisiblePacks = packs.filter(
+    (pack) => isPackAvailableToPlayer(pack) && pack.category !== 'Creator Drops',
+  )
 
   const totalRemaining = playerVisiblePacks.reduce(
     (total, pack) => total + pack.remainingQuantity,
@@ -1503,9 +1454,6 @@ function PlayerAdminDemoShell({
   )
 
 
-  const shippingRequestedCount = vaultCards.filter(
-    (card) => card.status !== 'Stored' && card.status !== 'Listed on Marketplace',
-  ).length
 
 
   const filteredPacks = useMemo(() => {
@@ -1541,13 +1489,7 @@ function PlayerAdminDemoShell({
     return sortedPacks
   }, [playerVisiblePacks, selectedCategory, packSearchQuery, packSortBy])
 
-  const recentHitCards = vaultCards.slice(0, 6)
 
-  const biggestPullCards = [...vaultCards]
-    .sort((firstCard, secondCard) => {
-      return getSellBackPoints(secondCard) - getSellBackPoints(firstCard)
-    })
-    .slice(0, 5)
 
 
   return (
@@ -1555,83 +1497,39 @@ function PlayerAdminDemoShell({
       <SciFiBackground />
 
       <main className="relative z-10">
-        <header className="mx-auto flex w-full max-w-7xl items-center justify-between px-5 py-6 lg:px-8">
+        <header className="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-4 sm:px-5 lg:px-8">
           <button
             type="button"
             className="group flex items-center gap-3 text-left"
           >
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-cyan-300/30 bg-cyan-300/10 shadow-[0_0_35px_rgba(34,211,238,0.22)]">
-              <Crown className="h-6 w-6 text-cyan-300" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-cyan-300/30 bg-cyan-300/10 shadow-[0_0_35px_rgba(34,211,238,0.22)] sm:h-12 sm:w-12">
+              <Trophy className="h-5 w-5 text-cyan-300 sm:h-6 sm:w-6" />
             </div>
 
             <div>
-              <p className="text-[10px] uppercase tracking-[0.35em] text-cyan-300">
+              <p className="text-[9px] uppercase tracking-[0.28em] text-cyan-300 sm:text-[10px] sm:tracking-[0.35em]">
                 Jomluffyz
               </p>
-              <h1 className="text-lg font-black leading-tight sm:text-xl">
+              <h1 className="text-base font-black leading-tight sm:text-xl">
                 Treasure Pack TCG
               </h1>
             </div>
           </button>
 
-          <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={openTopUpModal}
-              className="hidden items-center gap-2 rounded-2xl border border-amber-300/20 bg-amber-300/10 px-4 py-3 text-sm font-black text-amber-200 transition hover:scale-105 hover:bg-amber-300/20 sm:flex"
-            >
-              <Wallet className="h-4 w-4" />
-              {walletBalance.toLocaleString()} Points
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setIsTransactionOpen(true)}
-              className="hidden items-center gap-2 rounded-2xl border border-purple-300/20 bg-purple-300/10 px-4 py-3 text-sm font-black text-purple-200 transition hover:scale-105 hover:bg-purple-300/20 md:flex"
-            >
-              <ReceiptText className="h-4 w-4" />
-              History
-              <span className="rounded-full bg-purple-300 px-2 py-0.5 text-xs text-black">
-                {transactions.length}
-              </span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setIsAdminShippingOpen(true)}
-              className="hidden items-center gap-2 rounded-2xl border border-emerald-300/20 bg-emerald-300/10 px-4 py-3 text-sm font-black text-emerald-200 transition hover:scale-105 hover:bg-emerald-300/20 lg:flex"
-            >
-              <Settings className="h-4 w-4" />
-              Admin Center
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setIsVaultOpen(true)}
-              className="flex items-center gap-2 rounded-2xl border border-cyan-300/30 bg-cyan-300/10 px-4 py-3 text-sm font-black text-cyan-200 transition hover:scale-105 hover:bg-cyan-300/20"
-            >
-              <ShieldCheck className="h-4 w-4" />
-              Vault
-              <span className="rounded-full bg-cyan-300 px-2 py-0.5 text-xs text-black">
-                {vaultCards.length}
-              </span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setIsPlayerWalletOpen(true)}
-              className="group flex items-center gap-2 rounded-2xl border border-white/10 bg-white/[0.04] px-2 py-2 transition hover:scale-105 hover:border-purple-300/30 hover:bg-purple-300/10"
-            >
-              <span className="hidden pl-2 text-sm font-black text-white lg:inline">
-                Player
-              </span>
-              <img
-                src="https://api.dicebear.com/9.x/adventurer/svg?seed=detailedpower3615&radius=50&backgroundColor=8b5cf6"
-                alt="Player account"
-                className="h-9 w-9 rounded-xl border border-white/10 object-cover"
-              />
-            </button>
-          </div>
+          <button
+            type="button"
+            onClick={() => setIsPlayerWalletOpen(true)}
+            className="group flex items-center gap-2 rounded-2xl border border-white/10 bg-white/[0.04] px-2 py-2 transition hover:scale-105 hover:border-purple-300/30 hover:bg-purple-300/10"
+          >
+            <span className="hidden pl-2 text-sm font-black text-white sm:inline">
+              Profile
+            </span>
+            <img
+              src="https://api.dicebear.com/9.x/adventurer/svg?seed=detailedpower3615&radius=50&backgroundColor=8b5cf6"
+              alt="Player account"
+              className="h-9 w-9 rounded-xl border border-white/10 object-cover"
+            />
+          </button>
         </header>
 
         <HeroPackSection
@@ -1658,14 +1556,13 @@ function PlayerAdminDemoShell({
           onOpenVault={() => setIsVaultOpen(true)}
         />
 
-        <section id="packs" className="mx-auto w-full max-w-7xl scroll-mt-8 px-5 py-8 lg:px-8">
-          <div className="mb-8 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+        <section id="packs" className="mx-auto w-full max-w-7xl scroll-mt-8 px-4 py-7 sm:px-5 lg:px-8">
+          <div className="mb-5 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div>
               <p className="hud-label text-sm">Pack Catalog</p>
-              <h2 className="mt-2 text-4xl font-black">Browse Active Packs</h2>
-              <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-400">
-                Discover curated drops in a clean storefront layout. Browse by category,
-                search your favorite themes, and click View to open pack details.
+              <h2 className="mt-2 text-3xl font-black sm:text-4xl">Browse Active Packs</h2>
+              <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-400">
+                Swipe sideways on mobile to browse packs faster. Tap View to open details.
               </p>
             </div>
 
@@ -1697,7 +1594,7 @@ function PlayerAdminDemoShell({
             </div>
           </div>
 
-          <div className="mb-6 flex flex-wrap gap-3">
+          <div className="mb-5 flex gap-2 overflow-x-auto pb-1 [-webkit-overflow-scrolling:touch] sm:flex-wrap sm:overflow-visible sm:pb-0 sm:gap-3">
             {categoryFilters.map((category) => {
               const isSelected = selectedCategory === category
 
@@ -1706,7 +1603,7 @@ function PlayerAdminDemoShell({
                   key={category}
                   type="button"
                   onClick={() => setSelectedCategory(category)}
-                  className={`flex items-center gap-2 rounded-2xl border px-4 py-3 text-xs font-black uppercase tracking-wider transition hover:scale-[1.02] ${
+                  className={`flex shrink-0 items-center gap-2 rounded-2xl border px-3 py-2.5 text-[11px] font-black uppercase tracking-wider transition hover:scale-[1.02] sm:px-4 sm:py-3 sm:text-xs ${
                     isSelected
                       ? 'border-cyan-300 bg-cyan-300 text-black'
                       : 'border-white/8 bg-white/[0.04] text-slate-300 hover:border-cyan-300/25 hover:bg-white/[0.06] hover:text-white'
@@ -1727,7 +1624,7 @@ function PlayerAdminDemoShell({
               </p>
             </div>
           ) : (
-            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            <div className="flex snap-x gap-3 overflow-x-auto pb-4 [-webkit-overflow-scrolling:touch] sm:grid sm:grid-cols-2 sm:gap-4 sm:overflow-visible sm:pb-0 xl:grid-cols-4">
               {filteredPacks.map((pack, index) => {
                 const isSoldOut = pack.remainingQuantity <= 0
 
@@ -1740,30 +1637,31 @@ function PlayerAdminDemoShell({
                     onClick={() => {
                       if (!isSoldOut) openPackDetail(pack)
                     }}
-                    className={`group relative overflow-hidden rounded-[1.55rem] border border-white/6 bg-[#0a1322]/95 p-4 shadow-[0_12px_40px_rgba(0,0,0,0.28)] transition duration-300 hover:-translate-y-1 hover:border-cyan-300/20 hover:shadow-[0_18px_55px_rgba(8,145,178,0.18)] ${
+                    className={`group relative w-[245px] shrink-0 snap-start overflow-hidden rounded-[1.35rem] border border-white/6 bg-[#0a1322]/95 p-3 shadow-[0_12px_40px_rgba(0,0,0,0.28)] transition duration-300 hover:-translate-y-1 hover:border-cyan-300/20 hover:shadow-[0_18px_55px_rgba(8,145,178,0.18)] sm:w-auto sm:rounded-[1.55rem] sm:p-4 ${
                       isSoldOut ? 'cursor-not-allowed opacity-60 grayscale' : 'cursor-pointer'
                     }`}
                   >
                     <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.07),transparent_36%),linear-gradient(180deg,rgba(255,255,255,0.02),transparent)]" />
 
-                    <div className="relative flex min-h-[400px] flex-col">
+                    <div className="relative flex min-h-[315px] flex-col sm:min-h-[400px]">
                       <div className="text-center">
-                        <h3 className="line-clamp-2 min-h-[3.4rem] text-[1.05rem] font-black leading-tight text-white">
+                        <h3 className="line-clamp-2 min-h-[2.7rem] text-sm font-black leading-tight text-white sm:min-h-[3.4rem] sm:text-[1.05rem]">
                           {pack.name}
                         </h3>
-                        <p className="mt-1 text-sm text-slate-500">{pack.category}</p>
+                        <p className="mt-1 text-xs text-slate-500 sm:text-sm">{pack.category}</p>
                       </div>
 
-                      <div className="flex flex-1 items-center justify-center px-4 py-6">
+                      <div className="flex flex-1 items-center justify-center px-2 py-4 sm:px-4 sm:py-6">
                         <img
                           src={pack.cover}
                           alt={pack.name}
-                          className="max-h-[215px] w-auto object-contain drop-shadow-[0_18px_35px_rgba(0,0,0,0.45)] transition duration-300 group-hover:scale-[1.03]"
+                          loading="lazy"
+                          className="max-h-[165px] w-auto object-contain drop-shadow-[0_18px_35px_rgba(0,0,0,0.45)] transition duration-300 group-hover:scale-[1.03] sm:max-h-[215px]"
                         />
                       </div>
 
                       <div className="mt-auto flex items-center justify-between gap-4 pt-2">
-                        <div className="flex items-center gap-2 text-lg font-black text-white">
+                        <div className="flex items-center gap-2 text-base font-black text-white sm:text-lg">
                           <div className="flex h-6 w-6 items-center justify-center rounded-full bg-amber-300/15 text-amber-300">
                             <Gem className="h-4 w-4 fill-current" />
                           </div>
@@ -1822,188 +1720,7 @@ function PlayerAdminDemoShell({
 
         {/* Real Card Catalog Preview is hidden for boss/demo presentation. */}
 
-        <div className="hidden" aria-hidden="true">
-          <CreatorDropsPanel
-            packs={playerVisiblePacks.filter((pack) => pack.category === 'Creator Drops')}
-            onOpenDrop={openPackDetail}
-            onViewAll={() => setSelectedCategory('Creator Drops')}
-          />
-        </div>
-
-        <div className="hidden" aria-hidden="true">
-          <MarketplacePanel
-            listings={marketplaceListings}
-            walletBalance={walletBalance}
-            onBuyListing={handleBuyMarketplaceListing}
-            onCancelListing={handleCancelMarketplaceListing}
-          />
-        </div>
-
-        <section className="hidden mx-auto w-full max-w-7xl gap-6 px-5 py-10 lg:grid-cols-[0.9fr_1.1fr] lg:px-8">
-          <motion.div
-            className="hud-panel hud-corners rounded-[2rem] p-6"
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-          >
-            <div className="mb-5 flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-purple-300/30 bg-purple-300/10">
-                <Gem className="h-6 w-6 text-purple-300" />
-              </div>
-
-              <div>
-                <p className="hud-label text-sm">Vault Preview</p>
-                <h3 className="mt-1 text-2xl font-black">My Vault</h3>
-              </div>
-            </div>
-
-            <p className="text-sm leading-6 text-slate-400">
-              Your revealed cards are automatically stored here after pack
-              opening.
-            </p>
-
-            <div className="mt-6 grid grid-cols-3 gap-3">
-              <div className="rounded-2xl border border-cyan-300/10 bg-cyan-300/[0.04] p-4">
-                <p className="text-[10px] uppercase tracking-[0.25em] text-slate-500">
-                  Cards
-                </p>
-
-                <p className="mt-2 text-2xl font-black">{vaultCards.length}</p>
-              </div>
-
-              <div className="rounded-2xl border border-amber-300/10 bg-amber-300/[0.04] p-4">
-                <p className="text-[10px] uppercase tracking-[0.25em] text-slate-500">
-                  Recent Hits
-                </p>
-
-                <p className="mt-2 text-2xl font-black text-amber-300">
-                  {recentHitCards.length}
-                </p>
-              </div>
-
-              <div className="rounded-2xl border border-purple-300/10 bg-purple-300/[0.04] p-4">
-                <p className="text-[10px] uppercase tracking-[0.25em] text-slate-500">
-                  Shipping
-                </p>
-
-                <p className="mt-2 text-2xl font-black text-purple-300">
-                  {shippingRequestedCount}
-                </p>
-              </div>
-            </div>
-
-            <button
-              type="button"
-              onClick={() => setIsVaultOpen(true)}
-              className="mt-6 flex w-full items-center justify-center gap-2 rounded-2xl border border-cyan-300/30 bg-cyan-300/10 px-6 py-4 font-black text-cyan-200 transition hover:scale-[1.02] hover:bg-cyan-300/20"
-            >
-              <PackageOpen className="h-5 w-5" />
-              Enter Vault
-            </button>
-          </motion.div>
-
-          <div className="grid gap-6">
-            <motion.div
-              className="hud-panel hud-corners rounded-[2rem] p-6"
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-            >
-              <div className="mb-5 flex items-center justify-between gap-4">
-                <div>
-                  <p className="hud-label text-sm">Recent Hits</p>
-                  <h3 className="mt-1 text-2xl font-black">Latest Pulls</h3>
-                </div>
-                <Zap className="h-6 w-6 text-cyan-300" />
-              </div>
-
-              {recentHitCards.length === 0 ? (
-                <p className="text-sm text-slate-400">
-                  Open packs to generate recent hits.
-                </p>
-              ) : (
-                <div className="space-y-3">
-                  {recentHitCards.map((card) => (
-                    <div
-                      key={card.id}
-                      className="flex items-center gap-3 rounded-2xl border border-cyan-300/10 bg-cyan-300/[0.04] p-3"
-                    >
-                      <img
-                        src={card.image}
-                        alt={card.name}
-                        className="h-14 w-10 rounded-lg object-cover"
-                      />
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-black text-white">
-                          {card.name}
-                        </p>
-                        <p className="truncate text-xs text-cyan-300">
-                          {card.rarity} · {card.sourcePack}
-                        </p>
-                      </div>
-                      <span className="rounded-full border border-amber-300/20 bg-amber-300/10 px-3 py-1 text-xs font-black text-amber-200">
-                        +{getSellBackPoints(card)} pts
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </motion.div>
-
-            <motion.div
-              className="hud-panel hud-corners rounded-[2rem] p-6"
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-            >
-              <div className="mb-5 flex items-center justify-between gap-4">
-                <div>
-                  <p className="hud-label text-sm">Biggest Pulls</p>
-                  <h3 className="mt-1 text-2xl font-black">Top Vault Value</h3>
-                </div>
-                <Trophy className="h-6 w-6 text-purple-300" />
-              </div>
-
-              {biggestPullCards.length === 0 ? (
-                <LivePullFeed />
-              ) : (
-                <div className="space-y-3">
-                  {biggestPullCards.map((card, index) => (
-                    <div
-                      key={card.id}
-                      className="flex items-center gap-3 rounded-2xl border border-purple-300/10 bg-purple-300/[0.04] p-3"
-                    >
-                      <span className="flex h-9 w-9 items-center justify-center rounded-xl border border-purple-300/20 bg-purple-300/10 text-sm font-black text-purple-200">
-                        #{index + 1}
-                      </span>
-                      <img
-                        src={card.image}
-                        alt={card.name}
-                        className="h-14 w-10 rounded-lg object-cover"
-                      />
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-black text-white">
-                          {card.name}
-                        </p>
-                        <p className="truncate text-xs text-purple-300">
-                          {card.rarity} · {card.grade}
-                        </p>
-                      </div>
-                      <span className="rounded-full border border-emerald-300/20 bg-emerald-300/10 px-3 py-1 text-xs font-black text-emerald-200">
-                        {getSellBackPoints(card)} pts
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </motion.div>
-          </div>
-        </section>
       </main>
-
-        <div className="hidden" aria-hidden="true">
-          <FairnessCenterPanel records={fairnessRecords} />
-        </div>
 
       <PackDetailModal
         pack={activeModal === 'detail' ? activePack : null}

@@ -8,12 +8,8 @@ import {
 } from "framer-motion";
 import {
   ChevronRight,
-  Crown,
   Grab,
-  PackageOpen,
-  ShieldCheck,
   Sparkles,
-  Wallet,
 } from "lucide-react";
 
 import { pokemonRealCardPool } from "../data/cardPool";
@@ -43,15 +39,8 @@ const revealFallbackCards = pokemonRealCardPool.slice(0, 3);
 export default function HeroPackSection({
   packImage,
   packName = "Evolving Skies Featured Pack",
-  walletBalance,
-  totalRemaining,
-  totalSupply,
-  raffleTickets,
-  vaultCount,
   onStartOpening,
   onHowItWorks,
-  onTopUp,
-  onOpenVault,
 }: HeroPackSectionProps) {
   const packStageRef = useRef<HTMLDivElement | null>(null);
   const [isPackOpened, setIsPackOpened] = useState(false);
@@ -125,7 +114,7 @@ export default function HeroPackSection({
         }}
       />
 
-      <div className="relative mx-auto grid min-h-[720px] max-w-[1440px] grid-cols-1 gap-12 px-6 pb-14 pt-12 lg:grid-cols-[1.02fr_0.98fr] lg:px-12 lg:pb-20 lg:pt-16 xl:px-16">
+      <div className="relative mx-auto grid min-h-[620px] max-w-[1440px] grid-cols-1 gap-8 px-5 pb-8 pt-8 lg:min-h-[720px] lg:grid-cols-[1.02fr_0.98fr] lg:gap-12 lg:px-12 lg:pb-20 lg:pt-16 xl:px-16">
         <motion.div
           className="flex flex-col justify-center"
           initial={{ opacity: 0, y: 24 }}
@@ -137,18 +126,18 @@ export default function HeroPackSection({
             Real cards. Shipped to you.
           </div>
 
-          <h1 className="max-w-[760px] text-5xl font-black uppercase leading-[0.92] tracking-[-0.045em] text-white sm:text-6xl lg:text-7xl xl:text-8xl">
+          <h1 className="max-w-[760px] text-4xl font-black uppercase leading-[0.95] tracking-[-0.045em] text-white sm:text-6xl lg:text-7xl xl:text-8xl">
             Open iconic packs online.
             <br />
             Pull the real cards.
           </h1>
 
-          <p className="mt-6 max-w-[650px] text-lg leading-8 text-slate-300 sm:text-xl">
+          <p className="mt-4 max-w-[650px] text-sm leading-6 text-slate-300 sm:mt-6 sm:text-xl sm:leading-8">
             Hold the top seal, drag it to the right, peel the pack open, and watch
             three cards jump out instantly.
           </p>
 
-          <div className="mt-8 flex flex-wrap gap-4">
+          <div className="mt-6 flex flex-wrap gap-3 sm:mt-8 sm:gap-4">
             <button
               type="button"
               onClick={onStartOpening}
@@ -167,7 +156,7 @@ export default function HeroPackSection({
             </button>
           </div>
 
-          <div className="mt-10 flex flex-wrap gap-3">
+          <div className="mt-6 flex flex-wrap gap-2 sm:mt-10 sm:gap-3">
             {["Fair odds", "Authentic cards", "Vault · Sell · Ship"].map((item) => (
               <div
                 key={item}
@@ -178,67 +167,11 @@ export default function HeroPackSection({
             ))}
           </div>
 
-          <div className="mt-8 grid max-w-[760px] gap-3 sm:grid-cols-4">
-            <button
-              type="button"
-              onClick={onTopUp}
-              className="rounded-2xl border border-amber-300/20 bg-amber-300/10 p-4 text-left transition hover:scale-[1.02] hover:bg-amber-300/15"
-            >
-              <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl border border-amber-300/20 bg-amber-300/10">
-                <Wallet className="h-5 w-5 text-amber-300" />
-              </div>
-              <p className="text-[10px] uppercase tracking-[0.22em] text-slate-500">
-                Wallet
-              </p>
-              <p className="mt-1 text-xl font-black text-amber-200">
-                {walletBalance.toLocaleString()}
-              </p>
-            </button>
 
-            <button
-              type="button"
-              onClick={onOpenVault}
-              className="rounded-2xl border border-cyan-300/20 bg-cyan-300/10 p-4 text-left transition hover:scale-[1.02] hover:bg-cyan-300/15"
-            >
-              <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl border border-cyan-300/20 bg-cyan-300/10">
-                <ShieldCheck className="h-5 w-5 text-cyan-300" />
-              </div>
-              <p className="text-[10px] uppercase tracking-[0.22em] text-slate-500">
-                Vault
-              </p>
-              <p className="mt-1 text-xl font-black text-cyan-200">
-                {vaultCount} Cards
-              </p>
-            </button>
-
-            <div className="rounded-2xl border border-purple-300/20 bg-purple-300/10 p-4">
-              <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl border border-purple-300/20 bg-purple-300/10">
-                <Crown className="h-5 w-5 text-purple-300" />
-              </div>
-              <p className="text-[10px] uppercase tracking-[0.22em] text-slate-500">
-                Stock
-              </p>
-              <p className="mt-1 text-xl font-black text-purple-200">
-                {totalRemaining}/{totalSupply}
-              </p>
-            </div>
-
-            <div className="rounded-2xl border border-emerald-300/20 bg-emerald-300/10 p-4">
-              <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl border border-emerald-300/20 bg-emerald-300/10">
-                <PackageOpen className="h-5 w-5 text-emerald-300" />
-              </div>
-              <p className="text-[10px] uppercase tracking-[0.22em] text-slate-500">
-                Tickets
-              </p>
-              <p className="mt-1 text-xl font-black text-emerald-200">
-                {raffleTickets.toLocaleString()}
-              </p>
-            </div>
-          </div>
         </motion.div>
 
         <div className="relative flex items-center justify-center py-10 lg:py-0">
-          <div className="absolute top-[3%] z-20 rounded-full border border-cyan-300/30 bg-cyan-300/10 px-5 py-2 text-base font-black text-cyan-100 backdrop-blur sm:top-[6%] sm:text-xl">
+          <div className="absolute top-[2%] z-20 rounded-full border border-cyan-300/30 bg-cyan-300/10 px-4 py-2 text-sm font-black text-cyan-100 backdrop-blur sm:top-[6%] sm:px-5 sm:text-xl">
             {isPackOpened ? "3 Cards Revealed" : "Hold Top · Drag Right"}
           </div>
 
@@ -261,7 +194,7 @@ export default function HeroPackSection({
                 y: translateY,
                 transformStyle: "preserve-3d",
               }}
-              className="relative h-[560px] w-[520px] max-w-[88vw] sm:h-[620px] sm:w-[600px]"
+              className="relative h-[440px] w-[340px] max-w-[92vw] sm:h-[620px] sm:w-[600px]"
             >
               <div className="pointer-events-none absolute inset-0 rounded-[3rem] bg-gradient-to-br from-cyan-400/20 via-blue-500/10 to-emerald-400/10 blur-3xl" />
               <div className="pointer-events-none absolute left-1/2 top-[58%] h-80 w-80 -translate-x-1/2 -translate-y-1/2 rounded-full bg-cyan-300/15 blur-[88px]" />
@@ -280,7 +213,7 @@ export default function HeroPackSection({
                 <img
                   src={packImage}
                   alt={packName}
-                  className="h-[500px] w-auto object-contain drop-shadow-[0_45px_130px_rgba(139,92,246,0.34)] sm:h-[575px]"
+                  className="h-[370px] w-auto object-contain drop-shadow-[0_45px_130px_rgba(139,92,246,0.34)] sm:h-[575px]"
                   draggable={false}
                 />
                 <div className="pointer-events-none absolute left-1/2 top-[45%] h-24 w-52 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/20 blur-2xl" />
@@ -294,7 +227,7 @@ export default function HeroPackSection({
                   onDragEnd={handleTopSealDragEnd}
                   animate={{ x: 0, y: 0, rotate: 0, opacity: 1 }}
                   transition={{ type: "spring", stiffness: 140, damping: 16 }}
-                  className="absolute left-1/2 top-[96px] z-40 flex -translate-x-1/2 cursor-grab items-center justify-center active:cursor-grabbing sm:top-[104px]"
+                  className="absolute left-1/2 top-[80px] z-40 flex -translate-x-1/2 cursor-grab items-center justify-center active:cursor-grabbing sm:top-[104px]"
                 >
                   <div className="flex items-center gap-2 rounded-full border border-white/20 bg-black/55 px-4 py-2 text-xs font-black uppercase tracking-wider text-white shadow-[0_0_24px_rgba(34,211,238,0.22)] backdrop-blur-md">
                     <Grab className="h-4 w-4 text-cyan-200" />

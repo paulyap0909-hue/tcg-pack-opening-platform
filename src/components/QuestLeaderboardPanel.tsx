@@ -212,7 +212,7 @@ export default function QuestLeaderboardPanel({
   ).length;
 
   const renderQuestMissionCards = () => (
-    <div className="grid gap-3 sm:grid-cols-2">
+    <div className="grid gap-2 sm:grid-cols-2 sm:gap-3">
       {questDefinitions.map((quest, index) => {
         const progress = clampProgress(quest.current, quest.target);
         const progressPercent = Math.round((progress / quest.target) * 100);
@@ -223,7 +223,7 @@ export default function QuestLeaderboardPanel({
         return (
           <motion.article
             key={quest.id}
-            className="hud-card hud-corners flex min-h-[118px] flex-col rounded-[1.25rem] p-3"
+            className="hud-card hud-corners flex min-h-[102px] flex-col rounded-[1.15rem] p-3 sm:min-h-[118px] sm:rounded-[1.25rem]"
             initial={{ opacity: 0, y: 12 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -302,13 +302,12 @@ export default function QuestLeaderboardPanel({
   );
 
   return (
-    <section className="mx-auto w-full max-w-7xl px-5 py-8 lg:px-8">
-      <div className="mb-6 flex flex-col gap-3 text-center">
+    <section className="mx-auto w-full max-w-7xl px-4 py-7 sm:px-5 lg:px-8">
+      <div className="mb-5 flex flex-col gap-2 text-center">
         <p className="hud-label justify-center text-sm">Quest</p>
-        <h2 className="text-4xl font-black">Daily Progress Center</h2>
+        <h2 className="text-3xl font-black sm:text-4xl">Daily Progress Center</h2>
         <p className="mx-auto max-w-3xl text-sm leading-6 text-slate-400">
-          Player level, daily login rewards, free raffle countdown, and claimable
-          missions are grouped into a cleaner player hub with a larger leaderboard below.
+          Compact player progress, missions, rewards and leaderboard for mobile demo.
         </p>
       </div>
 
@@ -319,13 +318,13 @@ export default function QuestLeaderboardPanel({
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
         >
-          <div className="relative flex h-full flex-col overflow-hidden rounded-[2rem] border border-white/20 bg-gradient-to-br from-white/20 via-white/10 to-white/[0.03] p-6 shadow-[0_28px_80px_rgba(0,0,0,0.28)]">
+          <div className="relative flex h-full flex-col overflow-hidden rounded-[1.5rem] border border-white/20 bg-gradient-to-br from-white/20 via-white/10 to-white/[0.03] p-4 shadow-[0_28px_80px_rgba(0,0,0,0.28)] sm:rounded-[2rem] sm:p-6">
             <div className="relative z-10">
               <p className="text-xs font-black uppercase tracking-[0.28em] text-slate-300">
                 Player Level
               </p>
-              <div className="mt-4 flex flex-wrap items-end gap-4">
-                <h3 className="text-5xl font-black text-white">LV {level}</h3>
+              <div className="mt-3 flex flex-wrap items-end gap-3 sm:mt-4 sm:gap-4">
+                <h3 className="text-4xl font-black text-white sm:text-5xl">LV {level}</h3>
                 <p className="pb-2 text-sm font-bold text-orange-200">
                   🔥 {Math.max(xpTarget - xpIntoLevel, 0)} XP to Level Up
                 </p>
@@ -345,34 +344,34 @@ export default function QuestLeaderboardPanel({
               </div>
             </div>
 
-            <div className="relative z-10 mt-6 grid gap-3 sm:grid-cols-3">
-              <div className="rounded-2xl border border-white/10 bg-black/25 p-4">
+            <div className="relative z-10 mt-4 grid grid-cols-3 gap-2 sm:mt-6 sm:gap-3">
+              <div className="rounded-2xl border border-white/10 bg-black/25 p-3 sm:p-4">
                 <p className="text-[10px] uppercase tracking-[0.24em] text-slate-400">
                   Wallet
                 </p>
-                <p className="mt-2 text-2xl font-black text-white">
+                <p className="mt-1 text-xl font-black text-white sm:mt-2 sm:text-2xl">
                   {walletBalance.toLocaleString()}
                 </p>
               </div>
-              <div className="rounded-2xl border border-white/10 bg-black/25 p-4">
+              <div className="rounded-2xl border border-white/10 bg-black/25 p-3 sm:p-4">
                 <p className="text-[10px] uppercase tracking-[0.24em] text-slate-400">
                   Tickets
                 </p>
-                <p className="mt-2 text-2xl font-black text-amber-200">
+                <p className="mt-1 text-xl font-black text-amber-200 sm:mt-2 sm:text-2xl">
                   {raffleTickets.toLocaleString()}
                 </p>
               </div>
-              <div className="rounded-2xl border border-white/10 bg-black/25 p-4">
+              <div className="rounded-2xl border border-white/10 bg-black/25 p-3 sm:p-4">
                 <p className="text-[10px] uppercase tracking-[0.24em] text-slate-400">
                   Claimed
                 </p>
-                <p className="mt-2 text-2xl font-black text-emerald-200">
+                <p className="mt-1 text-xl font-black text-emerald-200 sm:mt-2 sm:text-2xl">
                   {claimedCount} / {questDefinitions.length}
                 </p>
               </div>
             </div>
 
-            <div className="relative z-10 mt-6 rounded-[1.7rem] border border-orange-300/35 bg-gradient-to-r from-[#7b2c17]/80 via-[#34120c]/80 to-[#0c1724]/80 p-5 shadow-[0_0_45px_rgba(249,115,22,0.18)]">
+            <div className="relative z-10 mt-4 rounded-[1.35rem] border border-orange-300/35 bg-gradient-to-r from-[#7b2c17]/80 via-[#34120c]/80 to-[#0c1724]/80 p-4 shadow-[0_0_45px_rgba(249,115,22,0.18)] sm:mt-6 sm:rounded-[1.7rem] sm:p-5">
               <div className="pointer-events-none absolute inset-0 rounded-[1.7rem] bg-[radial-gradient(circle_at_15%_50%,rgba(249,115,22,0.25),transparent_35%),radial-gradient(circle_at_85%_50%,rgba(34,211,238,0.15),transparent_35%)]" />
               <div className="relative z-10 grid gap-4 md:grid-cols-[1fr_auto] md:items-center">
                 <div>
@@ -380,7 +379,7 @@ export default function QuestLeaderboardPanel({
                     Free Raffle
                   </p>
                   <div className="mt-3 flex items-center gap-3">
-                    <span className="text-4xl font-black text-white">
+                    <span className="text-3xl font-black text-white sm:text-4xl">
                       🔥 {raffleTickets.toLocaleString()}
                     </span>
                     <span className="rounded-full border border-orange-200/20 bg-orange-300/10 px-3 py-1 text-xs font-black text-orange-100">
@@ -392,7 +391,7 @@ export default function QuestLeaderboardPanel({
                   <p className="text-xs font-black uppercase tracking-[0.28em] text-orange-300">
                     Next Draw
                   </p>
-                  <p className="mt-2 text-4xl font-black text-white">
+                  <p className="mt-1 text-3xl font-black text-white sm:mt-2 sm:text-4xl">
                     {raffleCountdown}
                   </p>
                   <div className="mt-2 h-2 overflow-hidden rounded-full bg-black/35">
@@ -402,7 +401,7 @@ export default function QuestLeaderboardPanel({
               </div>
             </div>
 
-            <div className="relative z-10 mt-6 rounded-[1.7rem] border border-orange-300/25 bg-gradient-to-br from-[#371006] via-[#1a0b08] to-black/60 p-5">
+            <div className="relative z-10 mt-4 rounded-[1.35rem] border border-orange-300/25 bg-gradient-to-br from-[#371006] via-[#1a0b08] to-black/60 p-4 sm:mt-6 sm:rounded-[1.7rem] sm:p-5">
               <div className="mb-4 flex items-center justify-between gap-3">
                 <div>
                   <p className="text-xs font-black uppercase tracking-[0.28em] text-orange-200">
@@ -423,7 +422,7 @@ export default function QuestLeaderboardPanel({
                 </button>
               </div>
 
-              <div className="grid grid-cols-4 gap-2 md:grid-cols-7 xl:grid-cols-7">
+              <div className="grid grid-cols-7 gap-1.5 sm:gap-2">
                 {dailyLoginRewards.map((reward) => {
                   const isActive = reward.day === activeDailyDay && !claimedToday;
                   const isClaimed = reward.day === activeDailyDay && claimedToday;
@@ -431,7 +430,7 @@ export default function QuestLeaderboardPanel({
                   return (
                     <div
                       key={reward.day}
-                      className={`relative min-h-[96px] rounded-xl border p-3 text-center ${
+                      className={`relative min-h-[68px] rounded-xl border p-2 text-center sm:min-h-[96px] sm:p-3 ${
                         isActive
                           ? 'border-orange-200 bg-orange-300/15 shadow-[0_0_20px_rgba(251,146,60,0.2)]'
                           : 'border-white/10 bg-white/[0.04]'
@@ -443,14 +442,14 @@ export default function QuestLeaderboardPanel({
                       <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/45">
                         Day {reward.day}
                       </p>
-                      <p className="mt-3 text-lg font-black text-white">
+                      <p className="mt-1 text-sm font-black text-white sm:mt-3 sm:text-lg">
                         {reward.kind === 'free-pull'
                           ? 'Free'
                           : reward.kind === 'gem'
                             ? '🔥'
                             : '+'}
                       </p>
-                      <p className="mt-1 text-[11px] font-black text-orange-100">
+                      <p className="mt-1 truncate text-[9px] font-black text-orange-100 sm:text-[11px]">
                         {reward.title}
                       </p>
                     </div>
@@ -462,7 +461,7 @@ export default function QuestLeaderboardPanel({
         </motion.div>
 
         <motion.div
-          className="hud-panel hud-corners h-full rounded-[2rem] p-6"
+          className="hud-panel hud-corners h-full rounded-[1.5rem] p-4 sm:rounded-[2rem] sm:p-6"
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -470,7 +469,7 @@ export default function QuestLeaderboardPanel({
           <div className="mb-5 flex items-center justify-between gap-4">
             <div>
               <p className="hud-label text-sm">Daily Quest</p>
-              <h2 className="mt-2 text-3xl font-black">Claimable Missions</h2>
+              <h2 className="mt-2 text-2xl font-black sm:text-3xl">Claimable Missions</h2>
               <p className="mt-2 text-sm leading-6 text-slate-400">
                 Compact mission grid aligned with the Player Level hub.
               </p>
@@ -481,7 +480,7 @@ export default function QuestLeaderboardPanel({
             </div>
           </div>
 
-          <div className="mb-4 grid grid-cols-3 gap-3">
+          <div className="mb-4 grid grid-cols-3 gap-2 sm:gap-3">
             <div className="rounded-2xl border border-cyan-300/10 bg-cyan-300/[0.04] p-3">
               <p className="text-[10px] uppercase tracking-[0.24em] text-slate-500">
                 Opened

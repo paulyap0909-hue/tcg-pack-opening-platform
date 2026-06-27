@@ -325,7 +325,7 @@ export default function MonthlyLeaderboardSection({
   const rest = data.filter((entry) => entry.rank >= 4).slice(0, 7);
 
   return (
-    <section className="relative overflow-hidden rounded-[2.5rem] border border-cyan-300/20 bg-[#030814]/90 p-5 shadow-[0_35px_140px_rgba(0,0,0,0.38)] md:p-8">
+    <section className="relative overflow-hidden rounded-[1.5rem] border border-cyan-300/20 bg-[#030814]/90 p-4 shadow-[0_35px_140px_rgba(0,0,0,0.38)] md:rounded-[2.5rem] md:p-8">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_18%,rgba(250,204,21,0.12),transparent_28%),radial-gradient(circle_at_18%_32%,rgba(56,189,248,0.12),transparent_30%),radial-gradient(circle_at_80%_32%,rgba(251,146,60,0.10),transparent_30%)]" />
       <div className="pointer-events-none absolute inset-0 opacity-[0.14] [background-image:linear-gradient(rgba(34,211,238,0.18)_1px,transparent_1px),linear-gradient(90deg,rgba(34,211,238,0.18)_1px,transparent_1px)] [background-size:64px_64px]" />
       <div className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-cyan-300/70 to-transparent" />
@@ -339,11 +339,11 @@ export default function MonthlyLeaderboardSection({
           <span className="h-px w-12 bg-cyan-300/50" />
         </div>
 
-        <h3 className="mt-3 text-4xl font-black tracking-tight text-white md:text-5xl">
+        <h3 className="mt-3 text-3xl font-black tracking-tight text-white md:text-5xl">
           Monthly Leaderboard
         </h3>
 
-        <div className="mt-4 inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/[0.05] px-5 py-2.5 text-sm text-slate-300 backdrop-blur">
+        <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/[0.05] px-3 py-2 text-xs text-slate-300 backdrop-blur sm:px-5 sm:py-2.5 sm:text-sm">
           <Clock3 className="h-4 w-4" />
           <span>
             Resets <span className="font-black text-white">Wed, Jul 1 at 8AM (GMT+8)</span>
@@ -351,13 +351,48 @@ export default function MonthlyLeaderboardSection({
         </div>
       </div>
 
-      <div className="relative z-10 mt-16 grid items-end gap-5 md:grid-cols-[1fr_1.16fr_1fr]">
+      <div className="relative z-10 mt-6 grid gap-3 md:hidden">
+        {[top1, top2, top3].filter((entry): entry is RankedLeaderboardUser => Boolean(entry)).map((entry) => (
+          <div
+            key={`mobile-top-${entry.id}`}
+            className={`flex items-center gap-3 rounded-2xl border p-3 ${
+              entry.rank === 1
+                ? "border-yellow-300/35 bg-yellow-300/10"
+                : entry.rank === 2
+                  ? "border-sky-300/25 bg-sky-300/10"
+                  : "border-orange-300/25 bg-orange-300/10"
+            }`}
+          >
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/15 bg-black/35 text-lg font-black text-white">
+              #{entry.rank}
+            </div>
+            <img
+              src={entry.avatar}
+              alt={entry.name}
+              loading="lazy"
+              className="h-12 w-12 shrink-0 rounded-full border border-white/15 object-cover"
+            />
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-black text-white">{entry.name}</p>
+              <p className="text-xs text-slate-400">
+                {entry.rank === 1 ? "Champion" : entry.rank === 2 ? "Runner Up" : "Third Place"}
+              </p>
+            </div>
+            <div className="flex items-center gap-1 text-sm font-black text-amber-200">
+              <Trophy className="h-4 w-4" />
+              {formatCompactPoints(entry.points)}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="relative z-10 mt-16 hidden items-end gap-5 md:grid md:grid-cols-[1fr_1.16fr_1fr]">
         {top2 && <TopPodiumCard user={top2} position={2} />}
         {top1 && <TopPodiumCard user={top1} position={1} />}
         {top3 && <TopPodiumCard user={top3} position={3} />}
       </div>
 
-      <div className="relative z-10 mt-7 overflow-hidden rounded-[1.8rem] border border-cyan-300/18 bg-black/35 p-3 shadow-[inset_0_0_28px_rgba(34,211,238,0.08)]">
+      <div className="relative z-10 mt-5 overflow-hidden rounded-[1.35rem] border border-cyan-300/18 bg-black/35 p-2.5 shadow-[inset_0_0_28px_rgba(34,211,238,0.08)] sm:mt-7 sm:rounded-[1.8rem] sm:p-3">
         <div className="mb-3 flex justify-end">
           <div className="inline-flex rounded-2xl border border-white/10 bg-white/[0.04] p-1">
             <button
@@ -389,7 +424,7 @@ export default function MonthlyLeaderboardSection({
           {rest.map((entry) => (
             <div
               key={`${entry.id}-${entry.name}`}
-              className={`grid grid-cols-[42px_44px_minmax(0,1fr)_auto] items-center gap-3 rounded-2xl border px-4 py-3 transition hover:bg-white/[0.055] ${
+              className={`grid grid-cols-[30px_36px_minmax(0,1fr)_auto] items-center gap-2 rounded-2xl border px-3 py-2.5 transition hover:bg-white/[0.055] sm:grid-cols-[42px_44px_minmax(0,1fr)_auto] sm:gap-3 sm:px-4 sm:py-3 ${
                 entry.isCurrentPlayer
                   ? "border-cyan-300/40 bg-cyan-300/12"
                   : "border-white/6 bg-white/[0.025]"
@@ -399,7 +434,7 @@ export default function MonthlyLeaderboardSection({
                 {entry.rank}
               </div>
 
-              <div className="h-10 w-10 rounded-full border border-cyan-300/20 bg-white/5 p-0.5 shadow-[0_0_16px_rgba(34,211,238,0.12)]">
+              <div className="h-8 w-8 rounded-full border border-cyan-300/20 bg-white/5 p-0.5 shadow-[0_0_16px_rgba(34,211,238,0.12)] sm:h-10 sm:w-10">
                 <img
                   src={entry.avatar}
                   alt={entry.name}
@@ -422,7 +457,7 @@ export default function MonthlyLeaderboardSection({
 
               <div className="flex items-center gap-2 text-right text-sm font-black text-cyan-200 md:text-base">
                 <Trophy className="h-4 w-4" />
-                <span>{formatFullPoints(entry.points)}</span>
+                <span className="hidden sm:inline">{formatFullPoints(entry.points)}</span><span className="sm:hidden">{formatCompactPoints(entry.points)}</span>
               </div>
             </div>
           ))}
