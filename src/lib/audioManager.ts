@@ -1,7 +1,6 @@
 import { Howl, Howler } from 'howler'
 
 import bgmLobbySrc from '../assets/audio/bgm-lobby.mp3'
-import buttonClickSrc from '../assets/audio/button-click.wav'
 import cardFlipSrc from '../assets/audio/card-flip.wav'
 import errorSrc from '../assets/audio/error.wav'
 import packOpenSrc from '../assets/audio/pack-open.mp3'
@@ -12,7 +11,6 @@ import successSrc from '../assets/audio/success.wav'
 export type BgmName = 'lobby'
 
 export type SfxName =
-  | 'buttonClick'
   | 'packOpen'
   | 'cardFlip'
   | 'rareHit'
@@ -32,7 +30,6 @@ const bgmSources: Record<BgmName, string> = {
 }
 
 const sfxSources: Record<SfxName, string> = {
-  buttonClick: buttonClickSrc,
   packOpen: packOpenSrc,
   cardFlip: cardFlipSrc,
   rareHit: rareHitSrc,
@@ -42,7 +39,6 @@ const sfxSources: Record<SfxName, string> = {
 }
 
 const sfxVolumeMultipliers: Record<SfxName, number> = {
-  buttonClick: 1.18,
   packOpen: 0.9,
   cardFlip: 1.2,
   rareHit: 0.95,
@@ -213,7 +209,7 @@ class TcgAudioManager {
       src: [sfxSources[name]],
       html5: false,
       preload: true,
-      pool: name === 'buttonClick' ? 12 : 6,
+      pool: 6,
       volume: this.getSfxEffectiveVolume(name),
     })
 
@@ -276,19 +272,13 @@ class TcgAudioManager {
     }
   }
 
-  playButtonClick(options?: { throttleMs?: number; volume?: number }) {
-    this.playSfx('buttonClick', {
-      throttleMs: options?.throttleMs ?? 55,
-      volume: options?.volume,
-    })
-  }
 
   playSfx(name: SfxName, options?: { throttleMs?: number; volume?: number }) {
     if (!isBrowser() || !this.enabled) return
 
     this.unlockHowler()
 
-    const throttleMs = options?.throttleMs ?? (name === 'buttonClick' ? 55 : 80)
+    const throttleMs = options?.throttleMs ?? 80
     const now = Date.now()
     const lastPlayedAt = this.lastSfxPlayedAt.get(name) ?? 0
 

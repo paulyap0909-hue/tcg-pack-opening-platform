@@ -265,9 +265,6 @@ export default function ProfileSettingsDrawer({
     }))
   }
 
-  const testButtonClickSound = () => {
-    audioManager.playButtonClick({ throttleMs: 0, volume: 0.9 })
-  }
 
   const testSuccessSound = () => {
     audioManager.playSfx('success', { throttleMs: 0, volume: 0.9 })
@@ -458,15 +455,7 @@ export default function ProfileSettingsDrawer({
                   <p className="text-sm font-black text-white">Audio Test</p>
                 </div>
 
-                <div className="grid grid-cols-2 gap-2 px-4 py-3">
-                  <button
-                    type="button"
-                    data-audio-silent="true"
-                    onClick={testButtonClickSound}
-                    className="rounded-2xl border border-cyan-300/18 bg-cyan-300/[0.07] px-3 py-3 text-xs font-black text-cyan-100"
-                  >
-                    Test Button
-                  </button>
+                <div className="grid grid-cols-3 gap-2 px-4 py-3">
                   <button
                     type="button"
                     data-audio-silent="true"

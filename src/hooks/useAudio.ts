@@ -39,48 +39,6 @@ export default function useAudio() {
     return undefined
   }, [])
 
-  useEffect(() => {
-    let lastButtonAudioAt = 0
-
-    const handleGlobalButtonPress = (event: Event) => {
-      const mouseButton = (event as MouseEvent).button
-
-      if (
-        typeof mouseButton === 'number' &&
-        mouseButton !== 0 &&
-        (event.type === 'pointerdown' || event.type === 'click')
-      ) {
-        return
-      }
-
-      const target = event.target
-      if (!(target instanceof HTMLElement)) return
-
-      const clickableElement = target.closest('button, a, [role="button"]')
-      if (!(clickableElement instanceof HTMLElement)) return
-      if (clickableElement.getAttribute('data-audio-silent') === 'true') return
-      if (clickableElement.closest('[data-audio-silent="true"]')) return
-      if (clickableElement.hasAttribute('disabled')) return
-      if (clickableElement.getAttribute('aria-disabled') === 'true') return
-
-      const now = Date.now()
-      if (now - lastButtonAudioAt < 90) return
-
-      lastButtonAudioAt = now
-      audioManager.playButtonClick()
-    }
-
-    document.addEventListener('pointerdown', handleGlobalButtonPress, true)
-    document.addEventListener('touchstart', handleGlobalButtonPress, true)
-    document.addEventListener('click', handleGlobalButtonPress, true)
-
-    return () => {
-      document.removeEventListener('pointerdown', handleGlobalButtonPress, true)
-      document.removeEventListener('touchstart', handleGlobalButtonPress, true)
-      document.removeEventListener('click', handleGlobalButtonPress, true)
-    }
-  }, [])
-
   const enterWithSound = useCallback(async () => {
     setIsSoundEnabled(true)
     setIsAudioGateOpen(false)
