@@ -1,9 +1,13 @@
 import { useState } from 'react'
 import {
   ChevronRight,
+  Clock3,
+  Crown,
   Flame,
   Gift,
+  HelpCircle,
   Medal,
+  RefreshCw,
   Share2,
   Sparkles,
   Trophy,
@@ -25,12 +29,80 @@ type MobileLukaHomePageProps = {
   onSignIn: () => void
 }
 
+type LeaderboardPlayer = {
+  rank: number
+  name: string
+  seed: string
+  level: number
+  score: number
+  title: string
+}
+
 const rewardRows = [
   { rank: 'Top 1', reward: '15,000 pts' },
   { rank: 'Top 2', reward: '10,000 pts' },
   { rank: 'Top 3', reward: '8,000 pts' },
   { rank: 'Top 4', reward: '5,000 pts' },
   { rank: 'Top 5', reward: '3,000 pts' },
+]
+
+const leaderboardPlayers: LeaderboardPlayer[] = [
+  {
+    rank: 1,
+    name: 'Enoch',
+    seed: 'enoch crystal tcg champion',
+    level: 320,
+    score: 3834300,
+    title: 'Crystal Champion',
+  },
+  {
+    rank: 2,
+    name: 'Ryan the Rizzler',
+    seed: 'ryan rizzler aqua card hunter',
+    level: 259,
+    score: 3411480,
+    title: 'Vault Runner',
+  },
+  {
+    rank: 3,
+    name: 'Pikazard',
+    seed: 'pikazard thunder collector',
+    level: 185,
+    score: 1544230,
+    title: 'Rare Chaser',
+  },
+  {
+    rank: 4,
+    name: 'William G',
+    seed: 'william galaxy holo pack',
+    level: 137,
+    score: 990000,
+    title: 'Foil Hunter',
+  },
+  {
+    rank: 5,
+    name: 'LuckyBurst',
+    seed: 'lucky burst neon card',
+    level: 118,
+    score: 805415,
+    title: 'Pack Grinder',
+  },
+  {
+    rank: 6,
+    name: 'SEAChaser',
+    seed: 'sea chaser blue rare pull',
+    level: 104,
+    score: 742800,
+    title: 'Auction Shark',
+  },
+  {
+    rank: 7,
+    name: 'VaultRider',
+    seed: 'vault rider purple deck',
+    level: 96,
+    score: 628200,
+    title: 'Vault Builder',
+  },
 ]
 
 const liveTicker = [
@@ -78,9 +150,129 @@ const packDisplay = [
   },
 ]
 
+const leaderboardEvents = [
+  {
+    title: 'Weekly Spending',
+    value: 'Worth RM13K',
+    active: true,
+    icon: Trophy,
+  },
+  {
+    title: 'Weekly Burn',
+    value: 'Worth RM10K',
+    active: false,
+    icon: Flame,
+  },
+  {
+    title: 'Master Pack',
+    value: 'Worth RM55K',
+    active: false,
+    icon: Crown,
+  },
+]
+
 const formatPackCost = (pack: Pack) => {
   const cost = Number(pack.price.replace(/[^0-9]/g, '')) || 0
   return cost.toLocaleString()
+}
+
+const formatScore = (score: number) => score.toLocaleString()
+
+const avatarUrl = (seed: string, backgroundColor = '1e163f') =>
+  `https://api.dicebear.com/9.x/adventurer/svg?seed=${encodeURIComponent(
+    seed,
+  )}&radius=50&backgroundColor=${backgroundColor}`
+
+function LeaderboardPodiumCard({ player }: { player: LeaderboardPlayer }) {
+  const isChampion = player.rank === 1
+  const ringTheme =
+    player.rank === 1
+      ? 'border-cyan-200/70 bg-cyan-300/15 shadow-[0_0_55px_rgba(103,232,249,0.48)]'
+      : player.rank === 2
+        ? 'border-violet-200/55 bg-violet-300/12 shadow-[0_0_40px_rgba(196,181,253,0.35)]'
+        : 'border-amber-200/55 bg-amber-300/12 shadow-[0_0_40px_rgba(251,191,36,0.32)]'
+  const bodyTheme =
+    player.rank === 1
+      ? 'from-cyan-300/35 via-violet-400/30 to-[#35225f] min-h-[170px] pt-14'
+      : player.rank === 2
+        ? 'from-violet-400/24 via-slate-600/28 to-[#2b1c2e] min-h-[132px] pt-11'
+        : 'from-amber-300/22 via-slate-600/24 to-[#2c2a16] min-h-[132px] pt-11'
+
+  return (
+    <div className={`relative flex flex-col items-center ${isChampion ? 'mt-0' : 'mt-16'}`}>
+      <div className="pointer-events-none absolute -top-7 h-24 w-24 rounded-full bg-cyan-300/20 blur-2xl" />
+      <div
+        className={`absolute z-20 rounded-full border-2 p-1.5 ${ringTheme} ${
+          isChampion ? '-top-8 h-[104px] w-[104px]' : '-top-7 h-[82px] w-[82px]'
+        }`}
+      >
+        <div className="absolute inset-[-10px] rounded-full border border-white/10" />
+        <img
+          src={avatarUrl(player.seed, player.rank === 1 ? '7dd3fc' : player.rank === 2 ? 'c4b5fd' : 'fde68a')}
+          alt={player.name}
+          loading="lazy"
+          className="h-full w-full rounded-full object-cover"
+        />
+      </div>
+
+      <div
+        className={`relative w-full overflow-hidden rounded-[1.65rem] border border-white/12 bg-gradient-to-b px-2.5 pb-4 text-center shadow-[0_18px_42px_rgba(0,0,0,0.34)] ${bodyTheme}`}
+      >
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.24),transparent_34%)]" />
+        <div className="relative z-10">
+          <p className="truncate text-xs font-black text-white">
+            {player.name}
+          </p>
+          <div className="mx-auto mt-1 inline-flex items-center gap-1 rounded-full border border-white/15 bg-black/30 px-2 py-1">
+            <Sparkles className="h-3 w-3 text-cyan-200" />
+            <span className="text-[10px] font-black text-cyan-100">
+              {player.level}
+            </span>
+          </div>
+          <p className="mt-2 text-[11px] font-bold text-white/58">
+            {player.title}
+          </p>
+          <p className={`mt-2 font-black text-white ${isChampion ? 'text-5xl' : 'text-4xl'}`}>
+            {player.rank}
+          </p>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function LeaderboardRow({ player }: { player: LeaderboardPlayer }) {
+  const rowTheme =
+    player.rank === 1
+      ? 'border-cyan-300/30 bg-gradient-to-r from-cyan-300/22 via-violet-300/18 to-cyan-300/12'
+      : player.rank === 2
+        ? 'border-violet-300/25 bg-gradient-to-r from-violet-300/18 via-slate-600/16 to-violet-300/8'
+        : player.rank === 3
+          ? 'border-amber-300/25 bg-gradient-to-r from-amber-300/18 via-slate-600/14 to-amber-300/8'
+          : 'border-white/8 bg-white/[0.045]'
+
+  return (
+    <div className={`grid grid-cols-[28px_42px_minmax(0,1fr)_auto] items-center gap-3 rounded-2xl border px-3 py-2.5 shadow-[0_10px_26px_rgba(0,0,0,0.18)] ${rowTheme}`}>
+      <p className="text-sm font-black text-white/85">{player.rank}</p>
+      <img
+        src={avatarUrl(player.seed, player.rank === 1 ? '7dd3fc' : player.rank === 2 ? 'c4b5fd' : player.rank === 3 ? 'fde68a' : '334155')}
+        alt={player.name}
+        loading="lazy"
+        className="h-10 w-10 rounded-full border border-white/12 object-cover"
+      />
+      <div className="min-w-0">
+        <p className="truncate text-sm font-black text-white">{player.name}</p>
+        <div className="mt-0.5 flex items-center gap-1 text-[10px] font-black text-cyan-100/75">
+          <Sparkles className="h-3 w-3" />
+          Lv.{player.level} · {player.title}
+        </div>
+      </div>
+      <div className="flex items-center gap-1 text-sm font-black text-amber-200">
+        <Flame className="h-4 w-4 fill-amber-200 text-amber-200" />
+        {formatScore(player.score)}
+      </div>
+    </div>
+  )
 }
 
 export default function MobileLukaHomePage({
@@ -96,6 +288,7 @@ export default function MobileLukaHomePage({
 }: MobileLukaHomePageProps) {
   const [isLeaderboardOpen, setIsLeaderboardOpen] = useState(false)
   const featuredPacks = packs.slice(0, 3)
+  const topThree = leaderboardPlayers.slice(0, 3)
 
   return (
     <section className="mx-auto w-full max-w-7xl px-4 pb-8 pt-3 lg:hidden">
@@ -330,41 +523,140 @@ export default function MobileLukaHomePage({
       </div>
 
       {isLeaderboardOpen && (
-        <div className="fixed inset-0 z-[1000000] flex items-end bg-black/70 p-4 backdrop-blur-md">
-          <div className="w-full rounded-[1.6rem] border border-orange-300/25 bg-[#170b07] p-4 shadow-[0_-20px_80px_rgba(249,115,22,0.22)]">
-            <div className="mb-4 flex items-center justify-between">
-              <div>
-                <p className="text-[10px] font-black uppercase tracking-[0.28em] text-orange-200">
-                  Weekly Leaderboard
+        <div className="fixed inset-0 z-[1000000] bg-[#030712] text-white">
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_52%_20%,rgba(168,85,247,0.26),transparent_34%),radial-gradient(circle_at_20%_36%,rgba(34,211,238,0.2),transparent_28%),radial-gradient(circle_at_78%_8%,rgba(249,115,22,0.28),transparent_30%),linear-gradient(180deg,#050816,#070915_46%,#020617)]" />
+          <div className="pointer-events-none absolute inset-0 opacity-[0.12] [background-image:linear-gradient(rgba(103,232,249,0.18)_1px,transparent_1px),linear-gradient(90deg,rgba(103,232,249,0.18)_1px,transparent_1px)] [background-size:54px_54px]" />
+
+          <div className="relative mx-auto flex h-full w-full max-w-md flex-col overflow-y-auto px-4 pb-28 pt-4 [-webkit-overflow-scrolling:touch]">
+            <div className="flex items-center justify-between">
+              <button
+                type="button"
+                onClick={() => setIsLeaderboardOpen(false)}
+                className="flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/[0.07] text-white shadow-[0_10px_28px_rgba(0,0,0,0.28)]"
+              >
+                <X className="h-5 w-5" />
+              </button>
+              <div className="text-center">
+                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-cyan-200">
+                  Jomluffyz Event
                 </p>
-                <h3 className="mt-1 text-2xl font-black text-white">
-                  Opening Race Rewards
+                <h3 className="mt-1 text-xl font-black tracking-tight text-white">
+                  Spending Leaderboard
                 </h3>
               </div>
               <button
                 type="button"
-                onClick={() => setIsLeaderboardOpen(false)}
-                className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/[0.06]"
+                className="flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/[0.07] text-slate-300 shadow-[0_10px_28px_rgba(0,0,0,0.28)]"
               >
-                <X className="h-5 w-5 text-white" />
+                <HelpCircle className="h-5 w-5" />
               </button>
             </div>
 
-            <div className="space-y-2">
-              {rewardRows.map((row, index) => (
-                <div
-                  key={`modal-${row.rank}`}
-                  className="flex items-center justify-between rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-orange-300/12 text-sm font-black text-orange-200">
-                      #{index + 1}
-                    </div>
-                    <p className="font-black text-white">{row.rank}</p>
+            <div className="-mx-4 mt-5 flex gap-2 overflow-x-auto px-4 pb-1 [-webkit-overflow-scrolling:touch]">
+              {leaderboardEvents.map((event) => {
+                const Icon = event.icon
+
+                return (
+                  <button
+                    key={event.title}
+                    type="button"
+                    className={`relative min-w-[132px] overflow-hidden rounded-2xl border p-3 text-left ${
+                      event.active
+                        ? 'border-cyan-200/45 bg-gradient-to-br from-cyan-300/22 via-violet-300/12 to-orange-300/18 shadow-[0_0_32px_rgba(34,211,238,0.22)]'
+                        : 'border-white/10 bg-white/[0.055]'
+                    }`}
+                  >
+                    <div className="absolute -right-4 -top-5 h-16 w-16 rounded-full bg-orange-300/12 blur-xl" />
+                    <Icon className={event.active ? 'h-5 w-5 text-cyan-100' : 'h-5 w-5 text-slate-400'} />
+                    <p className="mt-2 text-[11px] font-black text-white">
+                      {event.title}
+                    </p>
+                    <p className="mt-0.5 text-[9px] font-bold uppercase tracking-[0.12em] text-white/50">
+                      {event.value}
+                    </p>
+                  </button>
+                )
+              })}
+            </div>
+
+            <div className="relative mt-5 overflow-hidden rounded-[1.45rem] border border-orange-300/25 bg-[#120b0a] p-4 shadow-[0_22px_70px_rgba(249,115,22,0.18)]">
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_20%,rgba(249,115,22,0.36),transparent_28%),radial-gradient(circle_at_38%_92%,rgba(34,211,238,0.22),transparent_32%),linear-gradient(135deg,rgba(30,41,59,0.25),rgba(124,45,18,0.42),rgba(3,7,18,0.88))]" />
+              <div className="absolute -bottom-10 right-8 text-[7rem] leading-none opacity-15">🔥</div>
+              <div className="relative z-10 grid grid-cols-[1fr_132px] gap-3">
+                <div>
+                  <p className="text-[10px] font-black uppercase tracking-[0.22em] text-orange-200">
+                    Top Spenders
+                  </p>
+                  <div className="mt-12">
+                    <p className="text-[10px] font-bold text-orange-100/65">Ends in</p>
+                    <p className="mt-1 font-mono text-xl font-black tracking-[0.08em] text-white">
+                      01d:00h:31m
+                    </p>
                   </div>
-                  <p className="font-black text-orange-200">{row.reward}</p>
                 </div>
+
+                <div className="rounded-2xl border border-white/10 bg-black/35 p-3 backdrop-blur">
+                  {rewardRows.map((row) => (
+                    <div
+                      key={`reward-${row.rank}`}
+                      className="flex items-center justify-between gap-2 border-b border-white/8 py-1.5 last:border-b-0"
+                    >
+                      <span className="text-[10px] font-black uppercase tracking-[0.12em] text-white/74">
+                        {row.rank}
+                      </span>
+                      <span className="text-[10px] font-black text-orange-100">
+                        {row.reward}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="relative z-10 mt-4 inline-flex items-center gap-2 rounded-2xl border border-cyan-200/20 bg-cyan-300/10 px-3 py-2">
+                <Trophy className="h-4 w-4 text-cyan-100" />
+                <div>
+                  <p className="text-[9px] font-black uppercase tracking-[0.22em] text-cyan-100/65">
+                    Total Worth
+                  </p>
+                  <p className="text-lg font-black text-white">41,000 pts</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-5 flex items-center justify-between">
+              <div className="inline-flex rounded-full border border-white/10 bg-white/[0.055] p-1">
+                <button className="rounded-full bg-cyan-300 px-5 py-2 text-xs font-black text-black shadow-[0_0_24px_rgba(34,211,238,0.3)]">
+                  Current Event
+                </button>
+                <button className="rounded-full px-5 py-2 text-xs font-black text-slate-400">
+                  Past Event
+                </button>
+              </div>
+              <button
+                type="button"
+                className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/[0.055] text-slate-300"
+              >
+                <RefreshCw className="h-4 w-4" />
+              </button>
+            </div>
+
+            <div className="mt-7 grid grid-cols-3 items-end gap-2">
+              <LeaderboardPodiumCard player={topThree[1]} />
+              <LeaderboardPodiumCard player={topThree[0]} />
+              <LeaderboardPodiumCard player={topThree[2]} />
+            </div>
+
+            <div className="mt-5 space-y-2.5">
+              {leaderboardPlayers.map((player) => (
+                <LeaderboardRow key={`${player.rank}-${player.name}`} player={player} />
               ))}
+            </div>
+
+            <div className="mt-5 rounded-2xl border border-cyan-300/16 bg-cyan-300/[0.055] p-4 text-center">
+              <Clock3 className="mx-auto h-5 w-5 text-cyan-200" />
+              <p className="mt-2 text-xs font-semibold leading-5 text-slate-300">
+                Rankings are demo data for mobile preview. Real production will connect to wallet spend, pack openings and auction bid history.
+              </p>
             </div>
           </div>
         </div>
