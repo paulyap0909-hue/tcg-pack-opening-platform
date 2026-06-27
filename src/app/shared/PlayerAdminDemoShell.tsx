@@ -2398,12 +2398,14 @@ function PlayerAdminDemoShell({
 
       <TopUpModal
         isOpen={isTopUpOpen}
+        language={language}
         onClose={() => setIsTopUpOpen(false)}
         onTopUp={handleTopUp}
       />
 
       <PlayerWalletPanel
         isOpen={isPlayerWalletOpen}
+        language={language}
         onClose={() => setIsPlayerWalletOpen(false)}
         username={playerProfile.displayName}
         walletBalance={walletBalance}
@@ -2421,6 +2423,7 @@ function PlayerAdminDemoShell({
 
       <VaultDrawer
         isOpen={isVaultOpen}
+        language={language}
         cards={vaultCards}
         onClose={() => setIsVaultOpen(false)}
         onSellBackCard={handleSellBackCard}
@@ -2431,17 +2434,20 @@ function PlayerAdminDemoShell({
 
       <TransactionDrawer
         isOpen={isTransactionOpen}
+        language={language}
         transactions={transactions}
         onClose={() => setIsTransactionOpen(false)}
       />
 
       <SellBackConfirmModal
+        language={language}
         card={sellBackTarget}
         onClose={() => setSellBackTarget(null)}
         onConfirm={confirmSellBackCard}
       />
 
       <ShippingConfirmModal
+        language={language}
         card={shippingTarget}
         onClose={() => setShippingTarget(null)}
         onConfirm={confirmShippingRequest}

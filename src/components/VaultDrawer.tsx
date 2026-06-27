@@ -9,6 +9,7 @@ import {
   X,
 } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
+import { translations, type AppLanguage } from '../lib/i18n'
 
 export type ShippingStatus =
   | 'Stored'
@@ -53,6 +54,7 @@ export type VaultCard = {
 
 type VaultDrawerProps = {
   isOpen: boolean
+  language: AppLanguage
   cards: VaultCard[]
   onClose: () => void
   onSellBackCard?: (card: VaultCard) => void
@@ -102,6 +104,7 @@ const vaultFilters: Array<{ id: VaultFilter; label: string }> = [
 
 export default function VaultDrawer({
   isOpen,
+  language,
   cards,
   onClose,
   onSellBackCard,
@@ -109,6 +112,7 @@ export default function VaultDrawer({
   onListForSaleCard,
   onCancelMarketplaceListing,
 }: VaultDrawerProps) {
+  const t = translations[language]
   const [activeFilter, setActiveFilter] = useState<VaultFilter>('all')
 
   useEffect(() => {
@@ -170,26 +174,26 @@ export default function VaultDrawer({
               <button
                 type="button"
                 onClick={onClose}
-                aria-label="Close vault"
+                aria-label={t.cancel}
                 className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full border border-cyan-300/30 bg-slate-950/90 text-cyan-100 shadow-[0_0_28px_rgba(34,211,238,0.25)] transition active:scale-95"
               >
                 <X className="h-5 w-5" />
               </button>
 
               <p className="hud-label pr-14 text-[10px] tracking-[0.32em] text-cyan-300">
-                Player Inventory
+                {t.playerInventory}
               </p>
               <h2 className="mt-2 pr-14 text-3xl font-black text-white">
-                My Vault
+                {t.myVault}
               </h2>
               <p className="mt-1 pr-14 text-xs text-slate-400">
-                {stats.total} cards · {stats.rare} rare+ · {stats.locked} locked
+                {stats.total} {t.cards} · {stats.rare} {t.rarePlus} · {stats.locked} {t.locked}
               </p>
 
               <div className="mt-4 grid grid-cols-3 gap-2">
                 <div className="rounded-2xl border border-cyan-300/10 bg-cyan-300/[0.05] px-3 py-2">
                   <p className="text-[9px] uppercase tracking-[0.22em] text-slate-500">
-                    Cards
+                    {t.cards}
                   </p>
                   <p className="mt-1 text-xl font-black text-white">
                     {stats.total}
@@ -197,7 +201,7 @@ export default function VaultDrawer({
                 </div>
                 <div className="rounded-2xl border border-amber-300/10 bg-amber-300/[0.05] px-3 py-2">
                   <p className="text-[9px] uppercase tracking-[0.22em] text-slate-500">
-                    Rare+
+                    {t.rarePlus}
                   </p>
                   <p className="mt-1 text-xl font-black text-amber-300">
                     {stats.rare}
@@ -205,7 +209,7 @@ export default function VaultDrawer({
                 </div>
                 <div className="rounded-2xl border border-purple-300/10 bg-purple-300/[0.05] px-3 py-2">
                   <p className="text-[9px] uppercase tracking-[0.22em] text-slate-500">
-                    Locked
+                    {t.locked}
                   </p>
                   <p className="mt-1 text-xl font-black text-purple-300">
                     {stats.locked}
@@ -228,7 +232,7 @@ export default function VaultDrawer({
                           : 'border-white/10 bg-white/[0.04] text-slate-400'
                       }`}
                     >
-                      {filter.label}
+                      {filter.id === 'all' ? t.all : filter.id === 'rare' ? t.rarePlus : filter.id === 'stored' ? t.stored : t.locked}
                     </button>
                   )
                 })}
@@ -241,19 +245,19 @@ export default function VaultDrawer({
                   <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-cyan-300/25 bg-cyan-300/10">
                     <PackageOpen className="h-7 w-7 text-cyan-300" />
                   </div>
-                  <h3 className="text-xl font-black text-white">Vault is Empty</h3>
+                  <h3 className="text-xl font-black text-white">{t.vaultEmpty}</h3>
                   <p className="mt-2 text-sm leading-6 text-slate-400">
-                    Open a pack and your cards will be saved here automatically.
+                    {t.vaultEmptyDesc}
                   </p>
                 </div>
               ) : filteredCards.length === 0 ? (
                 <div className="rounded-[1.6rem] border border-white/10 bg-white/[0.04] p-6 text-center">
                   <Search className="mx-auto h-8 w-8 text-slate-500" />
                   <h3 className="mt-3 text-lg font-black text-white">
-                    No cards in this filter
+                    {t.noCardsInFilter}
                   </h3>
                   <p className="mt-1 text-sm text-slate-400">
-                    Try another vault category.
+                    {t.tryAnotherVaultCategory}
                   </p>
                 </div>
               ) : (
@@ -280,7 +284,7 @@ export default function VaultDrawer({
                           <span
                             className={`absolute left-2 top-2 rounded-full border px-2 py-1 text-[8px] font-black uppercase tracking-wider ${getStatusStyle(card.status)}`}
                           >
-                            {card.status === 'Stored' ? 'Stored' : 'Locked'}
+                            {card.status === 'Stored' ? t.stored : t.locked}
                           </span>
                         </div>
 
@@ -312,7 +316,7 @@ export default function VaultDrawer({
                                   : 'border-emerald-300/25 bg-emerald-300/10 text-emerald-200'
                               }`}
                             >
-                              Sell
+                              {t.sell}
                             </button>
                             <button
                               type="button"
@@ -324,7 +328,7 @@ export default function VaultDrawer({
                                   : 'border-cyan-300/25 bg-cyan-300/10 text-cyan-200'
                               }`}
                             >
-                              Ship
+                              {t.ship}
                             </button>
                             <button
                               type="button"
@@ -342,7 +346,7 @@ export default function VaultDrawer({
                                     : 'border-amber-300/25 bg-amber-300/10 text-amber-200'
                               }`}
                             >
-                              {isListed ? 'Cancel' : 'List'}
+                              {isListed ? t.cancel : t.list}
                             </button>
                           </div>
 
@@ -382,10 +386,10 @@ export default function VaultDrawer({
               {cards.length > 0 && (
                 <div className="mt-4 rounded-2xl border border-purple-300/10 bg-purple-400/[0.05] p-4">
                   <p className="text-[10px] font-black uppercase tracking-[0.28em] text-purple-300">
-                    Vault Notice
+                    {t.vaultNotice}
                   </p>
                   <p className="mt-2 text-xs leading-5 text-slate-400">
-                    Sell Back converts cards into points. Shipping or Marketplace actions lock the card until completed or cancelled.
+                    {t.vaultNoticeDesc}
                   </p>
                 </div>
               )}

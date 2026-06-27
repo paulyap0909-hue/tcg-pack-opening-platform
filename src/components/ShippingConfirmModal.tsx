@@ -7,10 +7,12 @@ import {
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
+import { translations, type AppLanguage } from '../lib/i18n'
 
 import type { ShippingInfo, VaultCard } from './VaultDrawer'
 
 type ShippingConfirmModalProps = {
+  language: AppLanguage
   card: VaultCard | null
   onClose: () => void
   onConfirm: (shippingInfo: ShippingInfo) => void
@@ -28,10 +30,12 @@ const initialShippingInfo: ShippingInfo = {
 }
 
 export default function ShippingConfirmModal({
+  language,
   card,
   onClose,
   onConfirm,
 }: ShippingConfirmModalProps) {
+  const t = translations[language]
   const [shippingInfo, setShippingInfo] =
     useState<ShippingInfo>(initialShippingInfo)
 
@@ -98,7 +102,7 @@ export default function ShippingConfirmModal({
           <button
             type="button"
             onClick={onClose}
-            aria-label="Close shipping confirmation"
+            aria-label={t.cancel}
             className="absolute right-5 top-5 z-10 flex h-11 w-11 items-center justify-center rounded-full border border-cyan-300/40 bg-slate-950/95 text-cyan-100 shadow-[0_0_35px_rgba(34,211,238,0.35)] transition hover:scale-105 hover:bg-cyan-300/10"
           >
             <X className="h-5 w-5" />
@@ -108,17 +112,16 @@ export default function ShippingConfirmModal({
             <div className="mb-3 flex items-center gap-2">
               <Truck className="h-5 w-5 text-cyan-300" />
               <p className="text-xs font-black uppercase tracking-[0.3em] text-cyan-300">
-                Shipping Address Form
+                {t.shippingAddressForm}
               </p>
             </div>
 
             <h2 className="text-3xl font-black text-white">
-              Request physical shipping
+              {t.requestPhysicalShipping}
             </h2>
 
             <p className="mt-3 text-sm leading-6 text-slate-400">
-              Fill in recipient details for admin fulfillment. This card will be
-              locked from Sell Back after confirmation.
+              {t.shippingFormDesc}
             </p>
           </div>
 
@@ -138,7 +141,7 @@ export default function ShippingConfirmModal({
                   {card.rarity} · {card.grade}
                 </p>
                 <p className="mt-3 text-xs text-slate-400">
-                  Source: {card.sourcePack}
+                  {t.source}: {card.sourcePack}
                 </p>
               </div>
             </div>
@@ -147,7 +150,7 @@ export default function ShippingConfirmModal({
               <div className="grid gap-4 sm:grid-cols-2">
                 <label className="block">
                   <span className="mb-2 block text-xs font-black uppercase tracking-[0.22em] text-cyan-300">
-                    Full Name
+                    {t.fullName}
                   </span>
                   <input
                     required
@@ -156,26 +159,26 @@ export default function ShippingConfirmModal({
                       updateField('fullName', event.target.value)
                     }
                     className="w-full rounded-2xl border border-cyan-300/20 bg-black/40 px-4 py-3 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300/60"
-                    placeholder="Recipient name"
+                    placeholder={t.recipientName}
                   />
                 </label>
 
                 <label className="block">
                   <span className="mb-2 block text-xs font-black uppercase tracking-[0.22em] text-cyan-300">
-                    Phone
+                    {t.phone}
                   </span>
                   <input
                     required
                     value={shippingInfo.phone}
                     onChange={(event) => updateField('phone', event.target.value)}
                     className="w-full rounded-2xl border border-cyan-300/20 bg-black/40 px-4 py-3 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300/60"
-                    placeholder="Phone number"
+                    placeholder={t.phoneNumberPlaceholder}
                   />
                 </label>
 
                 <label className="block sm:col-span-2">
                   <span className="mb-2 block text-xs font-black uppercase tracking-[0.22em] text-cyan-300">
-                    Email
+                    {t.email}
                   </span>
                   <input
                     required
@@ -183,13 +186,13 @@ export default function ShippingConfirmModal({
                     value={shippingInfo.email}
                     onChange={(event) => updateField('email', event.target.value)}
                     className="w-full rounded-2xl border border-cyan-300/20 bg-black/40 px-4 py-3 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300/60"
-                    placeholder="Email address"
+                    placeholder={t.emailAddress}
                   />
                 </label>
 
                 <label className="block sm:col-span-2">
                   <span className="mb-2 block text-xs font-black uppercase tracking-[0.22em] text-cyan-300">
-                    Shipping Address
+                    {t.shippingAddress}
                   </span>
                   <textarea
                     required
@@ -199,13 +202,13 @@ export default function ShippingConfirmModal({
                     }
                     rows={3}
                     className="w-full resize-none rounded-2xl border border-cyan-300/20 bg-black/40 px-4 py-3 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300/60"
-                    placeholder="Full shipping address"
+                    placeholder={t.fullShippingAddress}
                   />
                 </label>
 
                 <label className="block">
                   <span className="mb-2 block text-xs font-black uppercase tracking-[0.22em] text-cyan-300">
-                    Postcode
+                    {t.postcode}
                   </span>
                   <input
                     required
@@ -214,45 +217,45 @@ export default function ShippingConfirmModal({
                       updateField('postcode', event.target.value)
                     }
                     className="w-full rounded-2xl border border-cyan-300/20 bg-black/40 px-4 py-3 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300/60"
-                    placeholder="Postcode"
+                    placeholder={t.postcode}
                   />
                 </label>
 
                 <label className="block">
                   <span className="mb-2 block text-xs font-black uppercase tracking-[0.22em] text-cyan-300">
-                    City
+                    {t.city}
                   </span>
                   <input
                     required
                     value={shippingInfo.city}
                     onChange={(event) => updateField('city', event.target.value)}
                     className="w-full rounded-2xl border border-cyan-300/20 bg-black/40 px-4 py-3 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300/60"
-                    placeholder="City"
+                    placeholder={t.city}
                   />
                 </label>
 
                 <label className="block">
                   <span className="mb-2 block text-xs font-black uppercase tracking-[0.22em] text-cyan-300">
-                    State
+                    {t.state}
                   </span>
                   <input
                     required
                     value={shippingInfo.state}
                     onChange={(event) => updateField('state', event.target.value)}
                     className="w-full rounded-2xl border border-cyan-300/20 bg-black/40 px-4 py-3 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300/60"
-                    placeholder="State"
+                    placeholder={t.state}
                   />
                 </label>
 
                 <label className="block">
                   <span className="mb-2 block text-xs font-black uppercase tracking-[0.22em] text-cyan-300">
-                    Remark
+                    {t.remark}
                   </span>
                   <input
                     value={shippingInfo.remark ?? ''}
                     onChange={(event) => updateField('remark', event.target.value)}
                     className="w-full rounded-2xl border border-cyan-300/20 bg-black/40 px-4 py-3 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300/60"
-                    placeholder="Optional note"
+                    placeholder={t.optionalNote}
                   />
                 </label>
               </div>
@@ -261,13 +264,12 @@ export default function ShippingConfirmModal({
                 <div className="mb-2 flex items-center gap-2">
                   <AlertTriangle className="h-4 w-4 text-amber-300" />
                   <p className="text-xs uppercase tracking-[0.25em] text-amber-300">
-                    Important
+                    {t.important}
                   </p>
                 </div>
 
                 <p className="text-sm leading-6 text-slate-300">
-                  Once shipping is requested, this card will be locked from Sell
-                  Back unless the admin cancels the shipping request.
+                  {t.shippingImportant}
                 </p>
               </div>
             </div>
@@ -279,7 +281,7 @@ export default function ShippingConfirmModal({
               onClick={onClose}
               className="rounded-2xl border border-cyan-300/30 bg-cyan-300/10 px-6 py-4 font-black text-cyan-200 transition hover:scale-[1.02] hover:bg-cyan-300/20"
             >
-              Cancel
+              {t.cancel}
             </button>
 
             <button
@@ -287,7 +289,7 @@ export default function ShippingConfirmModal({
               className="flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-cyan-300 to-purple-400 px-6 py-4 font-black text-black shadow-[0_0_40px_rgba(34,211,238,0.28)] transition hover:scale-[1.02]"
             >
               <ShieldCheck className="h-5 w-5" />
-              Confirm Shipping Request
+              {t.confirmShippingRequest}
             </button>
           </div>
         </motion.form>

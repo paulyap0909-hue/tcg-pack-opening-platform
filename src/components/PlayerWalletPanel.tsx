@@ -13,9 +13,11 @@ import {
   Wallet,
   X,
 } from "lucide-react";
+import { translations, type AppLanguage } from "../lib/i18n";
 
 type PlayerWalletPanelProps = {
   isOpen: boolean;
+  language: AppLanguage;
   onClose: () => void;
   username: string;
   walletBalance: number;
@@ -31,6 +33,7 @@ type PlayerWalletPanelProps = {
 
 export default function PlayerWalletPanel({
   isOpen,
+  language,
   onClose,
   username,
   walletBalance,
@@ -43,6 +46,8 @@ export default function PlayerWalletPanel({
   onOpenHistory,
   onOpenDailyReward,
 }: PlayerWalletPanelProps) {
+  const t = translations[language]
+
   if (!isOpen) return null;
 
   const handleTopUp = () => {
@@ -69,7 +74,7 @@ export default function PlayerWalletPanel({
     <div className="fixed inset-0 z-[100000]">
       <button
         type="button"
-        aria-label="Close player wallet overlay"
+        aria-label={t.cancel}
         onClick={onClose}
         className="absolute inset-0 bg-black/65 backdrop-blur-sm"
       />
@@ -94,7 +99,7 @@ export default function PlayerWalletPanel({
                 type="button"
                 className="mt-0.5 text-sm font-bold text-slate-300 transition hover:text-cyan-200"
               >
-                View profile
+                {t.viewProfile}
               </button>
             </div>
           </div>
@@ -116,13 +121,13 @@ export default function PlayerWalletPanel({
                   <Wallet className="h-5 w-5 text-cyan-200" />
                 </div>
                 <div>
-                  <p className="text-sm font-black text-slate-200">Points balance</p>
+                  <p className="text-sm font-black text-slate-200">{t.pointsBalance}</p>
                   <button
                     type="button"
                     onClick={handleHistory}
                     className="mt-1 flex items-center gap-1 text-xs font-bold text-slate-400 transition hover:text-cyan-200"
                   >
-                    View History
+                    {t.viewHistory}
                     <ChevronRight className="h-3.5 w-3.5" />
                   </button>
                 </div>
@@ -133,7 +138,7 @@ export default function PlayerWalletPanel({
                   {walletBalance.toLocaleString()}
                 </p>
                 <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">
-                  Points
+                  {t.points}
                 </p>
               </div>
             </div>
@@ -144,7 +149,7 @@ export default function PlayerWalletPanel({
               className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-500 px-4 py-3 text-sm font-black text-white shadow-[0_0_35px_rgba(59,130,246,0.25)] transition hover:scale-[1.01]"
             >
               <Sparkles className="h-4 w-4" />
-              Roll Daily Points
+              {t.rollDailyPoints}
             </button>
           </div>
 
@@ -156,10 +161,10 @@ export default function PlayerWalletPanel({
                 </div>
                 <div>
                   <p className="text-sm font-black text-slate-200">
-                    Jomluffyz wallet
+                    {t.jomluffyzWallet}
                   </p>
                   <p className="mt-1 text-xs text-slate-500">
-                    Demo wallet for points, vault and shipping.
+                    {t.walletPanelSubtitle}
                   </p>
                 </div>
               </div>
@@ -173,7 +178,7 @@ export default function PlayerWalletPanel({
                 className="flex items-center justify-center gap-2 rounded-xl bg-white/10 px-3 py-3 text-sm font-black text-white transition hover:bg-white/15"
               >
                 <ArrowUpToLine className="h-4 w-4" />
-                Add
+                {t.add}
               </button>
 
               <button
@@ -181,7 +186,7 @@ export default function PlayerWalletPanel({
                 className="flex items-center justify-center gap-2 rounded-xl bg-white/10 px-3 py-3 text-sm font-black text-white transition hover:bg-white/15"
               >
                 <ArrowDownToLine className="h-4 w-4" />
-                Withdraw
+                {t.withdraw}
               </button>
 
               <button
@@ -189,7 +194,7 @@ export default function PlayerWalletPanel({
                 className="flex items-center justify-center gap-2 rounded-xl bg-white/10 px-3 py-3 text-sm font-black text-white transition hover:bg-white/15"
               >
                 <Send className="h-4 w-4" />
-                Transfer
+                {t.transfer}
               </button>
             </div>
           </div>
@@ -201,7 +206,7 @@ export default function PlayerWalletPanel({
               className="rounded-2xl border border-cyan-300/15 bg-cyan-300/[0.06] p-4 text-left transition hover:bg-cyan-300/10"
             >
               <p className="text-xs font-black uppercase tracking-[0.2em] text-cyan-300">
-                Vault
+                {t.myVault}
               </p>
               <p className="mt-2 text-2xl font-black">{vaultCount}</p>
             </button>
@@ -211,7 +216,7 @@ export default function PlayerWalletPanel({
               className="rounded-2xl border border-amber-300/15 bg-amber-300/[0.06] p-4 text-left transition hover:bg-amber-300/10"
             >
               <p className="text-xs font-black uppercase tracking-[0.2em] text-amber-300">
-                Tickets
+                {t.tickets}
               </p>
               <p className="mt-2 text-2xl font-black">{raffleTickets}</p>
             </button>
@@ -221,7 +226,7 @@ export default function PlayerWalletPanel({
               className="rounded-2xl border border-purple-300/15 bg-purple-300/[0.06] p-4 text-left transition hover:bg-purple-300/10"
             >
               <p className="text-xs font-black uppercase tracking-[0.2em] text-purple-300">
-                History
+                {t.history}
               </p>
               <p className="mt-2 text-2xl font-black">{transactionCount}</p>
             </button>
@@ -233,7 +238,7 @@ export default function PlayerWalletPanel({
             className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.035] px-4 py-3 text-sm font-black text-white transition hover:bg-white/[0.06]"
           >
             <PackageCheck className="h-4 w-4" />
-            Shipments
+            {t.shipments}
             <span className="rounded-full bg-white/10 px-2 py-0.5 text-xs">
               {shipmentCount}
             </span>
@@ -245,7 +250,7 @@ export default function PlayerWalletPanel({
               className="flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.035] px-4 py-3 text-sm font-black text-white transition hover:bg-white/[0.06]"
             >
               <LifeBuoy className="h-4 w-4" />
-              Support
+              {t.support}
             </button>
 
             <button
@@ -253,7 +258,7 @@ export default function PlayerWalletPanel({
               className="flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.035] px-4 py-3 text-sm font-black text-white transition hover:bg-white/[0.06]"
             >
               <Settings className="h-4 w-4" />
-              Settings
+              {t.settings}
             </button>
           </div>
 
@@ -262,19 +267,18 @@ export default function PlayerWalletPanel({
             className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.035] px-4 py-3 text-sm font-black text-white transition hover:bg-red-500/10 hover:text-red-200"
           >
             <LogOut className="h-4 w-4" />
-            Log Out
+            {t.logOut}
           </button>
 
           <div className="mt-5 rounded-2xl border border-emerald-300/15 bg-emerald-300/[0.05] p-4">
             <div className="flex items-center gap-2 text-emerald-200">
               <Bell className="h-4 w-4" />
               <p className="text-xs font-black uppercase tracking-[0.22em]">
-                Demo Account
+                {t.demoAccount}
               </p>
             </div>
             <p className="mt-2 text-sm leading-6 text-slate-400">
-              This panel is a simulated player wallet. Later it can connect to real
-              login, payment gateway, withdrawals, shipments and profile settings.
+              {t.simulatedWalletNotice}
             </p>
           </div>
         </div>

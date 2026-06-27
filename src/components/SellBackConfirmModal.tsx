@@ -8,20 +8,25 @@ import {
   PackageOpen,
 } from 'lucide-react'
 import { useEffect } from 'react'
+import { translations, type AppLanguage } from '../lib/i18n'
 
 import { type VaultCard, getSellBackPoints } from './VaultDrawer'
 
 type SellBackConfirmModalProps = {
+  language: AppLanguage
   card: VaultCard | null
   onClose: () => void
   onConfirm: () => void
 }
 
 export default function SellBackConfirmModal({
+  language,
   card,
   onClose,
   onConfirm,
 }: SellBackConfirmModalProps) {
+  const t = translations[language]
+
   useEffect(() => {
     if (!card) return
 
@@ -61,7 +66,7 @@ export default function SellBackConfirmModal({
           <button
             type="button"
             onClick={onClose}
-            aria-label="Close sell back confirmation"
+            aria-label={t.cancel}
             className="absolute right-5 top-5 z-10 flex h-11 w-11 items-center justify-center rounded-full border border-cyan-300/40 bg-slate-950/95 text-cyan-100 shadow-[0_0_35px_rgba(34,211,238,0.35)] transition hover:scale-105 hover:bg-cyan-300/10"
           >
             <X className="h-5 w-5" />
@@ -71,17 +76,16 @@ export default function SellBackConfirmModal({
             <div className="mb-3 flex items-center gap-2">
               <AlertTriangle className="h-5 w-5 text-amber-300" />
               <p className="text-xs font-black uppercase tracking-[0.3em] text-amber-300">
-                Confirm Sell Back
+                {t.confirmSellBack}
               </p>
             </div>
 
             <h2 className="text-3xl font-black text-white">
-              Sell this card back?
+              {t.sellThisCardBack}
             </h2>
 
             <p className="mt-3 text-sm leading-6 text-slate-400">
-              This action will remove the selected card from My Vault and convert
-              it into wallet points.
+              {t.sellBackDesc}
             </p>
           </div>
 
@@ -112,7 +116,7 @@ export default function SellBackConfirmModal({
                   <div className="mb-2 flex items-center gap-2">
                     <PackageOpen className="h-4 w-4 text-cyan-300" />
                     <p className="text-xs uppercase tracking-[0.25em] text-cyan-300">
-                      Source Pack
+                      {t.sourcePack}
                     </p>
                   </div>
 
@@ -123,12 +127,12 @@ export default function SellBackConfirmModal({
                   <div className="mb-2 flex items-center gap-2">
                     <Coins className="h-5 w-5 text-emerald-300" />
                     <p className="text-xs uppercase tracking-[0.25em] text-emerald-300">
-                      Sell Back Value
+                      {t.sellBackValue}
                     </p>
                   </div>
 
                   <p className="text-3xl font-black text-emerald-300">
-                    +{sellBackPoints.toLocaleString()} Points
+                    +{sellBackPoints.toLocaleString()} {t.points}
                   </p>
                 </div>
               </div>
@@ -137,13 +141,12 @@ export default function SellBackConfirmModal({
                 <div className="mb-2 flex items-center gap-2">
                   <Sparkles className="h-4 w-4 text-amber-300" />
                   <p className="text-xs uppercase tracking-[0.25em] text-amber-300">
-                    Important
+                    {t.important}
                   </p>
                 </div>
 
                 <p className="text-sm leading-6 text-slate-300">
-                  Once confirmed, this card will be removed from your vault.
-                  This demo does not include undo yet.
+                  {t.sellBackImportant}
                 </p>
               </div>
             </div>
@@ -155,7 +158,7 @@ export default function SellBackConfirmModal({
               onClick={onClose}
               className="rounded-2xl border border-cyan-300/30 bg-cyan-300/10 px-6 py-4 font-black text-cyan-200 transition hover:scale-[1.02] hover:bg-cyan-300/20"
             >
-              Cancel
+              {t.cancel}
             </button>
 
             <button
@@ -164,7 +167,7 @@ export default function SellBackConfirmModal({
               className="flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-emerald-300 to-cyan-400 px-6 py-4 font-black text-black shadow-[0_0_40px_rgba(16,185,129,0.28)] transition hover:scale-[1.02]"
             >
               <ShieldCheck className="h-5 w-5" />
-              Confirm Sell Back
+              {t.confirmSellBackButton}
             </button>
           </div>
         </motion.div>

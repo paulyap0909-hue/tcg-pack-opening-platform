@@ -12,6 +12,7 @@ import {
   X,
 } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
+import { translations, type AppLanguage } from '../lib/i18n'
 
 export type TransactionType =
   | 'top-up'
@@ -36,6 +37,7 @@ export type TransactionRecord = {
 
 type TransactionDrawerProps = {
   isOpen: boolean
+  language: AppLanguage
   transactions: TransactionRecord[]
   onClose: () => void
 }
@@ -128,9 +130,11 @@ const transactionFilters: Array<{ id: TransactionFilter; label: string }> = [
 
 export default function TransactionDrawer({
   isOpen,
+  language,
   transactions,
   onClose,
 }: TransactionDrawerProps) {
+  const t = translations[language]
   const [activeFilter, setActiveFilter] = useState<TransactionFilter>('all')
 
   useEffect(() => {
@@ -200,26 +204,26 @@ export default function TransactionDrawer({
               <button
                 type="button"
                 onClick={onClose}
-                aria-label="Close transaction history"
+                aria-label={t.cancel}
                 className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full border border-purple-300/30 bg-slate-950/90 text-purple-100 shadow-[0_0_28px_rgba(168,85,247,0.25)] transition active:scale-95"
               >
                 <X className="h-5 w-5" />
               </button>
 
               <p className="hud-label pr-14 text-[10px] tracking-[0.32em] text-purple-300">
-                Ledger
+                {t.ledger}
               </p>
               <h2 className="mt-2 pr-14 text-3xl font-black text-white">
-                Transaction History
+                {t.transactionHistory}
               </h2>
               <p className="mt-1 pr-14 text-xs text-slate-400">
-                Wallet, pack openings, bids, raffle entries, and rewards.
+                {t.transactionHistoryDesc}
               </p>
 
               <div className="mt-4 grid grid-cols-3 gap-2">
                 <div className="rounded-2xl border border-emerald-300/10 bg-emerald-300/[0.05] px-3 py-2">
                   <p className="text-[9px] uppercase tracking-[0.22em] text-slate-500">
-                    Top Up
+                    {t.topUp}
                   </p>
                   <p className="mt-1 text-lg font-black text-emerald-300">
                     {stats.totalTopUp.toLocaleString()}
@@ -227,7 +231,7 @@ export default function TransactionDrawer({
                 </div>
                 <div className="rounded-2xl border border-cyan-300/10 bg-cyan-300/[0.05] px-3 py-2">
                   <p className="text-[9px] uppercase tracking-[0.22em] text-slate-500">
-                    Spent
+                    {t.spent}
                   </p>
                   <p className="mt-1 text-lg font-black text-cyan-300">
                     {stats.totalSpent.toLocaleString()}
@@ -235,7 +239,7 @@ export default function TransactionDrawer({
                 </div>
                 <div className="rounded-2xl border border-pink-300/10 bg-pink-300/[0.05] px-3 py-2">
                   <p className="text-[9px] uppercase tracking-[0.22em] text-slate-500">
-                    Raffle
+                    {t.raffleCenter}
                   </p>
                   <p className="mt-1 text-lg font-black text-pink-300">
                     {stats.raffleEntries}
@@ -258,7 +262,7 @@ export default function TransactionDrawer({
                           : 'border-white/10 bg-white/[0.04] text-slate-400'
                       }`}
                     >
-                      {filter.label}
+                      {filter.id === 'all' ? t.all : filter.id === 'top-up' ? t.topUp : filter.id === 'spent' ? t.spent : filter.id === 'reward' ? t.navRewards : t.raffleCenter}
                     </button>
                   )
                 })}
@@ -272,26 +276,26 @@ export default function TransactionDrawer({
                     <RefreshCcw className="h-7 w-7 text-purple-300" />
                   </div>
                   <h3 className="text-xl font-black text-white">
-                    No Transactions Yet
+                    {t.noTransactionsYet}
                   </h3>
                   <p className="mt-2 text-sm leading-6 text-slate-400">
-                    Top up, open packs, place bids, or enter raffles to generate history.
+                    {t.noTransactionsDesc}
                   </p>
                 </div>
               ) : filteredTransactions.length === 0 ? (
                 <div className="rounded-[1.6rem] border border-white/10 bg-white/[0.04] p-6 text-center">
                   <ReceiptText className="mx-auto h-8 w-8 text-slate-500" />
                   <h3 className="mt-3 text-lg font-black text-white">
-                    No activity here
+                    {t.noActivityHere}
                   </h3>
                   <p className="mt-1 text-sm text-slate-400">
-                    Try another transaction category.
+                    {t.tryAnotherTransactionCategory}
                   </p>
                 </div>
               ) : (
                 <div className="space-y-2.5">
                   <p className="px-1 text-[10px] font-black uppercase tracking-[0.28em] text-slate-500">
-                    Latest Activity
+                    {t.latestActivity}
                   </p>
 
                   {filteredTransactions.map((transaction, index) => {
@@ -330,7 +334,7 @@ export default function TransactionDrawer({
                                   {amount.label}
                                 </p>
                                 <p className="mt-1 text-[10px] text-slate-500">
-                                  Bal {transaction.balanceAfter.toLocaleString()}
+                                  {t.bal} {transaction.balanceAfter.toLocaleString()}
                                 </p>
                               </div>
                             </div>
