@@ -579,48 +579,65 @@ export default function MobileLukaHomePage({
               </button>
             </div>
 
-            <div className="relative mt-4 overflow-hidden rounded-[1.45rem] border border-orange-300/25 bg-[#120b0a] p-4 shadow-[0_22px_70px_rgba(249,115,22,0.18)]">
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_72%_18%,rgba(249,115,22,0.42),transparent_28%),radial-gradient(circle_at_34%_92%,rgba(34,211,238,0.18),transparent_34%),linear-gradient(135deg,rgba(15,23,42,0.4),rgba(124,45,18,0.44),rgba(3,7,18,0.92))]" />
-              <div className="absolute -bottom-12 left-20 h-28 w-56 rounded-full bg-orange-500/28 blur-2xl" />
-              <div className="absolute -bottom-7 right-3 text-[6.5rem] leading-none opacity-15">🔥</div>
-              <div className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-orange-500/18 to-transparent" />
+            <div className="relative mt-4 rounded-[1.45rem] border border-orange-300/25 bg-[#120b0a] p-4 shadow-[0_22px_70px_rgba(249,115,22,0.18)]">
+              <div className="pointer-events-none absolute inset-0 rounded-[1.45rem] bg-[radial-gradient(circle_at_72%_18%,rgba(249,115,22,0.34),transparent_30%),radial-gradient(circle_at_34%_92%,rgba(34,211,238,0.16),transparent_36%),linear-gradient(135deg,rgba(15,23,42,0.4),rgba(124,45,18,0.42),rgba(3,7,18,0.92))]" />
+              <div className="pointer-events-none absolute -bottom-10 left-20 h-24 w-52 rounded-full bg-orange-500/22 blur-2xl" />
+              <div className="pointer-events-none absolute bottom-3 right-4 text-[4.8rem] leading-none opacity-10">🔥</div>
 
               <div className="relative z-10">
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <p className="text-[10px] font-black uppercase tracking-[0.28em] text-orange-100">
-                      {t.topSpenders}
+                <div className="space-y-2 pr-12">
+                  <p className="text-[10px] font-black uppercase leading-4 tracking-[0.24em] text-orange-100">
+                    {t.topSpenders}
+                  </p>
+                  <p className="max-w-[300px] text-[11px] font-semibold leading-5 text-orange-100/62">
+                    {t.topSpendersDesc}
+                  </p>
+                </div>
+
+                <div className="mt-4 grid grid-cols-3 gap-2">
+                  <div className="rounded-2xl border border-white/10 bg-black/35 px-3 py-2 backdrop-blur">
+                    <p className="text-[8px] font-black uppercase leading-3 tracking-[0.14em] text-orange-100/55">
+                      {t.totalWorth}
                     </p>
-                    <p className="mt-1 max-w-[180px] text-[11px] font-semibold leading-4 text-orange-100/55">
-                      {t.topSpendersDesc}
+                    <p className="mt-1 text-base font-black leading-none text-white">
+                      41K
                     </p>
                   </div>
 
-                  <div className="rounded-2xl border border-white/10 bg-black/35 px-3 py-2 text-right backdrop-blur">
-                    <p className="text-[9px] font-black uppercase tracking-[0.18em] text-orange-100/60">
-                      {t.totalWorth}
+                  <div className="rounded-2xl border border-orange-200/15 bg-black/24 px-3 py-2">
+                    <p className="text-[8px] font-black uppercase leading-3 tracking-[0.14em] text-orange-100/55">
+                      {t.endsIn}
                     </p>
-                    <p className="mt-1 text-lg font-black text-white">
-                      41,000
+                    <p className="mt-1 font-mono text-[0.9rem] font-black leading-none tracking-[0.02em] text-white">
+                      22H:29M
+                    </p>
+                  </div>
+
+                  <div className="rounded-2xl border border-white/10 bg-black/35 px-3 py-2 backdrop-blur">
+                    <p className="text-[8px] font-black uppercase leading-3 tracking-[0.14em] text-orange-100/55">
+                      {t.prize}
+                    </p>
+                    <p className="mt-1 text-base font-black leading-none text-orange-100">
+                      55K
                     </p>
                   </div>
                 </div>
 
-                <div className="mt-5 grid grid-cols-[1fr_132px] gap-3">
-                  <div className="flex flex-col justify-end rounded-2xl border border-orange-200/15 bg-black/20 p-3">
-                    <p className="text-[10px] font-bold text-orange-100/60">
-                      {t.endsIn}
+                <div className="mt-4 rounded-2xl border border-white/10 bg-black/35 p-3 backdrop-blur">
+                  <div className="mb-2 flex items-center justify-between gap-2">
+                    <p className="text-[9px] font-black uppercase tracking-[0.18em] text-orange-100/60">
+                      {t.topRewards}
                     </p>
-                    <p className="mt-1 font-mono text-[1.35rem] font-black tracking-[0.08em] text-white">
-                      22H:29M:00S
+                    <p className="text-[9px] font-black uppercase tracking-[0.14em] text-white/36">
+                      {t.masterPack}
                     </p>
                   </div>
 
-                  <div className="rounded-2xl border border-white/10 bg-black/35 p-3 backdrop-blur">
+                  <div className="grid gap-1.5">
                     {rewardRows.map((row) => (
                       <div
                         key={`reward-${row.rank}`}
-                        className="flex items-center justify-between gap-2 border-b border-white/8 py-1.5 last:border-b-0"
+                        className="flex items-center justify-between gap-2 rounded-xl border border-white/6 bg-white/[0.035] px-2.5 py-1.5"
                       >
                         <span className="text-[9px] font-black uppercase tracking-[0.12em] text-white/72">
                           {t.topRank} {row.rank.replace('Top ', '')}
