@@ -2371,6 +2371,7 @@ function PlayerAdminDemoShell({
       />
 
       <PackDetailModal
+        language={language}
         pack={activeModal === 'detail' ? activePack : null}
         onClose={closeModal}
         onOpenPack={handleOpenPackFromDetail}
@@ -2387,6 +2388,7 @@ function PlayerAdminDemoShell({
       />
 
       <MultiOpenModal
+        language={language}
         pack={activeModal === 'multi-opening' ? activePack : null}
         quantity={multiOpenQuantity}
         onClose={closeModal}

@@ -12,8 +12,10 @@ import {
 import { useEffect } from 'react'
 
 import type { Pack } from '../data/cardPool'
+import { translations, type AppLanguage, type Translation } from '../lib/i18n'
 
 type PackDetailModalProps = {
+  language: AppLanguage
   pack: Pack | null
   onClose: () => void
   onOpenPack: (pack: Pack) => void
@@ -30,6 +32,7 @@ const getButtonState = (
   pack: Pack,
   quantity: number,
   walletBalance: number,
+  t: Translation,
 ) => {
   const packCost = getPackCost(pack)
   const totalCost = packCost * quantity
@@ -37,10 +40,10 @@ const getButtonState = (
   if (pack.remainingQuantity <= 0) {
     return {
       disabled: true,
-      label: 'Sold Out',
-      compactLabel: 'Sold Out',
-      reason: 'This drop has no stock remaining.',
-      subLabel: 'No stock',
+      label: t.soldOut,
+      compactLabel: t.soldOut,
+      reason: t.noStock,
+      subLabel: t.noStock,
       needsTopUp: false,
     }
   }
@@ -48,10 +51,10 @@ const getButtonState = (
   if (pack.remainingQuantity < quantity) {
     return {
       disabled: true,
-      label: 'Not Enough Stock',
-      compactLabel: 'Stock',
-      reason: `Only ${pack.remainingQuantity} packs left.`,
-      subLabel: `${pack.remainingQuantity} left`,
+      label: t.notEnoughStock,
+      compactLabel: t.stock,
+      reason: `${pack.remainingQuantity} ${t.packsLeft}.`,
+      subLabel: `${pack.remainingQuantity} ${t.leftShort}`,
       needsTopUp: false,
     }
   }
@@ -59,9 +62,9 @@ const getButtonState = (
   if (walletBalance < totalCost) {
     return {
       disabled: false,
-      label: `Top Up for Open ${quantity}`,
-      compactLabel: 'Top Up',
-      reason: `Need ${totalCost.toLocaleString()} points.`,
+      label: `${t.topUpForOpen} ${quantity}`,
+      compactLabel: t.topUp,
+      reason: `${t.need} ${totalCost.toLocaleString()} ${t.points}.`,
       subLabel: `${totalCost.toLocaleString()} pts`,
       needsTopUp: true,
     }
@@ -69,9 +72,9 @@ const getButtonState = (
 
   return {
     disabled: false,
-    label: `Open ${quantity} · ${totalCost.toLocaleString()} pts`,
-    compactLabel: `Open ${quantity}`,
-    reason: `${quantity} pack${quantity > 1 ? 's' : ''} will be opened instantly.`,
+    label: `${t.openLabel} ${quantity} · ${totalCost.toLocaleString()} pts`,
+    compactLabel: `${t.openLabel} ${quantity}`,
+    reason: `${quantity} ${t.navPacks} ${t.willOpenInstantly}`,
     subLabel: `${totalCost.toLocaleString()} pts`,
     needsTopUp: false,
   }
@@ -84,6 +87,7 @@ const getQuantityIcon = (quantity: number) => {
 }
 
 export default function PackDetailModal({
+  language,
   pack,
   onClose,
   onOpenPack,
@@ -91,6 +95,8 @@ export default function PackDetailModal({
   walletBalance,
   onNeedTopUp,
 }: PackDetailModalProps) {
+  const t = translations[language]
+
   useEffect(() => {
     if (!pack) return
 
@@ -117,7 +123,7 @@ export default function PackDetailModal({
     pack.remainingQuantity > 0 && pack.remainingQuantity <= 10
 
   const handleOpen = (quantity: number) => {
-    const buttonState = getButtonState(pack, quantity, walletBalance)
+    const buttonState = getButtonState(pack, quantity, walletBalance, t)
 
     if (buttonState.disabled) return
 
@@ -151,7 +157,7 @@ export default function PackDetailModal({
           <button
             type="button"
             onClick={onClose}
-            aria-label="Close pack details"
+            aria-label={t.cancel}
             className="absolute right-4 top-4 z-30 flex h-10 w-10 items-center justify-center rounded-full border border-cyan-300/30 bg-slate-950/95 text-cyan-100 shadow-[0_0_28px_rgba(34,211,238,0.28)] transition hover:scale-105 hover:bg-cyan-300/10 sm:right-5 sm:top-5 sm:h-11 sm:w-11"
           >
             <X className="h-5 w-5" />
@@ -173,7 +179,7 @@ export default function PackDetailModal({
                           : 'border-cyan-300/30 bg-cyan-300/10 text-cyan-200'
                       }`}
                     >
-                      {isNearlySoldOut ? 'Nearly Sold Out' : pack.badge}
+                      {isNearlySoldOut ? t.nearlySoldOut : pack.badge}
                     </span>
 
                     <span className="truncate text-[10px] font-bold uppercase tracking-[0.18em] text-slate-500 sm:text-xs sm:tracking-[0.22em]">
@@ -200,10 +206,10 @@ export default function PackDetailModal({
                 <div>
                   <div className="mb-3 flex flex-wrap gap-2 sm:mb-4 sm:gap-3">
                     <span className="rounded-full border border-cyan-300/20 bg-cyan-300/10 px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.22em] text-cyan-200 sm:px-4 sm:py-2 sm:text-xs sm:tracking-[0.25em]">
-                      Pack Details
+                      {t.packDetails}
                     </span>
                     <span className="rounded-full border border-purple-300/20 bg-purple-300/10 px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.22em] text-purple-200 sm:px-4 sm:py-2 sm:text-xs sm:tracking-[0.25em]">
-                      Open 1 / 10 / 100
+                      {t.openOneTenHundred}
                     </span>
                   </div>
 
@@ -212,7 +218,7 @@ export default function PackDetailModal({
                   </h2>
 
                   <p className="mt-3 text-sm leading-6 text-slate-400 sm:mt-4 sm:max-w-2xl sm:leading-7">
-                    Choose quantity. Revealed cards are saved into Vault automatically.
+                    {t.chooseQuantityVault}
                   </p>
 
                   <div className="mt-4 grid grid-cols-3 gap-2 sm:mt-6 sm:gap-4">
@@ -221,7 +227,7 @@ export default function PackDetailModal({
                         <Coins className="h-4 w-4 text-cyan-300 sm:h-5 sm:w-5" />
                       </div>
                       <p className="text-[9px] uppercase tracking-[0.2em] text-slate-500 sm:text-[10px] sm:tracking-[0.25em]">
-                        Price
+                        {t.price}
                       </p>
                       <p className="mt-1 text-lg font-black text-cyan-200 sm:mt-2 sm:text-2xl">
                         {packCost}
@@ -233,7 +239,7 @@ export default function PackDetailModal({
                         <Box className="h-4 w-4 text-amber-300 sm:h-5 sm:w-5" />
                       </div>
                       <p className="text-[9px] uppercase tracking-[0.2em] text-slate-500 sm:text-[10px] sm:tracking-[0.25em]">
-                        Left
+                        {t.left}
                       </p>
                       <p className="mt-1 text-lg font-black text-amber-300 sm:mt-2 sm:text-2xl">
                         {pack.remainingQuantity}
@@ -245,7 +251,7 @@ export default function PackDetailModal({
                         <Wallet className="h-4 w-4 text-purple-300 sm:h-5 sm:w-5" />
                       </div>
                       <p className="text-[9px] uppercase tracking-[0.2em] text-slate-500 sm:text-[10px] sm:tracking-[0.25em]">
-                        Wallet
+                        {t.wallet}
                       </p>
                       <p className="mt-1 text-lg font-black text-purple-300 sm:mt-2 sm:text-2xl">
                         {walletBalance.toLocaleString()}
@@ -255,7 +261,7 @@ export default function PackDetailModal({
 
                   <div className="mt-4 hidden rounded-2xl border border-emerald-300/15 bg-emerald-300/[0.04] p-4 text-sm leading-6 text-slate-300 sm:flex sm:items-center sm:gap-2">
                     <ShieldCheck className="h-5 w-5 shrink-0 text-emerald-300" />
-                    All opened cards are automatically added to Vault and saved in local storage for this demo version.
+                    {t.vaultAutoSaveNotice}
                   </div>
                 </div>
 
@@ -265,6 +271,7 @@ export default function PackDetailModal({
                       pack,
                       quantity,
                       walletBalance,
+                      t,
                     )
                     const QuantityIcon = getQuantityIcon(quantity)
 
@@ -301,16 +308,16 @@ export default function PackDetailModal({
           <div className="shrink-0 border-t border-white/10 bg-[#050b18]/95 px-3 pb-[calc(10px+env(safe-area-inset-bottom))] pt-3 backdrop-blur-xl sm:hidden">
             <div className="mb-2 flex items-center justify-between px-1">
               <p className="text-xs font-black uppercase tracking-[0.24em] text-cyan-300">
-                Open Quantity
+                {t.openQuantity}
               </p>
               <p className="text-xs font-bold text-slate-400">
-                {packCost} pts each
+                {packCost} {t.ptsEach}
               </p>
             </div>
 
             <div className="grid grid-cols-3 gap-2">
               {openOptions.map((quantity) => {
-                const buttonState = getButtonState(pack, quantity, walletBalance)
+                const buttonState = getButtonState(pack, quantity, walletBalance, t)
                 const QuantityIcon = getQuantityIcon(quantity)
 
                 return (

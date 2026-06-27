@@ -13,8 +13,10 @@ import type { Pack, RevealCard } from '../data/cardPool'
 import { createWeightedResults, getBestPull, getOpenedTime } from '../data/cardPool'
 import type { VaultCard } from './VaultDrawer'
 import { audioManager } from '../lib/audioManager'
+import { translations, type AppLanguage } from '../lib/i18n'
 
 type MultiOpenModalProps = {
+  language: AppLanguage
   pack: Pack | null
   quantity: number
   onClose: () => void
@@ -41,12 +43,14 @@ const createVaultCards = (
 }
 
 export default function MultiOpenModal({
+  language,
   pack,
   quantity,
   onClose,
   onBackToDetail,
   onAddAllToVault,
 }: MultiOpenModalProps) {
+  const t = translations[language]
   const savedBatchRef = useRef<string | null>(null)
   const [viewMode, setViewMode] = useState<'best' | 'grid'>('best')
 
@@ -126,7 +130,7 @@ export default function MultiOpenModal({
 
             <div className="text-center">
               <p className="text-[10px] font-black uppercase tracking-[0.28em] text-cyan-300">
-                Open {quantity} Packs
+                {t.openLabel} {quantity} {t.navPacks}
               </p>
               <p className="max-w-[190px] truncate text-xs font-bold text-slate-400">
                 {pack.name}
@@ -145,7 +149,7 @@ export default function MultiOpenModal({
           <button
             type="button"
             onClick={onClose}
-            aria-label="Close multi opening modal"
+            aria-label={t.cancel}
             className="absolute right-5 top-5 z-10 hidden h-11 w-11 items-center justify-center rounded-full border border-cyan-300/40 bg-slate-950/95 text-cyan-100 shadow-[0_0_35px_rgba(34,211,238,0.35)] transition hover:scale-105 hover:bg-cyan-300/10 sm:flex"
           >
             <X className="h-5 w-5" />
@@ -155,14 +159,14 @@ export default function MultiOpenModal({
             <div className="mb-3 flex items-center gap-2">
               <PackageOpen className="h-5 w-5 text-cyan-300" />
               <p className="text-xs font-black uppercase tracking-[0.3em] text-cyan-300">
-                Pokémon Real Card Batch Opening
+                {t.pokemonBatchOpening}
               </p>
             </div>
             <h2 className="text-3xl font-black text-white">
-              Open {quantity} · {pack.name}
+              {t.openLabel} {quantity} · {pack.name}
             </h2>
             <p className="mt-3 text-sm leading-6 text-slate-400">
-              All revealed cards are saved automatically into My Vault.
+              {t.batchOpeningSubtitle}
             </p>
           </div>
 
@@ -170,7 +174,7 @@ export default function MultiOpenModal({
             <div className="mb-3 grid grid-cols-3 gap-2 sm:mb-6 sm:gap-4">
               <div className="rounded-2xl border border-cyan-300/10 bg-cyan-300/[0.05] p-3">
                 <p className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-500">
-                  Saved
+                  {t.saved}
                 </p>
                 <p className="mt-1 text-xl font-black text-cyan-200">
                   {quantity}
@@ -178,7 +182,7 @@ export default function MultiOpenModal({
               </div>
               <div className="rounded-2xl border border-amber-300/10 bg-amber-300/[0.05] p-3">
                 <p className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-500">
-                  Rare+
+                  {t.rarePlus}
                 </p>
                 <p className="mt-1 text-xl font-black text-amber-200">
                   {rarePlusCount}
@@ -186,10 +190,10 @@ export default function MultiOpenModal({
               </div>
               <div className="rounded-2xl border border-emerald-300/10 bg-emerald-300/[0.05] p-3">
                 <p className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-500">
-                  Vault
+                  {t.myVault}
                 </p>
                 <p className="mt-1 text-xl font-black text-emerald-200">
-                  Auto
+                  {t.auto}
                 </p>
               </div>
             </div>
@@ -204,7 +208,7 @@ export default function MultiOpenModal({
                     : 'border border-white/10 bg-white/[0.05] text-slate-300'
                 }`}
               >
-                Best Pull
+                {t.bestPull}
               </button>
               <button
                 type="button"
@@ -215,7 +219,7 @@ export default function MultiOpenModal({
                     : 'border border-white/10 bg-white/[0.05] text-slate-300'
                 }`}
               >
-                All Cards
+                {t.allCards}
               </button>
             </div>
 
@@ -225,12 +229,12 @@ export default function MultiOpenModal({
                   <div className="flex items-center gap-2">
                     <Crown className="h-5 w-5 text-amber-300" />
                     <p className="text-xs font-black uppercase tracking-[0.24em] text-amber-300">
-                      Best Pull
+                      {t.bestPull}
                     </p>
                   </div>
 
                   <span className="rounded-full border border-emerald-300/30 bg-emerald-300/10 px-3 py-1 text-xs font-black text-emerald-200">
-                    {quantity} saved
+                    {quantity} {t.saved}
                   </span>
                 </div>
 
@@ -245,7 +249,7 @@ export default function MultiOpenModal({
 
                 <div className="mt-4 inline-flex items-center gap-2 rounded-full border border-emerald-300/30 bg-emerald-300/10 px-4 py-2 text-sm font-black text-emerald-200">
                   <CheckCircle2 className="h-5 w-5" />
-                  {quantity} cards saved to Vault
+                  {quantity} {t.cardsSavedToVault}
                 </div>
               </div>
 
@@ -253,10 +257,10 @@ export default function MultiOpenModal({
                 <div className="mb-4 flex items-center justify-between gap-3">
                   <div>
                     <p className="text-[10px] font-black uppercase tracking-[0.3em] text-cyan-300">
-                      Results Grid
+                      {t.resultsGrid}
                     </p>
                     <h3 className="mt-1 text-2xl font-black text-white sm:text-3xl">
-                      Real Pokémon Pulls
+                      {t.realPokemonPulls}
                     </h3>
                   </div>
 
@@ -301,7 +305,7 @@ export default function MultiOpenModal({
                   className="inline-flex flex-1 items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm font-black text-slate-300 transition hover:bg-white/[0.08]"
                 >
                   <ArrowLeft className="h-4 w-4" />
-                  Back to Detail
+                  {t.backToDetail}
                 </button>
               )}
 
@@ -311,7 +315,7 @@ export default function MultiOpenModal({
                 className="hud-button inline-flex flex-[2] items-center justify-center gap-2 px-5 py-3 text-sm"
               >
                 <CheckCircle2 className="h-4 w-4" />
-                Continue
+                {t.continueLabel}
               </button>
             </div>
           </div>
@@ -323,7 +327,7 @@ export default function MultiOpenModal({
               className="hud-button flex w-full items-center justify-center gap-2 px-5 py-4 text-sm"
             >
               <CheckCircle2 className="h-4 w-4" />
-              Continue
+              {t.continueLabel}
             </button>
           </div>
         </motion.div>
