@@ -51,7 +51,7 @@ import HeroPackSection from '../../components/HeroPackSection'
 import DailyLoginRewardModal from '../../components/DailyLoginRewardModal'
 import LiveAuctionPanel from '../../components/LiveAuctionPanel'
 import MobileAuctionPanel from '../../components/MobileAuctionPanel'
-import MobileHomeProgressPanel from '../../components/MobileHomeProgressPanel'
+import MobileLukaHomePage from '../../components/MobileLukaHomePage'
 import PlayerWalletPanel from '../../components/PlayerWalletPanel'
 
 import type { Pack } from '../../data/cardPool'
@@ -1589,52 +1589,17 @@ function PlayerAdminDemoShell({
         </header>
         <div className="lg:hidden">
           {mobilePage === 'home' && (
-            <>
-              <HeroPackSection
-                packImage={heroPremiumShinyPack}
-                packName="Premium Shiny Featured Pack"
-                walletBalance={walletBalance}
-                totalRemaining={totalRemaining}
-                totalSupply={totalSupply}
-                raffleTickets={raffleTickets}
-                vaultCount={vaultCards.length}
-                onStartOpening={() => changeMobilePage('packs')}
-                onHowItWorks={() => changeMobilePage('rewards')}
-                onTopUp={openTopUpModal}
-                onOpenVault={() => setIsVaultOpen(true)}
-              />
-
-              <section className="mx-auto w-full max-w-7xl px-4 pb-8">
-                <div className="grid grid-cols-3 gap-3">
-                  <button type="button" onClick={() => changeMobilePage('packs')} className="rounded-2xl border border-cyan-300/20 bg-cyan-300/10 p-3 text-left">
-                    <PackageOpen className="h-6 w-6 text-cyan-300" />
-                    <p className="mt-2 text-xs font-black text-white">Browse Packs</p>
-                    <p className="mt-1 text-xs text-slate-400">Open 1 / 10</p>
-                  </button>
-                  <button type="button" onClick={() => changeMobilePage('auction')} className="rounded-2xl border border-yellow-300/20 bg-yellow-300/10 p-3 text-left">
-                    <Gavel className="h-6 w-6 text-yellow-300" />
-                    <p className="mt-2 text-xs font-black text-white">Auction</p>
-                    <p className="mt-1 text-xs text-slate-400">Bid live</p>
-                  </button>
-                  <button type="button" onClick={() => changeMobilePage('rewards')} className="rounded-2xl border border-purple-300/20 bg-purple-300/10 p-3 text-left">
-                    <Gift className="h-6 w-6 text-purple-300" />
-                    <p className="mt-2 text-xs font-black text-white">Rewards</p>
-                    <p className="mt-1 text-xs text-slate-400">Quest / login</p>
-                  </button>
-                </div>
-              </section>
-
-              <MobileHomeProgressPanel
-                questStats={questStats}
-                walletBalance={walletBalance}
-                raffleTickets={raffleTickets}
-                dailyLoginState={dailyLoginState}
-                onClaimQuest={handleClaimQuest}
-                onOpenDailyLogin={() => setIsDailyLoginOpen(true)}
-                onOpenPacks={() => changeMobilePage('packs')}
-                onOpenAuction={() => changeMobilePage('auction')}
-              />
-            </>
+            <MobileLukaHomePage
+              packs={playerVisiblePacks}
+              walletBalance={walletBalance}
+              raffleTickets={raffleTickets}
+              vaultCount={vaultCards.length}
+              onOpenPack={openPackDetail}
+              onOpenPacks={() => changeMobilePage('packs')}
+              onRaffles={() => changeMobilePage('rewards')}
+              onInvite={() => changeMobilePage('account')}
+              onSignIn={() => changeMobilePage('account')}
+            />
           )}
 
           {mobilePage === 'packs' && (
