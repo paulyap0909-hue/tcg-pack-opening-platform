@@ -1515,8 +1515,8 @@ function PlayerAdminDemoShell({
       <SciFiBackground />
 
       <main className="relative z-10 pb-24 lg:pb-0">
-        <header className="mx-auto w-full max-w-7xl px-4 py-3 sm:px-5 lg:px-8">
-          <div className="hidden items-center justify-between lg:flex">
+        <header className="mx-auto hidden w-full max-w-7xl px-4 py-3 sm:px-5 lg:block lg:px-8">
+          <div className="flex items-center justify-between">
             <button
               type="button"
               className="group flex items-center gap-3 text-left"
@@ -1547,42 +1547,6 @@ function PlayerAdminDemoShell({
                 src="https://api.dicebear.com/9.x/adventurer/svg?seed=detailedpower3615&radius=50&backgroundColor=8b5cf6"
                 alt="Player account"
                 className="h-9 w-9 rounded-xl border border-white/10 object-cover"
-              />
-            </button>
-          </div>
-
-          <div className="sticky top-0 z-40 -mx-4 flex items-center gap-2 border-b border-white/8 bg-[#050b18]/88 px-4 py-3 backdrop-blur-xl lg:hidden">
-            <div className="relative flex-1">
-              <Search className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
-              <input
-                type="text"
-                value={packSearchQuery}
-                onFocus={() => changeMobilePage('packs')}
-                onChange={(event) => setPackSearchQuery(event.target.value)}
-                placeholder="Search packs, cards"
-                className="h-11 w-full rounded-full border border-white/10 bg-white/[0.06] pl-10 pr-4 text-sm font-semibold text-white outline-none placeholder:text-slate-400 focus:border-cyan-300/40"
-              />
-            </div>
-
-            <button
-              type="button"
-              className="relative flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/[0.06] text-slate-200"
-            >
-              <Bell className="h-5 w-5" />
-              <span className="absolute right-0 top-0 flex h-5 min-w-5 items-center justify-center rounded-full bg-pink-500 px-1 text-[10px] font-black text-white">
-                2
-              </span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => changeMobilePage('account')}
-              className="flex h-11 w-11 items-center justify-center rounded-full border border-purple-300/20 bg-purple-300/10"
-            >
-              <img
-                src="https://api.dicebear.com/9.x/adventurer/svg?seed=detailedpower3615&radius=50&backgroundColor=8b5cf6"
-                alt="Player account"
-                className="h-9 w-9 rounded-full object-cover"
               />
             </button>
           </div>
