@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 
 import { pokemonRealCardPool } from "../data/cardPool";
+import { translations, type AppLanguage } from "../lib/i18n";
 
 type BidRecord = {
   id: string;
@@ -40,6 +41,7 @@ type AuctionItem = {
 };
 
 type LiveAuctionPanelProps = {
+  language: AppLanguage;
   walletBalance: number;
   onBid: (cost: number, auctionName: string, nextBid: number) => boolean;
   onNeedTopUp: () => void;
@@ -125,10 +127,12 @@ const upcomingCards = [
 ].filter(Boolean);
 
 export default function LiveAuctionPanel({
+  language,
   walletBalance,
   onBid,
   onNeedTopUp,
 }: LiveAuctionPanelProps) {
+  const t = translations[language];
   const [auction, setAuction] = useState<AuctionItem>(() => createInitialAuction());
   const [now, setNow] = useState(() => Date.now());
   const [selectedIncrement, setSelectedIncrement] = useState(50);
@@ -236,20 +240,17 @@ export default function LiveAuctionPanel({
 
         <div className="relative z-10 mb-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <p className="hud-label text-sm">Live Auction Arena</p>
-            <h2 className="mt-2 text-4xl font-black text-white">
-              Player Auction Bid
-            </h2>
+            <p className="hud-label text-sm">{t.liveAuctionArena}</p>
+            <h2 className="mt-2 text-4xl font-black text-white">{t.playerAuctionBid}</h2>
             <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-400">
-              Bid on vault cards in real time. Demo mode updates every 60 seconds and
-              extends the timer during final-call bidding.
+              {t.liveAuctionDesc}
             </p>
           </div>
 
           <div className="grid grid-cols-3 gap-3 text-center">
             <div className="rounded-2xl border border-cyan-300/15 bg-cyan-300/[0.06] px-4 py-3">
               <p className="text-[10px] font-black uppercase tracking-[0.22em] text-slate-500">
-                Status
+                {t.status}
               </p>
               <p className={`mt-1 text-sm font-black ${
                 auctionStatus === "Final Call"
@@ -258,13 +259,13 @@ export default function LiveAuctionPanel({
                     ? "text-slate-400"
                     : "text-emerald-300"
               }`}>
-                {auctionStatus}
+                {auctionStatus === "Final Call" ? t.finalCall : auctionStatus === "Ended" ? t.ended : t.live}
               </p>
             </div>
 
             <div className="rounded-2xl border border-amber-300/15 bg-amber-300/[0.06] px-4 py-3">
               <p className="text-[10px] font-black uppercase tracking-[0.22em] text-slate-500">
-                Wallet
+                {t.wallet}
               </p>
               <p className="mt-1 text-sm font-black text-amber-200">
                 {walletBalance.toLocaleString()} pts
@@ -273,7 +274,7 @@ export default function LiveAuctionPanel({
 
             <div className="rounded-2xl border border-purple-300/15 bg-purple-300/[0.06] px-4 py-3">
               <p className="text-[10px] font-black uppercase tracking-[0.22em] text-slate-500">
-                Update
+                {t.update}
               </p>
               <p className="mt-1 text-sm font-black text-purple-200">60s</p>
             </div>
@@ -290,7 +291,7 @@ export default function LiveAuctionPanel({
                 className="relative z-10 mx-auto h-[360px] w-auto rounded-2xl object-contain drop-shadow-[0_35px_80px_rgba(0,0,0,0.55)]"
               />
               <div className="pointer-events-none absolute left-4 top-4 rounded-full border border-emerald-300/20 bg-emerald-300/10 px-3 py-1 text-xs font-black text-emerald-200">
-                Vault Verified
+                {t.vaultVerified}
               </div>
             </div>
 
@@ -300,7 +301,7 @@ export default function LiveAuctionPanel({
                   {auction.rarity}
                 </span>
                 <span className="rounded-full border border-cyan-300/20 bg-cyan-300/10 px-3 py-1 text-xs font-black text-cyan-200">
-                  Seller: {auction.seller}
+                  {t.seller}: {auction.seller}
                 </span>
               </div>
               <h3 className="mt-3 text-2xl font-black text-white">
@@ -313,7 +314,7 @@ export default function LiveAuctionPanel({
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className="text-xs font-black uppercase tracking-[0.28em] text-amber-200">
-                  Current Bid
+                  {t.currentBid}
                 </p>
                 <div className="mt-2 flex items-end gap-2">
                   <p className="text-5xl font-black text-white">
@@ -322,7 +323,7 @@ export default function LiveAuctionPanel({
                   <p className="pb-2 text-sm font-black text-slate-400">pts</p>
                 </div>
                 <p className="mt-2 text-sm text-slate-400">
-                  Highest bidder:{" "}
+                  {t.highestBidder}:{" "}
                   <span className="font-black text-cyan-200">
                     {auction.highestBidder}
                   </span>
@@ -341,7 +342,7 @@ export default function LiveAuctionPanel({
                   {formatTime(remainingMs)}
                 </p>
                 <p className="text-[10px] font-black uppercase tracking-[0.22em] text-slate-500">
-                  Time Left
+                  {t.timeLeft}
                 </p>
               </div>
             </div>
@@ -349,10 +350,10 @@ export default function LiveAuctionPanel({
             <div className="mt-5 rounded-2xl border border-white/10 bg-black/25 p-4">
               <div className="mb-3 flex items-center justify-between">
                 <p className="text-xs font-black uppercase tracking-[0.25em] text-slate-400">
-                  Quick Bid
+                  {t.quickBid}
                 </p>
                 <p className="text-xs text-slate-500">
-                  Next:{" "}
+                  {t.next}:{" "}
                   <span className="font-black text-white">
                     {nextBid.toLocaleString()} pts
                   </span>
@@ -391,17 +392,17 @@ export default function LiveAuctionPanel({
                 {isEnded ? (
                   <>
                     <Trophy className="h-5 w-5" />
-                    Auction Ended
+                    {t.auctionEnded}
                   </>
                 ) : hasEnoughWallet ? (
                   <>
                     <Gavel className="h-5 w-5" />
-                    Place Bid +{selectedIncrement}
+                    {t.placeBid} +{selectedIncrement}
                   </>
                 ) : (
                   <>
                     <Wallet className="h-5 w-5" />
-                    Top Up to Bid
+                    {t.topUpToBid}
                   </>
                 )}
               </button>
@@ -414,7 +415,7 @@ export default function LiveAuctionPanel({
                   {auction.watchers}
                 </p>
                 <p className="text-[10px] uppercase tracking-[0.2em] text-slate-500">
-                  Watchers
+                  {t.watchers}
                 </p>
               </div>
               <div className="rounded-2xl border border-white/10 bg-black/25 p-3">
@@ -423,14 +424,14 @@ export default function LiveAuctionPanel({
                   {auction.bids.length}
                 </p>
                 <p className="text-[10px] uppercase tracking-[0.2em] text-slate-500">
-                  Bids
+                  {t.bids}
                 </p>
               </div>
               <div className="rounded-2xl border border-white/10 bg-black/25 p-3">
                 <ShieldCheck className="h-5 w-5 text-emerald-300" />
                 <p className="mt-2 text-xl font-black text-white">15s</p>
                 <p className="text-[10px] uppercase tracking-[0.2em] text-slate-500">
-                  Extend
+                  {t.extend}
                 </p>
               </div>
             </div>
@@ -440,10 +441,10 @@ export default function LiveAuctionPanel({
             <div className="mb-4 flex items-center justify-between">
               <div>
                 <p className="text-xs font-black uppercase tracking-[0.25em] text-cyan-300">
-                  Live Bid Feed
+                  {t.liveBidFeed}
                 </p>
                 <p className="mt-1 text-sm text-slate-500">
-                  Demo auto update every minute.
+                  {t.liveBidFeedDesc}
                 </p>
               </div>
               <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-emerald-300/20 bg-emerald-300/10">
@@ -466,7 +467,7 @@ export default function LiveAuctionPanel({
                       {bid.bidder}
                       {bid.isUser && (
                         <span className="ml-2 rounded-full bg-cyan-300 px-2 py-0.5 text-[10px] text-black">
-                          YOU
+                          {t.you}
                         </span>
                       )}
                     </p>
@@ -495,10 +496,10 @@ export default function LiveAuctionPanel({
           <div className="mb-4 flex items-center justify-between">
             <div>
               <p className="text-xs font-black uppercase tracking-[0.25em] text-slate-400">
-                Upcoming Auctions
+                {t.upcomingAuctions}
               </p>
               <p className="mt-1 text-sm text-slate-500">
-                More vault cards queued for the next live drop.
+                {t.upcomingAuctionsDesc}
               </p>
             </div>
             <Bell className="h-5 w-5 text-cyan-300" />
@@ -522,7 +523,7 @@ export default function LiveAuctionPanel({
                   <p className="truncate text-xs text-slate-500">{card.rarity}</p>
                   <p className="mt-1 flex items-center gap-1 text-xs font-black text-cyan-200">
                     <Zap className="h-3.5 w-3.5" />
-                    Starts soon
+                    {t.startsSoon}
                   </p>
                 </div>
               </div>

@@ -2334,6 +2334,7 @@ function PlayerAdminDemoShell({
 
         <div id="auction" className="hidden lg:block">
           <LiveAuctionPanel
+            language={language}
             walletBalance={walletBalance}
             onBid={handleAuctionBid}
             onNeedTopUp={openTopUpModal}

@@ -171,7 +171,7 @@ const parseAuctionSeconds = (endsIn: string) => {
 const padTime = (value: number) => value.toString().padStart(2, '0')
 
 const formatAuctionCountdown = (secondsLeft: number) => {
-  if (secondsLeft <= 0) return '{t.auctionEnded}'
+  if (secondsLeft <= 0) return '00:00'
 
   const hours = Math.floor(secondsLeft / 3600)
   const minutes = Math.floor((secondsLeft % 3600) / 60)
@@ -304,7 +304,7 @@ export default function MobileAuctionPanel({
               <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-cyan-200/60" />
               <input
                 type="text"
-                placeholder="Search cards, seller"
+                placeholder={t.auctionLobbySearchPlaceholder}
                 className="h-11 w-full rounded-full border border-white/10 bg-white/[0.06] pl-10 pr-4 text-sm font-semibold text-white outline-none placeholder:text-slate-500 shadow-inner shadow-black/20 focus:border-cyan-300/50 focus:bg-white/[0.09]"
               />
             </div>
@@ -340,7 +340,7 @@ export default function MobileAuctionPanel({
                   ) : (
                     <Trophy className={`h-4 w-4 ${isActive ? 'text-black' : 'text-cyan-200'}`} />
                   )}
-                  {tab} Auction
+                  {tab === 'General' ? t.generalAuction : t.premierAuction}
                 </button>
               )
             })}
@@ -353,17 +353,17 @@ export default function MobileAuctionPanel({
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_35%,rgba(250,204,21,0.42),transparent_34%),radial-gradient(circle_at_88%_62%,rgba(34,211,238,0.12),transparent_30%),linear-gradient(135deg,#111827,#020617)]" />
             <div className="relative z-10 p-4">
               <p className="text-xs font-black uppercase tracking-[0.28em] text-yellow-300">
-                Live Event
+                {t.liveEvent}
               </p>
               <h3 className="mt-2 max-w-[240px] text-2xl font-black leading-tight text-white">
-                Collect Cards & Unlock Auction Rewards
+                {t.auctionHeroTitle}
               </h3>
               <p className="mt-2 max-w-[230px] text-xs leading-5 text-slate-300">
-                Bid before the timer ends. Higher tier auctions unlock premium chase cards.
+                {t.auctionHeroDesc}
               </p>
 
               <div className="mt-4 inline-flex rounded-full bg-yellow-400 px-4 py-2 text-xs font-black text-black shadow-[0_0_24px_rgba(250,204,21,0.32)]">
-                {visibleCards.filter((item) => getTimeLeftSeconds(item) > 0).length} auctions live
+                {visibleCards.filter((item) => getTimeLeftSeconds(item) > 0).length} {t.auctionsLive}
               </div>
             </div>
 
@@ -377,14 +377,14 @@ export default function MobileAuctionPanel({
                 className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.06] px-3 py-2.5 text-sm font-black text-slate-200 shadow-sm shadow-black/20"
               >
                 <Filter className="h-4 w-4 text-cyan-200" />
-                Filter
+                {t.filter}
               </button>
               <button
                 type="button"
                 className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.06] px-3 py-2.5 text-sm font-black text-slate-200 shadow-sm shadow-black/20"
               >
                 <SlidersHorizontal className="h-4 w-4 text-cyan-200" />
-                Sort
+                {t.sort}
               </button>
             </div>
 
@@ -392,7 +392,7 @@ export default function MobileAuctionPanel({
               type="button"
               className="flex items-center gap-2 rounded-xl bg-yellow-400 px-4 py-2.5 text-sm font-black text-black shadow-[0_12px_28px_rgba(250,204,21,0.22)]"
             >
-              All
+              {t.allAuctions}
               <ChevronDown className="h-4 w-4" />
             </button>
           </div>
@@ -432,8 +432,8 @@ export default function MobileAuctionPanel({
                       )}`}
                     >
                       {countdownStatus === 'Ended'
-                        ? 'ENDED'
-                        : `${countdownStatus === 'Ending' ? 'ENDING' : 'LIVE'} · ${countdownLabel}`}
+                        ? t.ended.toUpperCase()
+                        : `${countdownStatus === 'Ending' ? t.ending.toUpperCase() : t.live.toUpperCase()} · ${countdownLabel}`}
                     </div>
 
                     <div className="absolute bottom-0 left-0 right-0 z-20 h-1 bg-black/50">
@@ -461,7 +461,7 @@ export default function MobileAuctionPanel({
                         className={`h-3.5 w-3.5 ${getCountdownTextClass(timeLeftSeconds)}`}
                       />
                       <span className={getCountdownTextClass(timeLeftSeconds)}>
-                        {countdownStatus === 'Ended' ? 'Sale closed' : countdownLabel}
+                        {countdownStatus === 'Ended' ? t.saleClosed : countdownLabel}
                       </span>
                     </div>
                     <p className="mt-1 text-sm font-black text-yellow-300">
@@ -550,7 +550,7 @@ export default function MobileAuctionPanel({
                     </div>
 
                     <span className="rounded-full border border-white/10 bg-black/30 px-3 py-1.5 text-xs font-black text-white">
-                      {selectedItem.bidCount} bid
+                      {selectedItem.bidCount} {selectedItem.bidCount === 1 ? t.bidSingular : t.bidsPlural}
                     </span>
                   </div>
 
@@ -669,7 +669,7 @@ export default function MobileAuctionPanel({
                     <p className="text-sm font-black text-white">+{bidStep}</p>
                   </div>
                   <div className="rounded-full border border-white/10 bg-white/[0.08] px-3 py-1 text-xs font-black text-white">
-                    {selectedItem.bidCount} bid
+                    {selectedItem.bidCount} {selectedItem.bidCount === 1 ? t.bidSingular : t.bidsPlural}
                   </div>
                 </div>
               </div>
@@ -695,10 +695,10 @@ export default function MobileAuctionPanel({
                 >
                   <Gavel className="h-4 w-4" />
                   {selectedCountdownStatus === 'Ended'
-                    ? '{t.auctionEnded}'
+                    ? t.auctionEnded
                     : walletBalance >= bidStep
-                      ? '{t.bidNow}'
-                      : '{t.topUpToBid}'}
+                      ? t.bidNow
+                      : t.topUpToBid}
                 </button>
               </div>
             </div>
