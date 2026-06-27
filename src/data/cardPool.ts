@@ -1,3 +1,14 @@
+import greatPack from '../assets/decks/great-pack.png'
+import ultraPack from '../assets/decks/ultra-pack.png'
+import masterPack from '../assets/decks/master-pack.png'
+import crownZenithVaultDrop from '../assets/decks/crown-zenith-vault-drop.png'
+import classicBaseHoloDrop from '../assets/decks/classic-base-holo-drop.png'
+import venusaurHoloVaultedDrop from '../assets/decks/venusaur-holo-vaulted-drop.png'
+import electricDeckCover from '../assets/decks/electric-deck-cover.png'
+import mysteryDeckCover from '../assets/decks/mystery-deck-cover.png'
+import pirateDeckCover from '../assets/decks/pirate-deck-cover.png'
+import secretDeckCover from '../assets/decks/secret-deck-cover.png'
+
 export type Pack = {
   name: string
   category: string
@@ -35,6 +46,22 @@ export const pokemonPackCoverUrls = {
   blastoiseBase: 'https://images.pokemontcg.io/base1/2_hires.png',
   venusaurBase: 'https://images.pokemontcg.io/base1/15_hires.png',
   crownPikachu: 'https://images.pokemontcg.io/swsh12pt5gg/GG30_hires.png',
+}
+
+export const packCoverAssets = {
+  greatPack,
+  ultraPack,
+  masterPack,
+  crownZenithVaultDrop,
+  classicBaseHoloDrop,
+  venusaurHoloVaultedDrop,
+}
+
+export const genericPackCoverAssets = {
+  electricDeckCover,
+  mysteryDeckCover,
+  pirateDeckCover,
+  secretDeckCover,
 }
 
 export const pokemonRealCardPool: RevealCard[] = [

@@ -39,7 +39,7 @@ import type { RaffleEntry, RaffleWinner } from '../../components/RaffleCenterPan
 import type { TransactionRecord } from '../../components/TransactionDrawer'
 import type { ShippingStatus, VaultCard } from '../../components/VaultDrawer'
 import type { Pack } from '../../data/cardPool'
-import { pokemonPackCoverUrls } from '../../data/cardPool'
+import { packCoverAssets, genericPackCoverAssets } from '../../data/cardPool'
 
 import thunderCard from '../../assets/cards/thunder-card.png'
 import pirateCard from '../../assets/cards/pirate-card.png'
@@ -123,7 +123,7 @@ const initialPacks: Pack[] = [
     totalQuantity: 300,
     glow: 'from-orange-300 to-red-700',
     badge: 'Charizard Chase',
-    cover: pokemonPackCoverUrls.charizard151,
+    cover: packCoverAssets.greatPack,
   },
   {
     name: 'Pokémon VMAX Electric Chase',
@@ -134,7 +134,7 @@ const initialPacks: Pack[] = [
     totalQuantity: 260,
     glow: 'from-yellow-300 to-cyan-600',
     badge: 'Pikachu Chase',
-    cover: pokemonPackCoverUrls.pikachuVmax,
+    cover: packCoverAssets.ultraPack,
   },
   {
     name: 'Crown Zenith Vault Drop',
@@ -145,7 +145,7 @@ const initialPacks: Pack[] = [
     totalQuantity: 120,
     glow: 'from-amber-200 to-purple-700',
     badge: 'Gold Chase',
-    cover: pokemonPackCoverUrls.arceusGallery,
+    cover: packCoverAssets.crownZenithVaultDrop,
   },
   {
     name: 'Classic Base Set Holo Drop',
@@ -156,7 +156,7 @@ const initialPacks: Pack[] = [
     totalQuantity: 50,
     glow: 'from-red-400 to-orange-700',
     badge: 'Vintage Holo',
-    cover: pokemonPackCoverUrls.baseCharizard,
+    cover: packCoverAssets.classicBaseHoloDrop,
   },
   {
     name: 'SEA Pokémon Creator Mega Drop',
@@ -167,7 +167,7 @@ const initialPacks: Pack[] = [
     totalQuantity: 500,
     glow: 'from-emerald-300 to-cyan-600',
     badge: 'Creator Drop',
-    cover: pokemonPackCoverUrls.mewEx,
+    cover: genericPackCoverAssets.mysteryDeckCover,
   },
   {
     name: 'Kanto Starter Creator Drop',
@@ -178,7 +178,7 @@ const initialPacks: Pack[] = [
     totalQuantity: 180,
     glow: 'from-cyan-300 to-blue-700',
     badge: 'Kanto Drop',
-    cover: pokemonPackCoverUrls.blastoiseBase,
+    cover: genericPackCoverAssets.electricDeckCover,
   },
   {
     name: 'Gallery Pikachu Weekly Drop',
@@ -189,7 +189,7 @@ const initialPacks: Pack[] = [
     totalQuantity: 120,
     glow: 'from-yellow-300 to-amber-600',
     badge: 'Weekly Drop',
-    cover: pokemonPackCoverUrls.crownPikachu,
+    cover: genericPackCoverAssets.secretDeckCover,
   },
   {
     name: 'Venusaur Holo Vaulted Drop',
@@ -200,7 +200,7 @@ const initialPacks: Pack[] = [
     totalQuantity: 180,
     glow: 'from-lime-300 to-emerald-700',
     badge: 'Vaulted',
-    cover: pokemonPackCoverUrls.venusaurBase,
+    cover: packCoverAssets.venusaurHoloVaultedDrop,
   },
 ]
 
@@ -324,9 +324,9 @@ const createPackFormFromPack = (pack: ManagedPack): PackFormState => ({
 
 
 const packCoverMap: Record<Exclude<PackCoverKey, 'custom'>, string> = {
-  electric: pokemonPackCoverUrls.pikachuVmax,
-  pirate: pokemonPackCoverUrls.baseCharizard,
-  secret: pokemonPackCoverUrls.arceusGallery,
+  electric: genericPackCoverAssets.electricDeckCover,
+  pirate: genericPackCoverAssets.pirateDeckCover,
+  secret: genericPackCoverAssets.secretDeckCover,
 }
 
 const inferCoverKey = (packName: string): Exclude<PackCoverKey, 'custom'> => {
