@@ -12,9 +12,11 @@ import type { Pack, RevealCard } from '../data/cardPool'
 import { getOpenedTime, getWeightedRandomCard } from '../data/cardPool'
 import type { VaultCard } from './VaultDrawer'
 import { audioManager } from '../lib/audioManager'
+import { translations, type AppLanguage } from '../lib/i18n'
 import sealedCardPremium from '../assets/ui/sealed-card-premium.png'
 
 type PackOpeningModalProps = {
+  language: AppLanguage
   pack: Pack | null
   onClose: () => void
   onBackToDetail?: () => void
@@ -35,11 +37,13 @@ const createVaultCard = (result: RevealCard, pack: Pack): VaultCard => ({
 })
 
 export default function PackOpeningModal({
+  language,
   pack,
   onClose,
   onBackToDetail,
   onAddToVault,
 }: PackOpeningModalProps) {
+  const t = translations[language]
   const [stage, setStage] = useState<Stage>('ready')
   const [result, setResult] = useState<RevealCard | null>(null)
   const savedResultIdRef = useRef<string | null>(null)
@@ -124,7 +128,7 @@ export default function PackOpeningModal({
 
             <div className="text-center">
               <p className="text-[10px] font-black uppercase tracking-[0.28em] text-cyan-300">
-                Open 1 Pack
+                {t.openOnePack}
               </p>
               <p className="max-w-[190px] truncate text-xs font-bold text-slate-400">
                 {pack.name}
@@ -143,7 +147,7 @@ export default function PackOpeningModal({
           <button
             type="button"
             onClick={onClose}
-            aria-label="Close opening modal"
+            aria-label={t.cancel}
             className="absolute right-5 top-5 z-10 hidden h-11 w-11 items-center justify-center rounded-full border border-cyan-300/40 bg-slate-950/95 text-cyan-100 shadow-[0_0_35px_rgba(34,211,238,0.35)] transition hover:scale-105 hover:bg-cyan-300/10 sm:flex"
           >
             <X className="h-5 w-5" />
@@ -153,12 +157,12 @@ export default function PackOpeningModal({
             <div className="mb-3 flex items-center gap-2">
               <PackageOpen className="h-5 w-5 text-cyan-300" />
               <p className="text-xs font-black uppercase tracking-[0.3em] text-cyan-300">
-                Pokémon Real Card Opening
+                {t.pokemonRealCardOpening}
               </p>
             </div>
             <h2 className="text-3xl font-black text-white">{pack.name}</h2>
             <p className="mt-3 text-sm leading-6 text-slate-400">
-              Real Pokémon TCG card image reveals and saves directly into My Vault.
+              {t.packOpeningDescription}
             </p>
           </div>
 
@@ -179,13 +183,13 @@ export default function PackOpeningModal({
                 <div className="mb-3 flex flex-wrap items-center gap-2 sm:mb-4">
                   <span className="rounded-full border border-cyan-300/20 bg-cyan-300/10 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-cyan-200">
                     {stage === 'ready'
-                      ? 'Ready'
+                      ? t.ready
                       : stage === 'opening'
-                        ? 'Opening'
-                        : 'Saved'}
+                        ? t.opening
+                        : t.saved}
                   </span>
                   <span className="rounded-full border border-emerald-300/20 bg-emerald-300/10 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-emerald-200">
-                    Auto Vault
+                    {t.autoVault}
                   </span>
                 </div>
 
@@ -226,7 +230,7 @@ export default function PackOpeningModal({
                     {isRevealed ? (
                       <>
                         <p className="text-[10px] font-black uppercase tracking-[0.28em] text-purple-300">
-                          Result
+                          {t.result}
                         </p>
                         <h3 className="mt-2 text-2xl font-black leading-tight text-white sm:text-3xl">
                           {result.name}
@@ -240,19 +244,19 @@ export default function PackOpeningModal({
 
                         <div className="mt-4 inline-flex items-center gap-2 rounded-full border border-emerald-300/30 bg-emerald-300/10 px-4 py-2 text-sm font-black text-emerald-200">
                           <CheckCircle2 className="h-5 w-5" />
-                          Saved to Vault
+                          {t.savedToVault}
                         </div>
                       </>
                     ) : (
                       <>
                         <p className="text-[10px] font-black uppercase tracking-[0.28em] text-cyan-300">
-                          Next Step
+                          {t.nextStep}
                         </p>
                         <h3 className="mt-2 text-2xl font-black leading-tight text-white">
-                          Reveal Your Card
+                          {t.revealYourCard}
                         </h3>
                         <p className="mt-2 text-sm leading-6 text-slate-400">
-                          The result will save into Vault automatically after reveal.
+                          {t.resultAutoSaveDesc}
                         </p>
                       </>
                     )}
@@ -267,7 +271,7 @@ export default function PackOpeningModal({
                       className="inline-flex flex-1 items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm font-black text-slate-300 transition hover:bg-white/[0.08]"
                     >
                       <ArrowLeft className="h-4 w-4" />
-                      Back to Detail
+                      {t.backToDetail}
                     </button>
                   )}
 
@@ -278,7 +282,7 @@ export default function PackOpeningModal({
                       className="hud-button inline-flex flex-[2] items-center justify-center gap-2 px-5 py-3 text-sm"
                     >
                       <ShieldCheck className="h-4 w-4" />
-                      Reveal Card
+                      {t.revealCard}
                     </button>
                   ) : (
                     <button
@@ -287,7 +291,7 @@ export default function PackOpeningModal({
                       className="hud-button inline-flex flex-[2] items-center justify-center gap-2 px-5 py-3 text-sm"
                     >
                       <CheckCircle2 className="h-4 w-4" />
-                      Continue
+                      {t.continueLabel}
                     </button>
                   )}
                 </div>
@@ -303,7 +307,7 @@ export default function PackOpeningModal({
                 className="hud-button flex w-full items-center justify-center gap-2 px-5 py-4 text-sm"
               >
                 <ShieldCheck className="h-4 w-4" />
-                Reveal Card
+                {t.revealCard}
               </button>
             ) : (
               <button
@@ -312,7 +316,7 @@ export default function PackOpeningModal({
                 className="hud-button flex w-full items-center justify-center gap-2 px-5 py-4 text-sm"
               >
                 <CheckCircle2 className="h-4 w-4" />
-                Continue
+                {t.continueLabel}
               </button>
             )}
           </div>

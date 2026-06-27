@@ -2381,6 +2381,7 @@ function PlayerAdminDemoShell({
       />
 
       <PackOpeningModal
+        language={language}
         pack={activeModal === 'opening' ? activePack : null}
         onClose={closeModal}
         onBackToDetail={backToPackDetail}
