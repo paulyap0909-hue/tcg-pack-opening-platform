@@ -7,6 +7,7 @@ import {
   Filter,
   Gavel,
   Heart,
+  HelpCircle,
   Search,
   Share2,
   SlidersHorizontal,
@@ -516,7 +517,7 @@ export default function MobileAuctionPanel({
               </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto pb-[190px]">
+            <div className="flex-1 overflow-y-auto pb-[230px]">
               <div className="flex justify-center border-b border-white/10 bg-[radial-gradient(circle_at_center,rgba(34,211,238,0.16),transparent_48%),linear-gradient(180deg,rgba(15,23,42,0.8),rgba(2,6,23,0.95))] p-4">
                 <img
                   src={selectedItem.image}
@@ -526,64 +527,48 @@ export default function MobileAuctionPanel({
               </div>
 
               <div className="px-5 py-5">
-                <h3 className="text-2xl font-semibold leading-tight text-white">
+                <h3 className="text-xl font-black leading-tight text-white">
                   {selectedItem.title}
                 </h3>
 
-                <div className="mt-4 flex items-end justify-between gap-4">
-                  <div>
-                    <p className="text-2xl font-black text-yellow-300">
-                      {formatMoney(selectedItem.currentBid)}
-                    </p>
-                    <p className="mt-1 text-sm text-slate-400">
-                      +MYR {selectedItem.shippingFee.toFixed(2)} Shipping Fee
-                    </p>
+                <div className="mt-4 rounded-[1.35rem] border border-white/10 bg-white/[0.055] p-4 shadow-inner shadow-black/20">
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <p className="text-[10px] font-black uppercase tracking-[0.22em] text-cyan-200/70">
+                        Current Bid
+                      </p>
+                      <p className="mt-1 text-3xl font-black text-yellow-300">
+                        {formatMoney(selectedItem.currentBid)}
+                      </p>
+                      <p className="mt-1 text-xs font-semibold text-slate-400">
+                        +MYR {selectedItem.shippingFee.toFixed(2)} Shipping Fee
+                      </p>
+                    </div>
+
+                    <span className="rounded-full border border-white/10 bg-black/30 px-3 py-1.5 text-xs font-black text-white">
+                      {selectedItem.bidCount} bid
+                    </span>
                   </div>
 
-                  <span className="rounded-full border border-white/10 bg-white/[0.08] px-3 py-1 text-xs font-black text-white">
-                    {selectedItem.bidCount} bid
-                  </span>
-                </div>
-
-                <div className="mt-5 overflow-hidden rounded-2xl border border-white/10 bg-white/[0.06] p-4 shadow-inner shadow-black/20">
-                  <div className="flex items-center justify-between gap-3">
-                    <div>
-                      <p className="text-[10px] font-black uppercase tracking-[0.24em] text-cyan-200/70">
-                        Countdown
-                      </p>
-                      <p
-                        className={`mt-1 text-2xl font-black ${getCountdownTextClass(
-                          selectedTimeLeftSeconds,
-                        )}`}
-                      >
+                  <div className="mt-4 rounded-2xl border border-white/10 bg-black/20 p-3">
+                    <div className="flex items-center justify-between gap-3">
+                      <p className="text-xs font-bold text-slate-400">Ends in</p>
+                      <p className={`text-sm font-black ${getCountdownTextClass(selectedTimeLeftSeconds)}`}>
                         {formatAuctionCountdown(selectedTimeLeftSeconds)}
                       </p>
                     </div>
-
-                    <div
-                      className={`rounded-full border px-3 py-1.5 text-xs font-black ${getCountdownBadgeClass(
-                        selectedTimeLeftSeconds,
-                      )}`}
-                    >
-                      {selectedCountdownStatus === 'Ended'
-                        ? 'ENDED'
-                        : selectedCountdownStatus === 'Ending'
-                          ? 'ENDING SOON'
-                          : 'LIVE'}
+                    <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-black/40">
+                      <div
+                        className={`h-full rounded-full transition-all duration-500 ${getCountdownProgressClass(
+                          selectedTimeLeftSeconds,
+                        )}`}
+                        style={{ width: `${selectedProgress}%` }}
+                      />
                     </div>
-                  </div>
-
-                  <div className="mt-3 h-2 overflow-hidden rounded-full bg-black/40">
-                    <div
-                      className={`h-full rounded-full transition-all duration-500 ${getCountdownProgressClass(
-                        selectedTimeLeftSeconds,
-                      )}`}
-                      style={{ width: `${selectedProgress}%` }}
-                    />
                   </div>
                 </div>
 
-                <div className="mt-5 flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.06] p-4 shadow-[0_16px_45px_rgba(0,0,0,0.24)]">
+                <div className="mt-4 flex items-center gap-3 rounded-[1.25rem] border border-white/10 bg-white/[0.055] p-4 shadow-[0_16px_45px_rgba(0,0,0,0.20)]">
                   <img
                     src={`https://api.dicebear.com/9.x/adventurer/svg?seed=${selectedItem.seller}&radius=50&backgroundColor=facc15`}
                     alt={selectedItem.seller}
@@ -594,7 +579,7 @@ export default function MobileAuctionPanel({
                     <p className="text-sm text-slate-400">
                       {selectedItem.country} | {selectedItem.followers} followers
                     </p>
-                    <p className="mt-1 text-xs text-slate-500">
+                    <p className="mt-1 text-xs text-yellow-100/75">
                       {selectedItem.sold} sold | ⭐ {selectedItem.review} Positive Review
                     </p>
                   </div>
@@ -606,7 +591,39 @@ export default function MobileAuctionPanel({
                   </button>
                 </div>
 
-                <div className="mt-5 rounded-2xl border border-white/10 bg-white/[0.06] p-4 shadow-inner shadow-black/20">
+                <div className="mt-4 overflow-hidden rounded-[1.25rem] border border-white/10 bg-white/[0.045]">
+                  <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
+                    <p className="text-sm font-bold text-slate-300">Shipping Method</p>
+                    <p className="text-sm font-black text-white">Express</p>
+                  </div>
+                  <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
+                    <p className="text-sm font-bold text-slate-300">Condition</p>
+                    <p className="text-sm font-black text-white">PSA 10 / Sealed</p>
+                  </div>
+                  <div className="flex items-center justify-between px-4 py-3">
+                    <p className="text-sm font-bold text-slate-300">Authenticity</p>
+                    <p className="text-sm font-black text-cyan-100">Checked</p>
+                  </div>
+                </div>
+
+                <div className="mt-4 rounded-[1.25rem] border border-white/10 bg-white/[0.045] p-4">
+                  <p className="text-sm font-black text-white">Description:</p>
+                  <p className="mt-3 text-sm leading-6 text-slate-400">
+                    Premium auction listing for {selectedItem.title}. The card is sealed,
+                    verified and ready for vault collection or express shipping after the
+                    auction is completed.
+                  </p>
+                </div>
+
+                <div className="mt-4 rounded-[1.25rem] border border-yellow-300/15 bg-yellow-300/[0.06] p-4">
+                  <p className="text-sm font-black text-yellow-100">Auction Note</p>
+                  <p className="mt-2 text-xs leading-5 text-yellow-100/70">
+                    1. Winner must complete payment within 3 days.<br />
+                    2. Auction items are final once the bid is confirmed.
+                  </p>
+                </div>
+
+                <div className="mt-4 rounded-[1.25rem] border border-white/10 bg-white/[0.045] p-4 shadow-inner shadow-black/20">
                   <p className="text-xs font-black uppercase tracking-[0.2em] text-cyan-200/70">
                     Quick Bid
                   </p>
@@ -617,7 +634,7 @@ export default function MobileAuctionPanel({
                         type="button"
                         onClick={() => setBidStep(step)}
                         disabled={selectedCountdownStatus === 'Ended'}
-                        className={`rounded-xl px-4 py-3 text-sm font-black ${
+                        className={`rounded-xl px-4 py-2.5 text-sm font-black ${
                           selectedCountdownStatus === 'Ended'
                             ? 'border border-white/5 bg-black/20 text-slate-600'
                             : bidStep === step
@@ -633,39 +650,55 @@ export default function MobileAuctionPanel({
               </div>
             </div>
 
-            <div className="fixed bottom-[calc(82px+env(safe-area-inset-bottom))] left-4 right-4 z-[1000020] rounded-[1.6rem] border border-white/10 bg-slate-950/90 p-3 shadow-[0_-18px_70px_rgba(0,0,0,0.42)] backdrop-blur-xl">
-              <div className="mb-2 flex items-center justify-between px-1">
-                <div>
-                  <p className="text-[10px] font-black uppercase tracking-[0.22em] text-cyan-200/70">
+            <div className="fixed bottom-[calc(58px+env(safe-area-inset-bottom))] left-0 right-0 z-[1000020] border-t border-white/10 bg-slate-950/95 px-4 pb-3 pt-3 shadow-[0_-18px_70px_rgba(0,0,0,0.48)] backdrop-blur-xl">
+              <div className="mb-2 flex items-center justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-cyan-200/70">
                     Current Bid
                   </p>
-                  <p className="text-lg font-black text-yellow-300">
+                  <p className="text-base font-black text-yellow-300">
                     {formatMoney(selectedItem.currentBid)}
                   </p>
                 </div>
 
-                <div className="rounded-full border border-white/10 bg-white/[0.08] px-3 py-1 text-xs font-black text-white">
-                  {selectedItem.bidCount} bid
+                <div className="flex shrink-0 items-center gap-2 text-right">
+                  <div>
+                    <p className="text-[10px] font-bold text-slate-500">Next</p>
+                    <p className="text-sm font-black text-white">+{bidStep}</p>
+                  </div>
+                  <div className="rounded-full border border-white/10 bg-white/[0.08] px-3 py-1 text-xs font-black text-white">
+                    {selectedItem.bidCount} bid
+                  </div>
                 </div>
               </div>
 
-              <button
-                type="button"
-                onClick={handleBid}
-                disabled={selectedCountdownStatus === 'Ended'}
-                className={`flex w-full items-center justify-center gap-2 rounded-full px-5 py-4 text-base font-black shadow-[0_12px_28px_rgba(234,179,8,0.25)] ${
-                  selectedCountdownStatus === 'Ended'
-                    ? 'bg-slate-800 text-slate-500 shadow-none'
-                    : 'bg-yellow-400 text-black'
-                }`}
-              >
-                <Gavel className="h-5 w-5" />
-                {selectedCountdownStatus === 'Ended'
-                  ? 'Auction Ended'
-                  : walletBalance >= bidStep
-                    ? `Bid Now +${bidStep}`
-                    : 'Top Up to Bid'}
-              </button>
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  className="flex h-12 w-14 shrink-0 flex-col items-center justify-center rounded-2xl border border-white/10 bg-white/[0.06] text-[10px] font-black text-slate-300"
+                >
+                  <HelpCircle className="h-4 w-4" />
+                  Help
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleBid}
+                  disabled={selectedCountdownStatus === 'Ended'}
+                  className={`flex h-12 flex-1 items-center justify-center gap-2 rounded-full px-5 text-sm font-black shadow-[0_12px_28px_rgba(234,179,8,0.22)] ${
+                    selectedCountdownStatus === 'Ended'
+                      ? 'bg-slate-800 text-slate-500 shadow-none'
+                      : 'bg-yellow-400 text-black'
+                  }`}
+                >
+                  <Gavel className="h-4 w-4" />
+                  {selectedCountdownStatus === 'Ended'
+                    ? 'Auction Ended'
+                    : walletBalance >= bidStep
+                      ? 'Bid Now'
+                      : 'Top Up to Bid'}
+                </button>
+              </div>
             </div>
           </div>
         </div>
