@@ -336,7 +336,7 @@ export default function MobileAuctionPanel({
       </div>
 
       {selectedItem && (
-        <div className="fixed inset-0 z-[1000000] bg-white text-slate-950">
+        <div className="fixed inset-0 z-[1000000] bg-white text-slate-950 lg:hidden">
           <div className="flex h-full flex-col">
             <div className="flex h-16 shrink-0 items-center justify-between border-b border-slate-100 px-4">
               <button
@@ -368,7 +368,7 @@ export default function MobileAuctionPanel({
               </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto pb-28">
+            <div className="flex-1 overflow-y-auto pb-[190px]">
               <div className="flex justify-center bg-slate-50 p-4">
                 <img
                   src={selectedItem.image}
@@ -453,14 +453,29 @@ export default function MobileAuctionPanel({
               </div>
             </div>
 
-            <div className="fixed bottom-0 left-0 right-0 border-t border-slate-100 bg-white px-5 py-4">
+            <div className="fixed bottom-[calc(82px+env(safe-area-inset-bottom))] left-4 right-4 z-[1000020] rounded-[1.6rem] border border-slate-200 bg-white/95 p-3 shadow-[0_-18px_60px_rgba(15,23,42,0.18)] backdrop-blur-xl">
+              <div className="mb-2 flex items-center justify-between px-1">
+                <div>
+                  <p className="text-[10px] font-black uppercase tracking-[0.22em] text-slate-400">
+                    Current Bid
+                  </p>
+                  <p className="text-lg font-black text-yellow-600">
+                    {formatMoney(selectedItem.currentBid)}
+                  </p>
+                </div>
+
+                <div className="rounded-full bg-slate-900 px-3 py-1 text-xs font-black text-white">
+                  {selectedItem.bidCount} bid
+                </div>
+              </div>
+
               <button
                 type="button"
                 onClick={handleBid}
                 disabled={selectedItem.status === 'Ended'}
-                className={`flex w-full items-center justify-center gap-2 rounded-full px-5 py-4 text-base font-black ${
+                className={`flex w-full items-center justify-center gap-2 rounded-full px-5 py-4 text-base font-black shadow-[0_12px_28px_rgba(234,179,8,0.25)] ${
                   selectedItem.status === 'Ended'
-                    ? 'bg-slate-200 text-slate-400'
+                    ? 'bg-slate-200 text-slate-400 shadow-none'
                     : 'bg-yellow-400 text-black'
                 }`}
               >
