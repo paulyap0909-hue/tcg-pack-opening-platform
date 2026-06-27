@@ -190,8 +190,8 @@ export default function PackOpeningModal({
                 </div>
 
                 <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_220px] sm:items-start">
-                  <div className={`hud-rarity-glow flex h-[360px] items-center justify-center rounded-[1.4rem] bg-gradient-to-br ${result.glow} p-[1px] sm:h-[430px] sm:rounded-3xl`}>
-                    <div className="flex h-full w-full items-center justify-center overflow-hidden rounded-[1.4rem] bg-black/85 p-3 sm:rounded-3xl">
+                  <div className={`hud-rarity-glow flex h-[58svh] min-h-[430px] max-h-[520px] items-center justify-center rounded-[1.4rem] bg-gradient-to-br ${result.glow} p-[1px] sm:h-[520px] sm:rounded-3xl`}>
+                    <div className="flex h-full w-full items-center justify-center overflow-hidden rounded-[1.4rem] bg-black/85 p-2 sm:rounded-3xl sm:p-4">
                       {isRevealed ? (
                         <motion.img
                           src={result.image}
@@ -214,7 +214,7 @@ export default function PackOpeningModal({
                           <img
                             src={sealedCardPremium}
                             alt="Premium sealed card reveal"
-                            className="h-full w-full object-cover"
+                            className="h-full w-full object-contain"
                             draggable={false}
                           />
                         </motion.div>
