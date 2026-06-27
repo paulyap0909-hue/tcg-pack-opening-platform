@@ -9,7 +9,7 @@ import {
   X,
 } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
-import { translations, type AppLanguage } from '../lib/i18n'
+import { translations, type AppLanguage, type Translation } from '../lib/i18n'
 
 export type ShippingStatus =
   | 'Stored'
@@ -89,6 +89,44 @@ function getStatusStyle(status: ShippingStatus) {
   }
 
   return 'border-purple-300/20 bg-purple-300/10 text-purple-200'
+}
+
+function getLocalizedCardStatus(status: ShippingStatus, t: Translation) {
+  if (status === 'Stored') return t.statusStored
+  if (status === 'Listed on Marketplace') return t.statusListedMarketplace
+  if (status === 'Shipping Requested') return t.statusShippingRequested
+  if (status === 'Preparing') return t.statusPreparing
+  if (status === 'Shipped') return t.statusShipped
+  if (status === 'Delivered') return t.statusDelivered
+
+  return status
+}
+
+export function getLocalizedCardRarity(rarity: string, t: Translation) {
+  if (rarity === 'Common') return t.rarityCommon
+  if (rarity === 'Rare') return t.rarityRare
+  if (rarity === 'Double Rare') return t.rarityDoubleRare
+  if (rarity === 'Rare Holo') return t.rarityRareHolo
+  if (rarity === 'Rare Holo EX') return t.rarityRareHoloEx
+  if (rarity === 'Rare Holo VMAX') return t.rarityRareHoloVmax
+  if (rarity === 'Rare Rainbow') return t.rarityRareRainbow
+  if (rarity === 'Rare Secret') return t.rarityRareSecret
+  if (rarity === 'Rare Shiny VMAX') return t.rarityRareShinyVmax
+  if (rarity === 'Special Illustration Rare') return t.raritySpecialIllustrationRare
+  if (rarity === 'Trainer Gallery Rare Holo') return t.rarityTrainerGalleryRareHolo
+
+  return rarity
+}
+
+export function getLocalizedCardGrade(grade: string, t: Translation) {
+  if (grade === 'Mint Style') return t.gradeMintStyle
+  if (grade === 'Near Mint Style') return t.gradeNearMintStyle
+  if (grade === 'Pack Fresh') return t.gradePackFresh
+  if (grade === 'Classic Pack Fresh') return t.gradeClassicPackFresh
+  if (grade === 'Classic Holo Style') return t.gradeClassicHoloStyle
+  if (grade === 'Gallery Style') return t.gradeGalleryStyle
+
+  return grade
 }
 
 function shortPackName(packName: string) {
@@ -284,17 +322,17 @@ export default function VaultDrawer({
                           <span
                             className={`absolute left-2 top-2 rounded-full border px-2 py-1 text-[8px] font-black uppercase tracking-wider ${getStatusStyle(card.status)}`}
                           >
-                            {card.status === 'Stored' ? t.stored : t.locked}
+                            {getLocalizedCardStatus(card.status, t)}
                           </span>
                         </div>
 
                         <div className="p-3">
                           <div className="mb-2 flex flex-wrap gap-1.5">
                             <span className="rounded-full border border-amber-300/20 bg-amber-300/10 px-2 py-1 text-[8px] font-black uppercase tracking-wider text-amber-200">
-                              {card.rarity}
+                              {getLocalizedCardRarity(card.rarity, t)}
                             </span>
                             <span className="rounded-full border border-purple-300/20 bg-purple-300/10 px-2 py-1 text-[8px] font-black uppercase tracking-wider text-purple-200">
-                              {sellBackPoints} pts
+                              {sellBackPoints} {t.pointsShort}
                             </span>
                           </div>
 
@@ -372,7 +410,7 @@ export default function VaultDrawer({
                             {isListed && card.listingPrice && (
                               <div className="flex items-center gap-1.5 text-amber-300">
                                 <ShoppingBag className="h-3 w-3" />
-                                <span>{card.listingPrice.toLocaleString()} pts</span>
+                                <span>{card.listingPrice.toLocaleString()} {t.pointsShort}</span>
                               </div>
                             )}
                           </div>

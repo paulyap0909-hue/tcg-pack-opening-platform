@@ -9,7 +9,7 @@ import { useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
 import { translations, type AppLanguage } from '../lib/i18n'
 
-import type { ShippingInfo, VaultCard } from './VaultDrawer'
+import { getLocalizedCardGrade, getLocalizedCardRarity, type ShippingInfo, type VaultCard } from './VaultDrawer'
 
 type ShippingConfirmModalProps = {
   language: AppLanguage
@@ -138,7 +138,7 @@ export default function ShippingConfirmModal({
               <div className="mt-4 rounded-2xl border border-cyan-300/10 bg-cyan-300/[0.04] p-4">
                 <p className="text-sm font-black text-white">{card.name}</p>
                 <p className="mt-1 text-xs uppercase tracking-[0.2em] text-cyan-300">
-                  {card.rarity} · {card.grade}
+                  {getLocalizedCardRarity(card.rarity, t)} · {getLocalizedCardGrade(card.grade, t)}
                 </p>
                 <p className="mt-3 text-xs text-slate-400">
                   {t.source}: {card.sourcePack}

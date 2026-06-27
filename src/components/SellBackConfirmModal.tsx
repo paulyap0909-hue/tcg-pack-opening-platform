@@ -10,7 +10,7 @@ import {
 import { useEffect } from 'react'
 import { translations, type AppLanguage } from '../lib/i18n'
 
-import { type VaultCard, getSellBackPoints } from './VaultDrawer'
+import { type VaultCard, getLocalizedCardGrade, getLocalizedCardRarity, getSellBackPoints } from './VaultDrawer'
 
 type SellBackConfirmModalProps = {
   language: AppLanguage
@@ -102,11 +102,11 @@ export default function SellBackConfirmModal({
               <div>
                 <div className="mb-3 flex flex-wrap gap-2">
                   <span className="rounded-full border border-amber-300/20 bg-amber-300/10 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-amber-200">
-                    {card.rarity}
+                    {getLocalizedCardRarity(card.rarity, t)}
                   </span>
 
                   <span className="rounded-full border border-cyan-300/20 bg-cyan-300/10 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-cyan-200">
-                    {card.grade}
+                    {getLocalizedCardGrade(card.grade, t)}
                   </span>
                 </div>
 
