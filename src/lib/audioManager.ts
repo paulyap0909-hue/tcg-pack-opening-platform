@@ -68,6 +68,7 @@ class TcgAudioManager {
   private sfxBufferPromises = new Map<SfxName, Promise<AudioBuffer | null>>()
   private htmlAudioPools = new Map<SfxName, HTMLAudioElement[]>()
   private lastSfxPlayedAt = new Map<SfxName, number>()
+  private lastButtonClickPlayedAt = 0
 
   get hasSavedPreference() {
     if (typeof window === 'undefined') return false
@@ -320,6 +321,24 @@ class TcgAudioManager {
     } catch {
       // Browser rejected this play attempt; ignore so UI never breaks.
     }
+  }
+
+  playButtonClick(options?: { throttleMs?: number; volume?: number }) {
+    if (!isBrowser() || !this.enabled) return
+
+    const throttleMs = options?.throttleMs ?? 70
+    const now = Date.now()
+
+    if (now - this.lastButtonClickPlayedAt < throttleMs) return
+
+    this.lastButtonClickPlayedAt = now
+
+    const volume = options?.volume ?? this.getSfxVolume()
+
+    // Keep button click on the HTMLAudio pool instead of Web Audio.
+    // This is more reliable on mobile browsers where BGM works but
+    // decoded Web Audio SFX may stay suspended or fail silently.
+    this.playHtmlSfx('buttonClick', volume)
   }
 
   playSfx(name: SfxName, options?: { throttleMs?: number; volume?: number }) {
