@@ -123,6 +123,8 @@ type PackSortOption =
   | 'Price: High to Low'
   | 'A-Z'
 
+type MobilePage = 'home' | 'packs' | 'auction' | 'rewards' | 'account'
+
 type QuestStatIncrement = Partial<
   Pick<
     QuestStats,
@@ -694,6 +696,7 @@ function PlayerAdminDemoShell({
   const [isTransactionOpen, setIsTransactionOpen] = useState(false)
   const [isPlayerWalletOpen, setIsPlayerWalletOpen] = useState(false)
   const [isAdminShippingOpen, setIsAdminShippingOpen] = useState(initialAdminOpen)
+  const [mobilePage, setMobilePage] = useState<MobilePage>('home')
   const [selectedCategory, setSelectedCategory] =
     useState<PackCategory>('All')
   const [packSearchQuery, setPackSearchQuery] = useState('')
@@ -1497,7 +1500,13 @@ function PlayerAdminDemoShell({
   }, [playerVisiblePacks, selectedCategory, packSearchQuery, packSortBy])
 
 
+  const getMobileNavClass = (page: MobilePage) => {
+    const isActive = mobilePage === page
 
+    return `flex flex-col items-center gap-1 rounded-2xl px-2 py-2 text-[11px] font-black transition ${
+      isActive ? 'text-cyan-200' : 'text-slate-400'
+    }`
+  }
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-[#030712] text-white">
@@ -1564,7 +1573,7 @@ function PlayerAdminDemoShell({
 
             <button
               type="button"
-              onClick={() => setIsPlayerWalletOpen(true)}
+              onClick={() => setMobilePage('account')}
               className="flex h-11 w-11 items-center justify-center rounded-full border border-purple-300/20 bg-purple-300/10"
             >
               <img
@@ -1576,6 +1585,317 @@ function PlayerAdminDemoShell({
           </div>
         </header>
 
+
+        <div className="lg:hidden">
+          {mobilePage === 'home' && (
+            <div className="space-y-6">
+              <HeroPackSection
+                packImage={heroPremiumShinyPack}
+                packName="Premium Shiny Featured Pack"
+                walletBalance={walletBalance}
+                totalRemaining={totalRemaining}
+                totalSupply={totalSupply}
+                raffleTickets={raffleTickets}
+                vaultCount={vaultCards.length}
+                onStartOpening={() => setMobilePage('packs')}
+                onHowItWorks={() => setMobilePage('rewards')}
+                onTopUp={openTopUpModal}
+                onOpenVault={() => setMobilePage('account')}
+              />
+
+              <section className="mx-auto w-full max-w-7xl px-4 pb-7">
+                <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.04] p-4">
+                  <p className="text-[11px] font-black uppercase tracking-[0.28em] text-cyan-300">
+                    Quick Access
+                  </p>
+                  <div className="mt-4 grid grid-cols-3 gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setMobilePage('packs')}
+                      className="rounded-2xl border border-cyan-300/20 bg-cyan-300/10 p-3 text-left"
+                    >
+                      <PackageOpen className="h-5 w-5 text-cyan-300" />
+                      <p className="mt-3 text-sm font-black text-white">Packs</p>
+                      <p className="mt-1 text-[11px] text-slate-400">Open drops</p>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setMobilePage('auction')}
+                      className="rounded-2xl border border-yellow-300/20 bg-yellow-300/10 p-3 text-left"
+                    >
+                      <Gavel className="h-5 w-5 text-yellow-300" />
+                      <p className="mt-3 text-sm font-black text-white">Auction</p>
+                      <p className="mt-1 text-[11px] text-slate-400">Live bids</p>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setMobilePage('rewards')}
+                      className="rounded-2xl border border-purple-300/20 bg-purple-300/10 p-3 text-left"
+                    >
+                      <Gift className="h-5 w-5 text-purple-300" />
+                      <p className="mt-3 text-sm font-black text-white">Rewards</p>
+                      <p className="mt-1 text-[11px] text-slate-400">Claim now</p>
+                    </button>
+                  </div>
+                </div>
+              </section>
+            </div>
+          )}
+
+          {mobilePage === 'packs' && (
+            <section id="packs" className="mx-auto w-full max-w-7xl px-4 py-5">
+              <div className="mb-4">
+                <p className="text-[11px] font-black uppercase tracking-[0.28em] text-cyan-300">
+                  Pack Catalog
+                </p>
+                <h2 className="mt-2 text-3xl font-black text-white">
+                  Browse Packs
+                </h2>
+                <p className="mt-2 text-sm leading-6 text-slate-400">
+                  Choose a pack, open details, then pull cards into your vault.
+                </p>
+              </div>
+
+              <div className="mb-4 flex gap-2 overflow-x-auto pb-1 [-webkit-overflow-scrolling:touch]">
+                {categoryFilters.map((category) => {
+                  const isSelected = selectedCategory === category
+
+                  return (
+                    <button
+                      key={category}
+                      type="button"
+                      onClick={() => setSelectedCategory(category)}
+                      className={`flex shrink-0 items-center gap-2 rounded-2xl border px-3 py-2.5 text-[11px] font-black uppercase tracking-wider transition ${
+                        isSelected
+                          ? 'border-cyan-300 bg-cyan-300 text-black'
+                          : 'border-white/8 bg-white/[0.04] text-slate-300'
+                      }`}
+                    >
+                      <Filter className="h-4 w-4" />
+                      {category}
+                    </button>
+                  )
+                })}
+              </div>
+
+              {filteredPacks.length === 0 ? (
+                <div className="rounded-[1.5rem] border border-white/8 bg-white/[0.03] px-6 py-12 text-center">
+                  <p className="text-xl font-black text-white">No packs found</p>
+                  <p className="mt-2 text-sm text-slate-400">
+                    Try another search keyword or switch to a different category.
+                  </p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 gap-3">
+                  {filteredPacks.map((pack, index) => {
+                    const isSoldOut = pack.remainingQuantity <= 0
+
+                    return (
+                      <motion.article
+                        key={pack.name}
+                        initial={{ opacity: 0, y: 18 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.03 }}
+                        onClick={() => {
+                          if (!isSoldOut) openPackDetail(pack)
+                        }}
+                        className={`group relative overflow-hidden rounded-[1.25rem] border border-white/6 bg-[#0a1322]/95 p-2.5 shadow-[0_12px_40px_rgba(0,0,0,0.28)] ${
+                          isSoldOut ? 'cursor-not-allowed opacity-60 grayscale' : 'cursor-pointer'
+                        }`}
+                      >
+                        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.07),transparent_36%),linear-gradient(180deg,rgba(255,255,255,0.02),transparent)]" />
+
+                        <div className="relative flex min-h-[245px] flex-col">
+                          <div className="text-center">
+                            <h3 className="line-clamp-2 min-h-[2.3rem] text-xs font-black leading-tight text-white">
+                              {pack.name}
+                            </h3>
+                            <p className="mt-1 text-xs text-slate-500">{pack.category}</p>
+                          </div>
+
+                          <div className="flex flex-1 items-center justify-center px-2 py-4">
+                            <img
+                              src={pack.cover}
+                              alt={pack.name}
+                              loading="lazy"
+                              className="max-h-[128px] w-auto object-contain drop-shadow-[0_18px_35px_rgba(0,0,0,0.45)]"
+                            />
+                          </div>
+
+                          <div className="mt-auto flex items-center justify-between gap-3 pt-2">
+                            <div className="flex items-center gap-1.5 text-sm font-black text-white">
+                              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-amber-300/15 text-amber-300">
+                                <Gem className="h-4 w-4 fill-current" />
+                              </div>
+                              {getPackCost(pack).toFixed(2)}
+                            </div>
+
+                            <button
+                              type="button"
+                              disabled={isSoldOut}
+                              onClick={(event) => {
+                                event.stopPropagation()
+                                if (!isSoldOut) openPackDetail(pack)
+                              }}
+                              className={`inline-flex items-center gap-1 text-sm font-bold ${
+                                isSoldOut ? 'text-slate-500' : 'text-slate-300'
+                              }`}
+                            >
+                              {isSoldOut ? 'Sold Out' : 'View'}
+                              {!isSoldOut && <ChevronRight className="h-4 w-4" />}
+                            </button>
+                          </div>
+                        </div>
+                      </motion.article>
+                    )
+                  })}
+                </div>
+              )}
+            </section>
+          )}
+
+          {mobilePage === 'auction' && (
+            <MobileAuctionPanel
+              walletBalance={walletBalance}
+              onBid={handleAuctionBid}
+              onNeedTopUp={openTopUpModal}
+            />
+          )}
+
+          {mobilePage === 'rewards' && (
+            <div>
+              <section id="how-it-works">
+                <QuestLeaderboardPanel
+                  questStats={questStats}
+                  vaultCards={vaultCards}
+                  transactions={transactions}
+                  raffleTickets={raffleTickets}
+                  walletBalance={walletBalance}
+                  dailyLoginState={dailyLoginState}
+                  onClaimQuest={handleClaimQuest}
+                  onOpenDailyLogin={() => setIsDailyLoginOpen(true)}
+                />
+              </section>
+
+              <RaffleCenterPanel
+                ticketBalance={raffleTickets}
+                entries={raffleEntries}
+                winners={raffleWinners}
+                onEnterRaffle={handleEnterRaffle}
+              />
+            </div>
+          )}
+
+          {mobilePage === 'account' && (
+            <section className="mx-auto w-full max-w-7xl px-4 py-5">
+              <div className="rounded-[1.8rem] border border-white/10 bg-gradient-to-b from-white/[0.08] to-white/[0.03] p-5 shadow-[0_22px_80px_rgba(0,0,0,0.35)]">
+                <div className="flex items-center gap-4">
+                  <img
+                    src="https://api.dicebear.com/9.x/adventurer/svg?seed=detailedpower3615&radius=50&backgroundColor=8b5cf6"
+                    alt="Player account"
+                    className="h-16 w-16 rounded-2xl border border-white/10 object-cover"
+                  />
+                  <div>
+                    <p className="text-xl font-black text-white">detailedpower3615</p>
+                    <p className="mt-1 text-sm text-slate-400">Demo player account</p>
+                  </div>
+                </div>
+
+                <div className="mt-5 rounded-[1.4rem] border border-cyan-300/15 bg-cyan-300/[0.06] p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs font-black uppercase tracking-[0.24em] text-slate-400">
+                        Points Balance
+                      </p>
+                      <p className="mt-2 text-4xl font-black text-cyan-100">
+                        {walletBalance.toLocaleString()}
+                      </p>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={openTopUpModal}
+                      className="rounded-full bg-cyan-300 px-4 py-2 text-sm font-black text-black"
+                    >
+                      Add Points
+                    </button>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => setIsDailyLoginOpen(true)}
+                    className="mt-4 flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-blue-500 to-purple-500 px-5 py-3 text-sm font-black text-white"
+                  >
+                    <Gift className="h-5 w-5" />
+                    Roll Daily Points
+                  </button>
+                </div>
+
+                <div className="mt-4 grid grid-cols-3 gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setIsVaultOpen(true)}
+                    className="rounded-2xl border border-cyan-300/15 bg-cyan-300/[0.06] p-4 text-left"
+                  >
+                    <p className="text-[10px] font-black uppercase tracking-[0.24em] text-cyan-300">Vault</p>
+                    <p className="mt-2 text-2xl font-black text-white">{vaultCards.length}</p>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setMobilePage('rewards')}
+                    className="rounded-2xl border border-yellow-300/15 bg-yellow-300/[0.06] p-4 text-left"
+                  >
+                    <p className="text-[10px] font-black uppercase tracking-[0.24em] text-yellow-300">Tickets</p>
+                    <p className="mt-2 text-2xl font-black text-white">{raffleTickets}</p>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setIsTransactionOpen(true)}
+                    className="rounded-2xl border border-purple-300/15 bg-purple-300/[0.06] p-4 text-left"
+                  >
+                    <p className="text-[10px] font-black uppercase tracking-[0.24em] text-purple-300">History</p>
+                    <p className="mt-2 text-2xl font-black text-white">{transactions.length}</p>
+                  </button>
+                </div>
+
+                <div className="mt-4 space-y-3">
+                  <button
+                    type="button"
+                    onClick={() => setIsAdminShippingOpen(true)}
+                    className="flex w-full items-center justify-between rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-4 text-left"
+                  >
+                    <span className="font-black text-white">Shipments</span>
+                    <span className="rounded-full bg-white/10 px-2 py-1 text-xs font-black text-slate-300">
+                      {vaultCards.filter((card) => card.status === 'Shipping Requested').length}
+                    </span>
+                  </button>
+
+                  <button
+                    type="button"
+                    className="flex w-full items-center justify-between rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-4 text-left"
+                  >
+                    <span className="font-black text-white">Support</span>
+                    <ChevronRight className="h-4 w-4 text-slate-500" />
+                  </button>
+
+                  <button
+                    type="button"
+                    className="flex w-full items-center justify-between rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-4 text-left"
+                  >
+                    <span className="font-black text-white">Settings</span>
+                    <ChevronRight className="h-4 w-4 text-slate-500" />
+                  </button>
+                </div>
+              </div>
+            </section>
+          )}
+        </div>
+
+        <div className="hidden lg:block">
         <HeroPackSection
           packImage={heroPremiumShinyPack}
           packName="Premium Shiny Featured Pack"
@@ -1774,14 +2094,16 @@ function PlayerAdminDemoShell({
 
         {/* Real Card Catalog Preview is hidden for boss/demo presentation. */}
 
+        </div>
+
       </main>
 
       <nav className="fixed bottom-0 left-0 right-0 z-[99990] border-t border-white/10 bg-[#05070d]/94 px-2 pb-[env(safe-area-inset-bottom)] pt-2 backdrop-blur-xl lg:hidden">
         <div className="mx-auto grid max-w-md grid-cols-5">
           <button
             type="button"
-            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-            className="flex flex-col items-center gap-1 rounded-2xl px-2 py-2 text-[11px] font-black text-cyan-200"
+            onClick={() => setMobilePage('home')}
+            className={getMobileNavClass('home')}
           >
             <Home className="h-5 w-5" />
             Home
@@ -1789,8 +2111,8 @@ function PlayerAdminDemoShell({
 
           <button
             type="button"
-            onClick={() => document.getElementById('packs')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
-            className="flex flex-col items-center gap-1 rounded-2xl px-2 py-2 text-[11px] font-black text-slate-400"
+            onClick={() => setMobilePage('packs')}
+            className={getMobileNavClass('packs')}
           >
             <PackageOpen className="h-5 w-5" />
             Packs
@@ -1798,8 +2120,10 @@ function PlayerAdminDemoShell({
 
           <button
             type="button"
-            onClick={() => document.getElementById('auction')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
-            className="flex flex-col items-center gap-1 rounded-2xl px-2 py-2 text-[11px] font-black text-yellow-300"
+            onClick={() => setMobilePage('auction')}
+            className={`flex flex-col items-center gap-1 rounded-2xl px-2 py-2 text-[11px] font-black transition ${
+              mobilePage === 'auction' ? 'text-yellow-300' : 'text-slate-400'
+            }`}
           >
             <Gavel className="h-5 w-5" />
             Auction
@@ -1807,8 +2131,10 @@ function PlayerAdminDemoShell({
 
           <button
             type="button"
-            onClick={() => document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
-            className="flex flex-col items-center gap-1 rounded-2xl px-2 py-2 text-[11px] font-black text-slate-400"
+            onClick={() => setMobilePage('rewards')}
+            className={`flex flex-col items-center gap-1 rounded-2xl px-2 py-2 text-[11px] font-black transition ${
+              mobilePage === 'rewards' ? 'text-purple-300' : 'text-slate-400'
+            }`}
           >
             <Gift className="h-5 w-5" />
             Rewards
@@ -1816,8 +2142,10 @@ function PlayerAdminDemoShell({
 
           <button
             type="button"
-            onClick={() => setIsPlayerWalletOpen(true)}
-            className="flex flex-col items-center gap-1 rounded-2xl px-2 py-2 text-[11px] font-black text-slate-400"
+            onClick={() => setMobilePage('account')}
+            className={`flex flex-col items-center gap-1 rounded-2xl px-2 py-2 text-[11px] font-black transition ${
+              mobilePage === 'account' ? 'text-emerald-300' : 'text-slate-400'
+            }`}
           >
             <UserCircle className="h-5 w-5" />
             Account
