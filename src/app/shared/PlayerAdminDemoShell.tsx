@@ -1738,7 +1738,26 @@ function PlayerAdminDemoShell({
     })
   }, [playerVisiblePacks, selectedCategory, selectedPackUniverse])
 
+  const closeMobileOverlays = () => {
+    setActivePack(null)
+    setActiveModal(null)
+    setIsTopUpOpen(false)
+    setIsVaultOpen(false)
+    setIsTransactionOpen(false)
+    setIsPlayerWalletOpen(false)
+    setIsShippingCenterOpen(false)
+    setIsProfileSettingsOpen(false)
+    setIsAccountLanguageOpen(false)
+    setIsTermPolicyOpen(false)
+    setIsAboutUsOpen(false)
+    setIsDailyLoginOpen(false)
+    setSellBackTarget(null)
+    setShippingTarget(null)
+    setListForSaleTarget(null)
+  }
+
   const changeMobilePage = (page: MobilePage) => {
+    closeMobileOverlays()
     setMobilePage(page)
 
     if (typeof window !== 'undefined') {
