@@ -74,6 +74,7 @@ class TcgAudioManager {
   private enabled = false
   private activeBgm: Howl | null = null
   private activeBgmName: BgmName | null = null
+  private desiredBgmName: BgmName = 'lobby'
   private bgmHowls = new Map<BgmName, Howl>()
   private sfxHowls = new Map<SfxName, Howl>()
   private lastSfxPlayedAt = new Map<SfxName, number>()
@@ -162,13 +163,14 @@ class TcgAudioManager {
     this.enabled = false
     this.activeBgm = null
     this.activeBgmName = null
+    this.desiredBgmName = 'lobby'
     this.lastSfxPlayedAt.clear()
   }
 
   async enableWithSound() {
     this.setEnabled(true)
     this.unlockHowler()
-    this.preloadAll()
+    void this.warmUpSfx()
     await this.playBgm('lobby')
     this.playSfx('success', { throttleMs: 0, volume: 0.82 })
   }
@@ -200,7 +202,7 @@ class TcgAudioManager {
       src: [bgmSources[name]],
       loop: true,
       html5: true,
-      preload: true,
+      preload: false,
       volume: this.getBgmVolume(),
     })
 
@@ -229,7 +231,6 @@ class TcgAudioManager {
   preloadAll() {
     if (!isBrowser()) return
 
-    this.getBgmHowl('lobby')
     ;(Object.keys(sfxSources) as SfxName[]).forEach((name) => {
       this.getSfxHowl(name)
     })
@@ -243,14 +244,21 @@ class TcgAudioManager {
   }
 
   stopBgm() {
-    if (!this.activeBgm) return
+    this.bgmHowls.forEach((sound) => {
+      try {
+        sound.stop()
+      } catch {
+        // Ignore browser audio stop failures.
+      }
+    })
 
-    this.activeBgm.stop()
     this.activeBgm = null
     this.activeBgmName = null
   }
 
   async playBgm(name: BgmName) {
+    this.desiredBgmName = name
+
     if (!isBrowser() || !this.enabled) return false
 
     this.unlockHowler()
@@ -284,17 +292,15 @@ class TcgAudioManager {
   ensureBgmLoop(name?: BgmName) {
     if (!isBrowser() || !this.enabled) return
 
-    const targetName = name ?? this.activeBgmName ?? 'lobby'
-    const bgm = this.getBgmHowl(targetName)
-    bgm.loop(true)
-    bgm.volume(this.getBgmVolume())
+    const targetName = name ?? this.desiredBgmName ?? this.activeBgmName ?? 'lobby'
 
-    this.activeBgm = bgm
-    this.activeBgmName = targetName
-
-    if (!bgm.playing()) {
+    if (this.activeBgmName !== targetName || !this.activeBgm?.playing()) {
       void this.playBgm(targetName)
+      return
     }
+
+    this.activeBgm.loop(true)
+    this.activeBgm.volume(this.getBgmVolume())
   }
 
   playSfx(name: SfxName, options?: { throttleMs?: number; volume?: number }) {

@@ -584,6 +584,9 @@ const loadPacks = () => {
       )
       const coverKey = storedPack.coverKey ?? fallbackPack?.coverKey ?? inferCoverKey(storedPack.name)
       const coverImageUrl = storedPack.coverImageUrl ?? fallbackPack?.coverImageUrl
+      const restoredCover = coverImageUrl?.trim()
+        ? getPackCover(coverKey, storedPack.name, coverImageUrl)
+        : fallbackPack?.cover ?? getPackCover(coverKey, storedPack.name, coverImageUrl)
 
       return {
         ...(fallbackPack ?? {
@@ -592,7 +595,7 @@ const loadPacks = () => {
           price: storedPack.price ?? '100 Points',
           glow: storedPack.glow ?? 'from-cyan-400 to-blue-600',
           badge: storedPack.badge ?? 'Admin Pack',
-          cover: getPackCover(coverKey, storedPack.name, coverImageUrl),
+          cover: restoredCover,
         }),
         name: storedPack.name,
         category: storedPack.category ?? fallbackPack?.category ?? 'Creator Drops',
@@ -602,7 +605,7 @@ const loadPacks = () => {
         remaining: formatPackRemaining(remainingQuantity, totalQuantity),
         badge: storedPack.badge ?? fallbackPack?.badge ?? 'Admin Pack',
         glow: storedPack.glow ?? fallbackPack?.glow ?? 'from-cyan-400 to-blue-600',
-        cover: getPackCover(coverKey, storedPack.name, coverImageUrl),
+        cover: restoredCover,
         coverKey,
         coverImageUrl,
         adminStatus: storedPack.adminStatus ?? fallbackPack?.adminStatus ?? 'Active',

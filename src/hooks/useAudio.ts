@@ -18,7 +18,7 @@ export default function useAudio() {
 
       const unlockAudio = () => {
         void audioManager.warmUpSfx()
-        void audioManager.playBgm('lobby')
+        audioManager.ensureBgmLoop()
       }
 
       window.addEventListener('pointerdown', unlockAudio, { once: true })
@@ -41,21 +41,19 @@ export default function useAudio() {
 
   useEffect(() => {
     const keepBgmLooping = () => {
+      if (document.visibilityState === 'hidden') return
+
       audioManager.ensureBgmLoop()
     }
 
     document.addEventListener('visibilitychange', keepBgmLooping)
     window.addEventListener('focus', keepBgmLooping)
     window.addEventListener('pageshow', keepBgmLooping)
-    window.addEventListener('pointerdown', keepBgmLooping)
-    window.addEventListener('touchstart', keepBgmLooping)
 
     return () => {
       document.removeEventListener('visibilitychange', keepBgmLooping)
       window.removeEventListener('focus', keepBgmLooping)
       window.removeEventListener('pageshow', keepBgmLooping)
-      window.removeEventListener('pointerdown', keepBgmLooping)
-      window.removeEventListener('touchstart', keepBgmLooping)
     }
   }, [])
 
