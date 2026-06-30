@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
 import {
   CheckCircle2,
   Crown,
@@ -227,7 +226,7 @@ export default function QuestLeaderboardPanel({
 
   const renderQuestMissionCards = () => (
     <div className="grid gap-2 sm:grid-cols-2 sm:gap-3">
-      {questDefinitions.map((quest, index) => {
+      {questDefinitions.map((quest) => {
         const progress = clampProgress(quest.current, quest.target);
         const progressPercent = Math.round((progress / quest.target) * 100);
         const isCompleted = quest.current >= quest.target;
@@ -235,13 +234,9 @@ export default function QuestLeaderboardPanel({
         const Icon = quest.icon;
 
         return (
-          <motion.article
+          <article
             key={quest.id}
             className="hud-card hud-corners flex min-h-[102px] flex-col rounded-[1.15rem] p-3 sm:min-h-[118px] sm:rounded-[1.25rem]"
-            initial={{ opacity: 0, y: 12 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: index * 0.025 }}
           >
             <div className="flex items-start gap-3">
               <div
@@ -309,7 +304,7 @@ export default function QuestLeaderboardPanel({
                 {isClaimed ? t.done : isCompleted ? t.claim : t.locked}
               </button>
             </div>
-          </motion.article>
+          </article>
         );
       })}
     </div>
@@ -326,11 +321,8 @@ export default function QuestLeaderboardPanel({
       </div>
 
       <div className="grid items-stretch gap-6 xl:grid-cols-[1.02fr_0.98fr]">
-        <motion.div
+        <div
           className="h-full"
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
         >
           <div className="relative flex h-full flex-col overflow-hidden rounded-[1.5rem] border border-white/20 bg-gradient-to-br from-white/20 via-white/10 to-white/[0.03] p-4 shadow-[0_28px_80px_rgba(0,0,0,0.28)] sm:rounded-[2rem] sm:p-6">
             <div className="relative z-10">
@@ -472,13 +464,10 @@ export default function QuestLeaderboardPanel({
               </div>
             </div>
           </div>
-        </motion.div>
+        </div>
 
-        <motion.div
+        <div
           className="hud-panel hud-corners h-full rounded-[1.5rem] p-4 sm:rounded-[2rem] sm:p-6"
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
         >
           <div className="mb-5 flex items-center justify-between gap-4">
             <div>
@@ -522,21 +511,18 @@ export default function QuestLeaderboardPanel({
           </div>
 
           {renderQuestMissionCards()}
-        </motion.div>
+        </div>
       </div>
 
-      <motion.div
+      <div
         className="mt-6"
-        initial={{ opacity: 0, y: 24 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
       >
         <MonthlyLeaderboardSection
           language={language}
           currentPlayerScore={currentPlayerScore}
           transactionCount={transactions.length}
         />
-      </motion.div>
+      </div>
     </section>
   );
 }

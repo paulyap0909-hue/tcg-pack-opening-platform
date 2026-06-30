@@ -1,4 +1,3 @@
-import { motion } from 'framer-motion'
 import {
   CalendarDays,
   Gift,
@@ -154,11 +153,8 @@ export default function RaffleCenterPanel({
 
   return (
     <section className="mx-auto w-full max-w-7xl px-4 py-4 sm:px-5 sm:py-8 lg:px-8">
-      <motion.div
+      <div
         className="rounded-[1.45rem] border border-cyan-300/18 bg-[#061120]/94 p-4 shadow-[0_22px_70px_rgba(0,0,0,0.28)] sm:rounded-[2rem] sm:p-6"
-        initial={{ opacity: 0, y: 24 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
       >
         <div className="mb-4 flex items-start justify-between gap-3">
           <div className="min-w-0">
@@ -424,7 +420,7 @@ export default function RaffleCenterPanel({
             </div>
           </div>
         )}
-      </motion.div>
+      </div>
     </section>
   )
 }
