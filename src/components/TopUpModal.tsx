@@ -9,76 +9,21 @@ import {
   Zap,
 } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
-import { translations, type AppLanguage } from '../lib/i18n'
+import { translations, type AppLanguage, type Translation } from '../lib/i18n'
+import { createStripeTopUpCheckoutSession } from '../lib/paymentClient'
+import {
+  DEFAULT_TOP_UP_PACKAGE_ID,
+  TOP_UP_PACKAGES,
+  type TopUpPackage,
+  type TopUpPackageId,
+} from '../lib/topUpPackages'
 
 type TopUpModalProps = {
   isOpen: boolean
   language: AppLanguage
   onClose: () => void
-  onTopUp: (points: number) => void
+  onTopUp?: (points: number) => void
 }
-
-type TopUpPackage = {
-  id: string
-  label: string
-  price: string
-  points: number
-  bonus: number
-  icon: 'gem' | 'spark' | 'wallet' | 'zap'
-  popular?: boolean
-}
-
-const topUpPackages: TopUpPackage[] = [
-  {
-    id: 'starter',
-    label: 'Starter',
-    price: 'RM10',
-    points: 300,
-    bonus: 30,
-    icon: 'gem',
-  },
-  {
-    id: 'open10',
-    label: 'Open 10',
-    price: 'RM50',
-    points: 1500,
-    bonus: 150,
-    icon: 'spark',
-    popular: true,
-  },
-  {
-    id: 'chase',
-    label: 'Chase',
-    price: 'RM200',
-    points: 6000,
-    bonus: 600,
-    icon: 'wallet',
-  },
-  {
-    id: 'highroller',
-    label: 'High Roller',
-    price: 'RM800',
-    points: 24000,
-    bonus: 2400,
-    icon: 'zap',
-  },
-  {
-    id: 'vault',
-    label: 'Vault',
-    price: 'RM2000',
-    points: 60000,
-    bonus: 6000,
-    icon: 'wallet',
-  },
-  {
-    id: 'legend',
-    label: 'Legend',
-    price: 'RM5000',
-    points: 150000,
-    bonus: 15000,
-    icon: 'spark',
-  },
-]
 
 const packageIconMap = {
   gem: Gem,
@@ -88,27 +33,41 @@ const packageIconMap = {
 }
 
 const formatPoints = (value: number) => value.toLocaleString()
+const formatPrice = (value: number) => `RM${value.toLocaleString()}`
+
+const getPackageLabel = (topUpPackage: TopUpPackage, t: Translation) => {
+  return t[topUpPackage.labelKey]
+}
+
+const getBadgeLabel = (topUpPackage: TopUpPackage, t: Translation) => {
+  if (!topUpPackage.badgeKey) return null
+
+  return t[topUpPackage.badgeKey]
+}
 
 export default function TopUpModal({
   isOpen,
   language,
   onClose,
-  onTopUp,
 }: TopUpModalProps) {
   const t = translations[language]
-  const [selectedPackageId, setSelectedPackageId] = useState('open10')
+  const [selectedPackageId, setSelectedPackageId] =
+    useState<TopUpPackageId>(DEFAULT_TOP_UP_PACKAGE_ID)
+  const [isRedirecting, setIsRedirecting] = useState(false)
+  const [checkoutError, setCheckoutError] = useState('')
 
   const selectedPackage = useMemo(() => {
     return (
-      topUpPackages.find((item) => item.id === selectedPackageId) ??
-      topUpPackages[0]
+      TOP_UP_PACKAGES.find((item) => item.id === selectedPackageId) ??
+      TOP_UP_PACKAGES[0]
     )
   }, [selectedPackageId])
 
-  const totalPoints = selectedPackage.points + selectedPackage.bonus
-
   useEffect(() => {
     if (!isOpen) return
+
+    setCheckoutError('')
+    setIsRedirecting(false)
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') onClose()
@@ -123,9 +82,20 @@ export default function TopUpModal({
     }
   }, [isOpen, onClose])
 
-  const handleConfirm = () => {
-    onTopUp(totalPoints)
-    onClose()
+  const handleConfirm = async () => {
+    if (isRedirecting) return
+
+    try {
+      setCheckoutError('')
+      setIsRedirecting(true)
+
+      const checkoutUrl = await createStripeTopUpCheckoutSession(selectedPackage.id)
+      window.location.href = checkoutUrl
+    } catch (error) {
+      console.error(error)
+      setCheckoutError(t.stripeTopUpError)
+      setIsRedirecting(false)
+    }
   }
 
   return (
@@ -171,42 +141,51 @@ export default function TopUpModal({
                 </p>
               </div>
 
-              <div className="mt-5 grid grid-cols-3 gap-2">
-                {topUpPackages.map((item) => {
+              <div className="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-3">
+                {TOP_UP_PACKAGES.map((item) => {
                   const isSelected = item.id === selectedPackageId
                   const Icon = packageIconMap[item.icon]
+                  const badgeLabel = getBadgeLabel(item, t)
 
                   return (
                     <button
                       key={item.id}
                       type="button"
                       onClick={() => setSelectedPackageId(item.id)}
-                      className={`relative min-h-[128px] rounded-2xl border p-2.5 text-center transition active:scale-95 ${
+                      className={`relative min-h-[134px] rounded-2xl border p-2.5 text-center transition active:scale-95 ${
                         isSelected
                           ? 'border-orange-200 bg-orange-300/16 shadow-[0_0_32px_rgba(249,115,22,0.22)]'
                           : 'border-orange-200/28 bg-white/[0.045]'
                       }`}
                     >
-                      {item.popular && (
-                        <span className="absolute -top-2 left-1/2 -translate-x-1/2 rounded-full bg-orange-400 px-2 py-0.5 text-[8px] font-black uppercase tracking-[0.16em] text-black">
-                          {t.hot}
+                      {badgeLabel && (
+                        <span className="absolute -top-2 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-orange-400 px-2 py-0.5 text-[8px] font-black uppercase tracking-[0.12em] text-black">
+                          {badgeLabel}
                         </span>
                       )}
 
-                      <div className="mx-auto flex h-11 w-11 items-center justify-center rounded-2xl border border-orange-200/20 bg-black/25">
+                      <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-2xl border border-orange-200/20 bg-black/25">
                         <Icon className="h-5 w-5 text-orange-200" />
                       </div>
 
-                      <p className="mt-2 text-xl font-black text-orange-300">
+                      <p className="mt-1.5 text-[11px] font-black text-white">
+                        {getPackageLabel(item, t)}
+                      </p>
+
+                      <p className="mt-1 text-xl font-black text-orange-300">
                         {formatPoints(item.points)}
                       </p>
 
                       <p className="mt-1 rounded-full border border-orange-200/18 bg-orange-200/8 px-1 py-0.5 text-[10px] font-black text-orange-100/85">
-                        +{formatPoints(item.bonus)} {t.bonus}
+                        {item.bonusPoints > 0
+                          ? `+${formatPoints(item.bonusPoints)} ${t.bonus}`
+                          : item.bonusPoints === 0
+                            ? t.receive
+                            : t.selectPackage}
                       </p>
 
                       <p className="mt-2 text-sm font-black text-white">
-                        {item.price}
+                        {formatPrice(item.amountMyr)}
                       </p>
                     </button>
                   )
@@ -231,7 +210,7 @@ export default function TopUpModal({
                       {t.selectedPackage}
                     </p>
                     <p className="mt-1 text-lg font-black text-white">
-                      {selectedPackage.label} · {selectedPackage.price}
+                      {getPackageLabel(selectedPackage, t)} · {formatPrice(selectedPackage.amountMyr)}
                     </p>
                   </div>
 
@@ -240,15 +219,21 @@ export default function TopUpModal({
                       {t.receive}
                     </p>
                     <p className="mt-1 text-lg font-black text-orange-200">
-                      {formatPoints(totalPoints)}
+                      {formatPoints(selectedPackage.points)}
                     </p>
                   </div>
                 </div>
 
                 <div className="mt-3 rounded-xl border border-emerald-300/18 bg-emerald-300/10 px-3 py-2 text-xs font-black text-emerald-200">
                   <CheckCircle2 className="mr-1 inline h-4 w-4" />
-                  {t.demoTopUpNotice}
+                  {t.stripeCheckoutNotice}
                 </div>
+
+                {checkoutError && (
+                  <div className="mt-3 rounded-xl border border-rose-300/20 bg-rose-300/10 px-3 py-2 text-xs font-black text-rose-200">
+                    {checkoutError}
+                  </div>
+                )}
               </div>
             </div>
 
@@ -256,11 +241,16 @@ export default function TopUpModal({
               <button
                 type="button"
                 data-audio-silent="true"
+                disabled={isRedirecting}
                 onClick={handleConfirm}
-                className="flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-orange-500 via-orange-400 to-yellow-300 px-5 py-4 text-sm font-black uppercase tracking-[0.12em] text-black shadow-[0_16px_38px_rgba(249,115,22,0.32)]"
+                className={`flex w-full items-center justify-center gap-2 rounded-full px-5 py-4 text-sm font-black uppercase tracking-[0.12em] text-black shadow-[0_16px_38px_rgba(249,115,22,0.32)] transition ${
+                  isRedirecting
+                    ? 'cursor-wait bg-slate-500 text-slate-900'
+                    : 'bg-gradient-to-r from-orange-500 via-orange-400 to-yellow-300'
+                }`}
               >
                 <CreditCard className="h-5 w-5" />
-                {t.selectPackage}
+                {isRedirecting ? t.redirectingToStripe : t.continueToStripe}
               </button>
 
               <p className="mt-2 text-center text-[10px] text-orange-100/45">
