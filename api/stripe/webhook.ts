@@ -1,12 +1,27 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
+import { createClient } from '@supabase/supabase-js'
 import Stripe from 'stripe'
-
-import { getSupabaseAdmin } from '../_lib/supabaseAdmin'
 
 export const config = {
   api: {
     bodyParser: false,
   },
+}
+
+const getSupabaseAdmin = () => {
+  const supabaseUrl = process.env.SUPABASE_URL
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+
+  if (!supabaseUrl || !serviceRoleKey) {
+    throw new Error('Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY.')
+  }
+
+  return createClient(supabaseUrl, serviceRoleKey, {
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false,
+    },
+  })
 }
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? '', {
@@ -99,16 +114,14 @@ async function creditWalletFromCheckoutSession(session: Stripe.Checkout.Session)
     throw walletUpdateError
   }
 
-  const { error: transactionError } = await supabase
-    .from('wallet_transactions')
-    .insert({
-      user_id: userId,
-      type: 'topup',
-      amount_points: points,
-      balance_after: nextBalance,
-      payment_order_id: paymentOrder.id,
-      description: `Stripe top up · ${points.toLocaleString()} points`,
-    })
+  const { error: transactionError } = await supabase.from('wallet_transactions').insert({
+    user_id: userId,
+    type: 'topup',
+    amount_points: points,
+    balance_after: nextBalance,
+    payment_order_id: paymentOrder.id,
+    description: `Stripe top up · ${points.toLocaleString()} points`,
+  })
 
   if (transactionError) {
     throw transactionError

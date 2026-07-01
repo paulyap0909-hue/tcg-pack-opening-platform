@@ -1,8 +1,96 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
+import { createClient } from '@supabase/supabase-js'
 import Stripe from 'stripe'
 
-import { getSupabaseAdmin, getDemoUserId } from '../_lib/supabaseAdmin'
-import { getTopUpPackage } from '../_lib/topUpPackages'
+type TopUpPackageId =
+  | 'starter_spark'
+  | 'rookie_pack'
+  | 'hunter_pack'
+  | 'elite_pack'
+  | 'master_pack'
+  | 'whale_vault'
+
+type TopUpPackage = {
+  id: TopUpPackageId
+  label: string
+  amountMyr: number
+  amountCents: number
+  points: number
+}
+
+const TOP_UP_PACKAGES: TopUpPackage[] = [
+  {
+    id: 'starter_spark',
+    label: 'Starter Spark',
+    amountMyr: 5,
+    amountCents: 500,
+    points: 450,
+  },
+  {
+    id: 'rookie_pack',
+    label: 'Rookie Pack',
+    amountMyr: 10,
+    amountCents: 1000,
+    points: 1000,
+  },
+  {
+    id: 'hunter_pack',
+    label: 'Hunter Pack',
+    amountMyr: 30,
+    amountCents: 3000,
+    points: 3300,
+  },
+  {
+    id: 'elite_pack',
+    label: 'Elite Pack',
+    amountMyr: 50,
+    amountCents: 5000,
+    points: 5800,
+  },
+  {
+    id: 'master_pack',
+    label: 'Master Pack',
+    amountMyr: 100,
+    amountCents: 10000,
+    points: 12000,
+  },
+  {
+    id: 'whale_vault',
+    label: 'Whale Vault',
+    amountMyr: 200,
+    amountCents: 20000,
+    points: 26000,
+  },
+]
+
+const getTopUpPackage = (packageId: string) =>
+  TOP_UP_PACKAGES.find((topUpPackage) => topUpPackage.id === packageId)
+
+const getSupabaseAdmin = () => {
+  const supabaseUrl = process.env.SUPABASE_URL
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+
+  if (!supabaseUrl || !serviceRoleKey) {
+    throw new Error('Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY.')
+  }
+
+  return createClient(supabaseUrl, serviceRoleKey, {
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false,
+    },
+  })
+}
+
+const getDemoUserId = () => {
+  const demoUserId = process.env.DEMO_USER_ID
+
+  if (!demoUserId) {
+    throw new Error('Missing DEMO_USER_ID. Replace demo mode with Supabase Auth before production.')
+  }
+
+  return demoUserId
+}
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? '', {
   apiVersion: '2024-06-20',
