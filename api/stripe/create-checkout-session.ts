@@ -93,7 +93,7 @@ const getDemoUserId = () => {
 }
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? '', {
-  apiVersion: '2024-06-20',
+  apiVersion: '2026-06-24.dahlia',
 })
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
